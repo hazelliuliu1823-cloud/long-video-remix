@@ -32,11 +32,13 @@ Source footage
       │
       ▼
 ① BROAD STRUCTURE
-全量粗覆盖：场景、对白、人物、事件、关系变化、可见动作、未确认区域
+全量粗覆盖：抽样帧、对白、场景、人物、事件、关系变化、未确认区域
       │
+      ├─ Frame Observation Index
+      │  每张已分析抽样帧的结构化观察表
       ▼
 Content Map
-可检索、可回查的素材地图
+由逐帧观察、scene、overview 汇总出的可检索素材地图
       │
       ▼
 ② DIRECT  ← 人 / brainstorming / Director
@@ -46,7 +48,9 @@ Brief + Rough Editorial Plan
       ▼
 ③ DIRECTED DEEP STRUCTURE
 带着 rough plan 回到原素材
-提高抽样与观察密度、补前后文、核听原声、形成更细 unit / protected ranges
+提高抽样与观察密度，形成 Deep Observation Index：
+完整画面描述 / 内容描述 / 场景与叙事背景 / 前后状态 / 原声核听 / 反证
+再收敛为更细 unit / protected ranges
       │
       ├── 证据不足或原计划不成立 ──→ 返回 Direct 调整 rough plan
       │
@@ -71,6 +75,7 @@ Broad Structure 允许在还没有明确选题时启动。典型产物包括：
 
 - 源素材与版本登记；
 - 全时段画面抽样与字幕 / 转写覆盖；
+- **Frame Observation Index**：把每张已分析抽样帧的可见事实、人物、动作 / 状态、表情 / 视线、空间关系、环境背景、关键物件、可见文字、邻近对白、内容说明、interpretations 与 unknowns 结构化成表；
 - scene 级事件结构；
 - 可回查的对白、人物、地点和动作证据；
 - source-order overview；
@@ -79,6 +84,14 @@ Broad Structure 允许在还没有明确选题时启动。典型产物包括：
 - coverage 与 unknowns，明确哪些地方只是抽样、哪些已经连续音画核实。
 
 Structure 的目标不是“总结剧情”，而是把原本难以浏览的长视频变成一个**人和模型都能重新检索、组合和回查的素材空间**。
+
+因此 Broad Structure 的正式交付不是“九宫格 + 一个总结”，而是三层：
+
+1. **Raw evidence**：抽样单帧、九宫格、字幕 / ASR、原始定位；
+2. **Structured observation layer**：`frames.jsonl` + 人可读的 `frame-observations.csv` + scene cards / `overview.md`；
+3. **Creative navigation layer**：`content-map.md`，供人、Director 或其他 Skill 在更完整的信息面上形成 rough plan。
+
+这里的逐帧指 **each analyzed / sampled frame**，不是声称对 25/30fps 的每一个视频帧都做了语义分析。
 
 `deliverable=content_map` 时，可以在这一阶段正式结束，不必进入剪辑。
 
@@ -118,14 +131,16 @@ rough plan 不需要已经精确到时间码。它只需要把创意结构说清
 
 第一次 Content Map 不应该为了某个主题把所有区域都扫描到帧级；那会非常昂贵，也会让 Structure 变成提前押题。
 
-有了 rough plan 后，系统才知道应该在哪些区域增加信息密度，例如：
+有了 rough plan 后，系统才知道应该在哪些区域增加信息密度。第二轮仍然先做**完整素材理解**，再做剪辑判断，而不是找到候选后马上标切点。典型动作包括：
 
 - 从十秒级概览抽样提高到一秒一至两张或连续播放；
-- 从字幕关键词回到整段对话核听；
-- 从单个场景扩到前后十五至三十秒，必要时继续扩到完整事件；
-- 核对说话人、被说话人、否定、条件、停顿和动作后果；
-- 形成 unit、context_ranges、protected_ranges；
-- 检查 rough plan 的反证、缺口和错误因果。
+- 对选中的核心区域建立 **Deep Observation Index**，记录完整画面描述：人物、站位 / 朝向、动作链、表情 / 视线、人物间距离、关键物件、景别 / 构图和画面变化；
+- 补充**内容描述**：这一小段实际发生了什么，而不是只抄关键词或台词；
+- 补充**场景背景与叙事背景**：地点 / 时间 / 环境、前一事件、为什么会来到这一刻；
+- 从字幕关键词回到整段对话核听，记录说话人、对象、语气、停顿、环境声 / 音乐和 audio_verified；
+- 从单个场景扩到前后十五至三十秒，必要时继续扩到完整事件，记录 before_state / after_state；
+- facts、interpretations、unknowns 分开，并检查 rough plan 的反证、缺口、错误因果和时空关系；
+- 最后才把已充分理解的核心区域收敛为 unit、context_ranges、protected_ranges 和可执行剪辑判断。
 
 如果证据与 rough plan 冲突，工具应报告问题并把需要调整的节点返回 Direct，而不是用剪辑技巧强行证明原方案。
 
@@ -151,10 +166,13 @@ rough plan 不需要已经精确到时间码。它只需要把创意结构说清
 ```text
 long-video-remix/
 ├── README.md
+├── CHANGELOG.md
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
 ├── assets/
+│   ├── frame-observation-template.csv
+│   ├── deep-observation-template.csv
 │   ├── content-map-template.md
 │   ├── brief-template.md
 │   ├── editorial-plan-template.md
@@ -180,8 +198,8 @@ long-video-remix/
 
 1. 复制 `assets/project-template.json` 为项目目录中的 `project.json`；
 2. 登记 sources 和实际可用工具；
-3. 完成 Broad Structure；
-4. 可参考 `assets/content-map-template.md` 生成 `overview.md`、`content-map.md`、scenes / transcript / coverage 等证据文件；
+3. 完成 Broad Structure，并同时保留 `frames.jsonl` 与人可读的 `frame-observations.csv`（可复制 `assets/frame-observation-template.csv`）；
+4. 在逐抽样帧观察之上形成 scene / `overview.md` / `content-map.md`，可参考 `assets/content-map-template.md`；
 5. 将 `project.deliverable` 设为 `content_map` 即可在这里交付。
 
 ### 做完整 Remix
@@ -189,8 +207,8 @@ long-video-remix/
 1. 先完成 Broad Structure 和 Content Map；
 2. 由人 / Director 基于 Content Map 形成 brief 和 rough editorial plan；
 3. 把 rough plan 接回项目；
-4. 对计划涉及的区域进行 Directed Deep Structure；
-5. 证据充分后形成 edit plan 和 timeline；
+4. 对计划涉及的区域进行 Directed Deep Structure，并生成 `deep-observations.csv`（可复制 `assets/deep-observation-template.csv`），把核心区域的画面、内容、背景、前后状态和原声证据补全；
+5. 再把已充分理解的核心区域收敛为 verified units / protected ranges，证据充分后形成 edit plan 和 timeline；
 6. 运行：
 
 ```text

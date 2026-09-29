@@ -58,7 +58,12 @@ G QA & Handoff
 
 九宫格是展示方式，不等于分析时间单位。每格保留 frame_id、source_id、真实取帧时间；从左至右、从上至下按时间排序。跨场景清楚标记。保留原分辨率单帧；文字或表情看不清就读取单帧或放大，不能凭缩略图补写。
 
-每张已分析抽样帧记录可见事实、可见文字、遮挡与未知。相邻帧间的动作只能作为待核实假设。请求“逐帧文档”时说明这里是逐抽样帧记录，并列抽样规则，不声称看过每个视频帧。
+每张已分析抽样帧都要留下两层记录：
+
+1. `frames.jsonl`：机器可追溯证据，保留 frame_id、真实时间、image_ref、facts、unknowns；
+2. `frame-observations.csv`：面向人工 / Director / 其他 Skill 的结构化观察表。除定位外，至少覆盖 characters、visual_facts、visible_action_state、expression_gaze、spatial_relationship、setting_background、key_objects、visible_text、nearby_dialogue_refs、content_description、interpretations、unknowns。可复制 `assets/frame-observation-template.csv`。
+
+这张表不是九宫格的重复说明，而是把“每一张已看过的抽样帧里真正有什么”变成人可浏览的中间层。相邻帧间的动作只能作为待核实假设。请求“逐帧文档”时说明这里是逐抽样帧记录，并列抽样规则，不声称看过每个视频帧。
 
 机器检测的镜头切换先作为技术边界。同一轮正反打通常仍属于一个场景；闪白、运镜和灯光变化可能需要人工复核。保留检测原结果及调整结果，不用算法切点直接决定叙事单元。
 
@@ -72,7 +77,7 @@ Broad Structure 的完成条件不是“已经知道该剪什么”，而是：�
 
 将跨批次同一对话合并。用 source_id、区间和证据 ID 去重；不要因重叠读取把同一个动作算成发生两次。
 
-`overview.md` 保留 source-order 导航：事件顺序、关系变化、重复线索、未确认事项，每一项链接 scene_id。它不能替代台词原文、逐抽样帧记录和场景卡。
+`overview.md` 保留 source-order 导航：事件顺序、关系变化、重复线索、未确认事项，每一项链接 scene_id。它不能替代台词原文、`frames.jsonl`、`frame-observations.csv` 和场景卡。Content Map 中的重要线索应能继续下钻回 scene，再下钻到具体 frame / utterance / review，而不是只剩摘要。
 
 同时生成 `content-map.md`。它面向后续人工 / Director，不按源时间顺序机械罗列，而是在不丢证据链接的前提下提供可横向浏览的素材面，例如：
 
@@ -115,14 +120,22 @@ rough plan 至少应让后续系统知道：
 
 这是第二轮 Structure，也是从“rough plan”进入“可剪方案”的关键步骤。
 
-对 editorial plan 中每个节点重新回到原素材，不仅复用第一轮摘要。先读取对应 scene / unit / transcript / frames，再提高信息密度：
+对 editorial plan 中每个节点重新回到原素材，不仅复用第一轮摘要。先读取对应 scene / unit / transcript / frames / frame-observations，再提高信息密度。第二轮的顺序是**先重新把核心区域看完整，再决定怎么剪**：
 
 - 相关片段从前后各十五至三十秒开始扩查；指代、条件、人物动机或动作因果仍不清楚时继续扩到完整事件，必要时追溯前后场景或前集；
 - 候选段可从每秒一至两张抽帧开始，但动作起止、反应链、停顿和声音关系必须用连续播放或等价能力确认；
-- 字幕 / ASR 命中必须回到原声核听；
-- 逐一核对说话人、被说话人、否定词、条件、重要停顿、动作发起与回应、动作后果；
+- 建立 `deep-observations.csv`（可复制 `assets/deep-observation-template.csv`），每个核心观察区间至少补齐：
+  - **visual_facts**：人物、站位 / 朝向、动作、表情 / 视线、人物距离、关键物件、景别 / 构图、画面变化；
+  - **setting_context**：地点、可确认时间、环境与空间状态；
+  - **narrative_context**：前一个事件是什么、为什么来到这一刻、它与前后事件怎样连接；
+  - **content_description**：这一小段实际发生了什么，不能只复制字幕关键词；
+  - **dialogue_audio**：原声对白、说话人、对象、语气、停顿、环境声 / 音乐及核听状态；
+  - **before_state / after_state**：进入和离开这一段时人物 / 事件状态；
+  - **interpretations / unknowns / counterevidence**：把事实、解读和不确定性分开；
+  - **plan_node_id / narrative_function**：这一段为什么被回查、准备承担什么功能，但该字段不能反过来污染事实描述。
+- 字幕 / ASR 命中必须回到原声核听；逐一核对说话人、被说话人、否定词、条件、重要停顿、动作发起与回应、动作后果；
 - 检查 rough plan 可能忽略的反证、玩笑语境、时间差、关系阶段和异场反应；
-- 把第一轮粗 unit 收敛为可剪 unit，确认 context_ranges、protected_ranges、isolated_use_risk 和 verification；
+- 在上述内容理解完成后，再把第一轮粗 unit 收敛为可剪 unit，确认 context_ranges、protected_ranges、isolated_use_risk 和 verification；
 - 为接续关系准备连续性、比较、倒叙、章节变化等依据。
 
 记录审阅者身份或能力来源、时间范围和结果。只有文件实际被读取不等于被看懂；音频抽取成功也不等于原声已核听。不能处理音频或连续视频时，请有能力的工具或用户核查；同时继续可做的索引和草案。

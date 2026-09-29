@@ -46,6 +46,8 @@
   "structure_state": {
     "broad_pass": "pending",
     "content_map": "pending",
-    "directed_deep_pass": "pending"
+    "directed_deep_pass": "pending",
+    "frame_observations": "pending",
+    "deep_observations": "pending"
   }
 }

@@ -5,7 +5,7 @@ description: 从三到五小时或多集影视、活动视频中建立可回查�
 
 # 长视频结构化与混剪执行
 
-版本 1.2 · 2026年9月29日
+公开仓库版本 v1.0.1 · 2026年9月29日
 
 本 Skill 的核心不是“一句话自动生成成片”，而是把长素材先整理成有来源、可检索、可回查的内容空间，再把人工或独立编导形成的 rough plan 可靠地压回原素材证据，并落实成真正可执行的剪辑方案。
 
@@ -63,10 +63,10 @@ Execute
 | 阶段 | 执行动作 | 产物 | 进入下一步的条件 |
 |---|---|---|---|
 | A 素材登记 | 确认版本、时长、时间基准、字幕匹配、能力与配置 | project、sources、capability-map | 能把后续证据定位回原素材；否则只做准备 |
-| B Broad Structure | 全时段粗扫画面和台词，记录无声段及未覆盖区域 | frames、transcript、coverage | 可识别覆盖与缺口；不冒称已完整观看 |
-| C Content Map | 合并镜头为事件，建立 scene / 初步 unit、source-order overview 和跨场景内容地图 | scenes、units、overview、content-map | 形成足够完整的素材面；若 deliverable=content_map 可在此正式交付 |
+| B Broad Structure | 全时段粗扫画面和台词；逐张记录已分析抽样帧的结构化观察，保留无声段及未覆盖区域 | frames、frame-observations、transcript、coverage | 可识别覆盖与缺口；人工 / Director 不必重新从九宫格猜内容 |
+| C Content Map | 在逐抽样帧观察之上合并镜头为事件，建立 scene / 初步 unit、source-order overview 和跨场景内容地图 | scenes、units、overview、content-map | 形成足够完整且可下钻回 frame observation 的素材面；若 deliverable=content_map 可在此正式交付 |
 | D Editorial Plan Intake | 接入由人 / brainstorming / Director 形成的 brief 与 rough editorial plan，明确已确认主线、段落功能、重点线索和禁改项 | brief、editorial-plan、plan mapping | 创意方向足以指导定向深挖；不要求已有精确切点 |
-| E Directed Deep Structure | 带着 rough plan 回到相关原素材，提高抽样 / 播放密度，补前后文、核听原声、查反证、确定保护范围和接续依据 | 已核实 units、reviews、protected_ranges、evidence gaps | 每个核心节点有足够音画与语境证据；不成立时退回 D 调整 |
+| E Directed Deep Structure | 带着 rough plan 回到相关原素材，提高抽样 / 播放密度；先补完整画面、内容、背景、前后状态与原声，再做剪辑判断 | deep-observations、已核实 units、reviews、protected_ranges、evidence gaps | 每个核心节点有足够音画、内容与语境证据；不成立时退回 D 调整 |
 | F Execute | 校准文字；编译叠化后的时间轴；分层渲染；生成全接点图表 | timeline、transitions、render-manifest、edit-plan、rough-cut | 实测帧数与时长；近静音窗口有记录，再继续音画实看 |
 | G QA & Handoff | 逐接点及全片复核，做 EVA，保存问题与缓存版本 | render-audit、接点图表、qa、handoff | 技术检查与人工观看分别记录，不以成功日志代替验收 |
 
@@ -77,6 +77,8 @@ Execute
 目标是**扩大可见范围**，不是提前替某个选题找证明。
 
 - 全时段建立基础画面与台词覆盖；
+- 对每张**已实际分析的抽样帧**建立结构化观察：可见人物、动作 / 状态、表情 / 视线、空间关系、环境背景、物件、可见文字、邻近对白、内容说明、interpretations 与 unknowns；
+- 同时保留机器可追溯的 `frames.jsonl` 与便于人工 / Director / 其他 Skill 阅读的 `frame-observations.csv`；
 - 场景、人物、事件、关系变化和无声互动都保留入口；
 - 形成 source-order overview 和跨场景 Content Map；
 - 明确抽样、字幕 / ASR、连续音画核实三种 coverage 的差别；
@@ -87,10 +89,11 @@ Execute
 目标是**把 rough plan 重新压回原片证据**。
 
 - 根据计划节点提高抽样密度或直接连续播放；
-- 从台词命中扩展到完整问答、动作链和必要前后文；
-- 核对说话人、指向、否定、条件、停顿、回应和动作后果；
-- 检查反证、误读风险和时空关系；
-- 把初步 unit 收敛为可剪 unit，并形成 protected_ranges；
+- 先建立 `deep-observations.csv`：完整记录人物与站位、镜头 / 构图、动作链、表情 / 视线、空间关系、场景环境、关键物件和画面变化；
+- 写清这一核心区域**实际发生了什么**，并补充 setting_context、narrative_context、before_state、after_state；
+- 从台词命中扩展到完整问答、动作链和必要前后文，核听说话人、对象、语气、否定、条件、停顿、环境声 / 音乐和动作后果；
+- facts、interpretations、unknowns 分开，检查反证、误读风险和时空关系；
+- 在完整理解之后，再把初步 unit 收敛为可剪 unit，并形成 context_ranges、protected_ranges 与 isolated_use_risk；
 - 如果原计划不成立，把具体问题返回 Direct，而不是直接替用户重写核心创意。
 
 ## 决策时读取
@@ -103,7 +106,7 @@ Execute
 - 交付前、移交另一模型：读取 [检查与交接](references/qa-handoff.md)。
 - 需要演示两轮 Structure、外部 Direct 和 Execute 的衔接：读取 [执行示例](references/worked-example.md)。示例均为虚构，不是当前素材。
 
-复制 `assets/project-template.json` 建立配置。需要 Direct 时，可复制 `assets/brief-template.md` 和 `assets/editorial-plan-template.md`，也可以直接接入用户已有的编导文档。复制 `assets/timeline-template.json` 建立时间轴。
+复制 `assets/project-template.json` 建立配置。Broad Structure 可复制 `assets/frame-observation-template.csv` 建立人可读逐抽样帧观察表；第二轮可复制 `assets/deep-observation-template.csv` 建立核心区域高密度观察表。需要 Direct 时，可复制 `assets/brief-template.md` 和 `assets/editorial-plan-template.md`，也可以直接接入用户已有的编导文档。复制 `assets/timeline-template.json` 建立时间轴。
 
 具备 Python 时运行 `scripts/validate_project.py 项目目录` 检查来源、时间和引用；不具备 Python 时按数据契约逐项核查，并写明为人工或模型静态检查。脚本不判断剧情真伪或观看流畅度。
 

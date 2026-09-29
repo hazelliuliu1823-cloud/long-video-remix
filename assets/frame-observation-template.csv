@@ -1,0 +1,2 @@
+source_id,episode,timestamp_ms,display_timecode,frame_id,sheet_id,cell_index,scene_id,characters,visual_facts,visible_action_state,expression_gaze,spatial_relationship,setting_background,key_objects,visible_text,nearby_dialogue_refs,content_description,interpretations,unknowns,evidence_ref,image_ref,coverage_status
+SRC001,,0,00:00:00.000,F001,,1,S001,,,,,,,,,,,,,frame:F001,,visual_sample

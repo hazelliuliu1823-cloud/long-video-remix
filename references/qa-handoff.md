@@ -58,7 +58,7 @@ qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_q
 未处理或低可信区间：
 关键决定及对应证据 ID：
 当前 brief / editorial plan 及来源：
-第二轮 Directed Deep Structure 已补查节点与证据缺口：
+第二轮 Directed Deep Structure 已补查节点与证据缺口（并确认 `deep-observations.csv` 是否已覆盖核心区域的画面 / 内容 / 背景 / 前后状态）：
 已有文件与路径：
 实际使用的工具和能力缺口：
 源版本及时间映射注意事项：
@@ -81,7 +81,7 @@ qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_q
 ```text
 请把随附《长视频混剪跨模型与MCP执行规范》作为本任务的工作说明。
 先盘点我提供的素材、已有记录和实际可用的视频工具，输出能力映射。
-第一轮先做 Broad Structure，建立可回查的索引、场景和 Content Map；如果当前只要求内容地图，到这里正式交付。
+第一轮先做 Broad Structure，建立可回查的 `frames.jsonl`、人可读 `frame-observations.csv`、场景、overview 和 Content Map；如果当前只要求内容地图，到这里正式交付。
 如果要继续混剪，请读取我提供的 brief / editorial plan；没有时先把 Content Map 交给我或独立 Director 做创意判断，不要默认替代这一层。
 拿到 rough plan 后，重新回原素材做 Directed Deep Structure，补足完整音画、上下文和保护范围，再推进到执行。
 优先同集，保留完整对白与动作，不根据抽样帧或摘要补造未验证内容。

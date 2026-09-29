@@ -1,0 +1,2 @@
+observation_id,plan_node_id,source_id,episode,start_ms,end_ms,display_range,scene_id,unit_id,representative_frame_refs,visual_facts,shot_composition,action_chain,expression_gaze,spatial_relationship,setting_context,narrative_context,content_description,dialogue_audio,before_state,after_state,interpretations,unknowns,evidence_status,counterevidence,context_ranges,protected_ranges,isolated_use_risk,review_refs,narrative_function,edit_note
+DO001,P01,SRC001,,0,1,00:00:00.000-00:00:00.001,S001,U001,,,,,,,,,,,,,,,pending,,,,,,,

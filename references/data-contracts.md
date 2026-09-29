@@ -11,11 +11,13 @@
 | project.json | 对象；任务范围、约束、参数、交付目标、版本 |
 | capability-map.json | 数组；内部能力和真实工具的映射 |
 | sources.json | 数组；源文件、版本、时长、时间映射 |
-| frames.jsonl | 每行一个抽样帧观察；包含图片定位 |
+| frames.jsonl | 每行一个抽样帧证据记录；包含图片定位和机器可追溯 facts / unknowns |
+| frame-observations.csv | Broad Structure 的人可读逐抽样帧结构化观察表；供人工 / Director / 其他 Skill 浏览 |
 | transcript.jsonl | 每行一条字幕或转写；保留核听状态 |
 | scenes.jsonl | 每行一个事件或场景；链接多个源区间 |
 | units.jsonl | 每行一个可用的连续片段及其保护范围 |
 | reviews.jsonl | 每行一次实际观察的区间、模态、结果与审阅者 |
+| deep-observations.csv | Directed Deep Structure 的核心区域高密度观察表；包含完整画面、内容、背景、前后状态、原声、反证及 plan 关系 |
 | coverage.json | 数组；按素材、区间、模态记录覆盖状态 |
 | overview.md | 带 scene_id 的 source-order 全片导航，不替代证据 |
 | content-map.md | 第一轮 Structure 的横向内容地图；链接 scene / evidence / coverage，供人或 Director 做创意判断 |
@@ -40,7 +42,7 @@
 - evidence_refs 使用带类型的引用，例如 frame:F001、utterance:T001、review:R001。外部前情使用 context_refs，记录来源与核实状态，不伪造本项目证据 ID。
 - facts、interpretations、unknowns 分开。facts 中也保留证据来源，区分模型实际观察、用户提供和上游工具输出。
 - 第一轮 Broad Structure 与第二轮 Directed Deep Structure 使用同一套稳定 source / scene / unit / evidence ID；第二轮补密时优先更新 verification、context_ranges、protected_ranges 和 review_refs，不复制一个看似全新的平行素材库。
-- `content-map.md`、`brief.md`、`editorial-plan.md` 都是人可读层，不替代 JSON / JSONL 证据。任何创意判断进入 Execute 前仍须链接回 scene / unit / review / source range。
+- `frame-observations.csv`、`deep-observations.csv`、`content-map.md`、`brief.md`、`editorial-plan.md` 都是人可读工作层，不替代 JSON / JSONL 原始证据。任何创意判断进入 Execute 前仍须链接回 frame / utterance / scene / unit / review / source range。
 - 不把取样帧序号当成源视频帧号。display_timecode 只用于阅读，机器使用毫秒或输出帧号。
 
 ## 素材和证据记录
@@ -48,6 +50,10 @@
 sources 每条必填 source_id、locator、version、duration_ms。version 可以是可核查版本标识或哈希；未知为 null，并阻止复用旧缓存到精确剪辑。其他字段包括 episode、width、height、fps_num、fps_den、frame_rate_mode、audio_streams、subtitle_source、time_mapping。
 
 frame 必填 frame_id、source_id、timestamp_ms、image_ref、facts、unknowns。建议补充 sheet_id、cell_index、visible_text、observation_origin。cell_index 为一至九，不参与时间计算。frame 只描述该时点看见的状态。
+
+`frame-observations.csv` 是同一批抽样帧的**人可读结构化层**，不是另起一套证据 ID。每行对应一个已实际分析的 sampled frame，推荐字段：`source_id`、`episode`、`timestamp_ms`、`display_timecode`、`frame_id`、`sheet_id`、`cell_index`、`scene_id`、`characters`、`visual_facts`、`visible_action_state`、`expression_gaze`、`spatial_relationship`、`setting_background`、`key_objects`、`visible_text`、`nearby_dialogue_refs`、`content_description`、`interpretations`、`unknowns`、`evidence_ref`、`image_ref`、`coverage_status`。
+
+其中 `visual_facts` / `content_description` 不得把相邻抽样帧之间未实际观察到的动作补齐；`interpretations` 必须与事实分列。这里的“逐帧”始终指逐**已分析抽样帧**。
 
 utterance 必填 utterance_id、source_id、start_ms、end_ms、text、origin、audio_verified。origin 为 subtitle、asr、manual 或 user；audio_verified 默认为 false。其他字段包括 speaker、addressee、language、translation、unclear_words、review_refs。未知说话人保持 null，不能按画面中出现的人直接指定。
 
@@ -83,6 +89,32 @@ unit 包含以下字段。一个 unit 只能对应一个源文件中的连续区
 ```
 
 verification 的 audio、visual、context 使用 pending、reviewed、not_applicable。not_applicable 在 not_applicable_reasons 对象中按对应字段说明原因，例如已确认源文件完全没有音轨。仅仅没有对白不等于音频不需检查。reviewed 必须有 review_refs，值为 reviews.jsonl 中真实存在的 review_id；不能仅靠摘要设置。连续画面核查使用 video 模态，仅有 frames 不能标记 visual=reviewed。核查区间合计应覆盖实际选用的片段。protected_ranges 可以在探索期暂为空，精查后入选执行稿时必须有明确保护范围，或在 protection_note 写明为何整段无可保护的对白、动作且经复核。
+
+## Directed Deep Structure 的结构化观察
+
+`deep-observations.csv` 用于第二轮定向高密度 Structure。它不是剪辑表的替代品，也不能只记录“可用 / 不可用”。当某个区域已经被 rough plan 选为核心回查对象时，应先把它做成更完整的内容档案，再收敛为 unit 和切点。
+
+推荐每行对应一个高密度观察时点或连续观察区间，字段至少包括：
+
+- 定位：`observation_id`、`plan_node_id`、`source_id`、`episode`、`start_ms`、`end_ms`、`display_range`、`scene_id`、`unit_id`、`representative_frame_refs`；
+- 画面：`visual_facts`、`shot_composition`、`action_chain`、`expression_gaze`、`spatial_relationship`；
+- 背景：`setting_context`、`narrative_context`；
+- 内容：`content_description`、`dialogue_audio`、`before_state`、`after_state`；
+- 判断：`interpretations`、`unknowns`、`evidence_status`、`counterevidence`；
+- 执行衔接：`context_ranges`、`protected_ranges`、`isolated_use_risk`、`review_refs`、`narrative_function`、`edit_note`。
+
+字段含义：
+
+- `visual_facts` 写这一时段实际看到的画面；人物、站位 / 朝向、动作、表情 / 视线、人物间距离、物件、景别 / 构图与明显画面变化尽量具体；
+- `content_description` 回答“这一小段实际发生了什么”，不只抄对白；
+- `setting_context` 写地点、时间、环境、空间状态等场景背景；
+- `narrative_context` 写它在完整事件中的位置、前一事件和后续关系；
+- `dialogue_audio` 写已核听的原声信息，并明确 speaker / addressee / tone / pause / ambience / music / audio_verified；
+- `before_state` / `after_state` 用于保住动作与因果，不等同心理推断；
+- `plan_node_id` / `narrative_function` 只说明为什么要回查这一段，不得用计划目标倒推事实；
+- `evidence_status` 可用 pending、supported、contradicted、partial；关键节点若为 contradicted 或仍 pending，不进入 ready_for_render。
+
+第二轮可以在第一轮相同 frame_id / scene_id 上补充更密的新 frame / review，也可以对连续区间形成新的 observation_id；不要为了“更细”而复制一套与第一轮断开的素材库。
 
 ## Content Map 与外部 Direct
 

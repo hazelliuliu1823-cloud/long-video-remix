@@ -1,7 +1,7 @@
 interface:
   display_name: 长视频结构化与混剪执行
-  short_description: 先把长视频结构化为可回查 Content Map，再把外部编导方案定向深挖并落实为剪辑执行
-  default_prompt: 使用 $long-video-remix 处理这批长视频：先做 Broad Structure 与 Content Map；如已有 brief / editorial plan，则带着方案回原片做 Directed Deep Structure，再输出可回查的剪辑执行稿。不要默认替代人的创意选题。
+  short_description: 先把长视频结构化为逐抽样帧观察表与可回查 Content Map，再把外部编导方案定向深挖并落实为剪辑执行
+  default_prompt: 使用 $long-video-remix 处理这批长视频：先做 Broad Structure，保留逐抽样帧结构化观察表与 Content Map；如已有 brief / editorial plan，则带着方案回原片做 Directed Deep Structure，补全核心区域的画面、内容、背景和原声，再输出可回查的剪辑执行稿。不要默认替代人的创意选题。
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:
