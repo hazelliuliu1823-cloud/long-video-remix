@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.1",
+  "project_id": null,
+  "candidate_id": null,
+  "status": "draft",
+  "fps_num": null,
+  "fps_den": null,
+  "width": null,
+  "height": null,
+  "events": [],
+  "audio_tracks": [],
+  "text_tracks": [],
+  "coordinate_space": "assembly"
+}

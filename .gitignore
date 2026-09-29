@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local project outputs
+projects/
+workspace/
+outputs/
+audit/
+cache/
+*.log
+
+# Large / source media
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
+*.m4v
+*.wav
+*.mp3
+*.aac
+*.flac
+
+# Generated images / contact sheets
+contacts/
+contact-sheets/

@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.1",
+  "project_id": null,
+  "version": 1,
+  "goal": null,
+  "target_characters": [],
+  "experience": null,
+  "source_scope": [],
+  "scope_policy": "prefer_same_episode",
+  "source_audio_policy": "preserve_complete_speech",
+  "target_duration_ms": null,
+  "output": {
+    "width": null,
+    "height": null,
+    "fps_num": null,
+    "fps_den": null
+  },
+  "deliverable": "detailed_plan",
+  "render_authorized": false,
+  "sampling": {
+    "overview_interval_ms": 10000,
+    "batch_target_ms": 300000,
+    "context_margin_ms": 20000,
+    "directed_start_interval_ms": 1000
+  },
+  "confirmed_constraints": [],
+  "defaults_used": [
+    "同集优先",
+    "保留完整原声",
+    "时长由必要叙事决定"
+  ],
+  "unknowns": [],
+  "current_stage": "A",
+  "audio_policy": {
+    "allow_original_music": null,
+    "preserve_dialogue": true,
+    "preserve_ambience": true
+  },
+  "render_options": {},
+  "tool_versions": {},
+  "brief_ref": null,
+  "editorial_plan_ref": null,
+  "content_map_ref": "content-map.md",
+  "direct_policy": "external_by_default",
+  "editorial_plan_status": "not_provided",
+  "structure_state": {
+    "broad_pass": "pending",
+    "content_map": "pending",
+    "directed_deep_pass": "pending"
+  }
+}
