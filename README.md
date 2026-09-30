@@ -1,10 +1,45 @@
 # long-video-remix
 
-> **Make video queryable before you make it editable.**
+> **Structure the source. Execute the edit. Keep direction human.**
 >
-> Turn hours of multimodal footage into compact, searchable structured data — then use that structure for editing, research, content analysis and execution.
+> Turn hours of multimodal footage into compact, searchable structured data — then turn a confirmed editorial plan into an evidence-backed, executable remix timeline.
 
-`long-video-remix` 的核心不是“让 AI 再看一遍视频”，而是先把视频变成一种**更容易理解、更便宜读取、更容易组合**的结构化表示。
+`long-video-remix` 有两个核心能力：**Structure** 和 **Execute**。
+
+| 核心能力 | 它解决什么问题 | 主要产物 |
+|---|---|---|
+| **Structure** | 把视频、图片、字幕 / 原声、人物、动作、场景与上下文这些高成本多模态信息，压成更容易理解、检索和复用的结构化数据 | `frame-observations.csv`、scenes、`overview.md`、`content-map.md`、`deep-observations.csv` |
+| **Execute** | 把已经确认的编导 / 脚本方案重新落回原素材，核验证据并转换成真正可剪、可渲染、可检查的工程结果 | verified units、`protected_ranges`、双时间轴、`render-manifest.json`、render audit / QA |
+
+中间的 **Direct** 是创意接口，而不是默认塞进一个“超级 Skill”里自动完成。人、研究流程、brainstorming 或独立 Director 可以基于 Structure 的结果形成并确认 Editorial / Script Plan；之后再交给 Directed Deep Structure 和 Execute 落地。
+
+如果只记住一条链路，就是：
+
+```text
+Raw multimodal footage
+      │
+      ▼
+① STRUCTURE
+把长视频变成可查询、可复用的结构化内容层
+      │
+      ▼
+② DIRECT  ← Human / Research / Director
+形成并确认 Editorial / Script Plan
+      │
+      ▼
+③ DIRECTED DEEP STRUCTURE
+只对脚本命中的区域做高密度音画回查
+      │
+      ▼
+④ EXECUTE
+Verified units → timeline → render manifest → QA
+```
+
+这套设计不是只解决“怎么把视频看懂”，也不是只解决“怎么把视频切出来”。它处理的是从**长素材理解**到**工程执行**之间最容易丢信息的整条链路：
+
+> **先把素材结构化，让人和模型更便宜地工作；再把人的创意可靠地压回原片，直到形成可执行、可核查的剪辑结果。**
+
+## 为什么 Structure 值得单独做
 
 视频、图片、字幕 / 原声、人物、动作、场景与上下文原本都是高成本的多模态信息。Structure 会把这些信息压成可检索、可排序、可回查的表格和文本层，例如 `frame-observations.csv`、scene / overview 与 `content-map.md`。后续的人、Director 或其他 Skill 可以优先消费这些紧凑数据，而不是每次重新加载原视频、九宫格和大量图片。
 
@@ -16,6 +51,21 @@
 | 想看某个时间点，还要重新打开视频 | 直接定位到时间码对应的人物、动作、对白、背景和内容说明 |
 | 不同任务要重复读取同一批多模态素材 | 剪辑、内容研究、效果复盘、检索可以复用同一套结构化结果 |
 | 大量上下文消耗在“重新看一遍” | 高成本多模态读取集中到真正需要深挖的区域 |
+
+## Execute 为什么同样是核心
+
+Structure 解决“素材怎么看得清、怎么复用”，但最终要做成视频，还需要把已经确认的创意方案变成**不会丢语义、不会错因果、可以真正渲染和验收**的时间轴。
+
+Execute 负责把 Directed Deep Structure 已经核实过的素材继续收敛成：
+
+- verified units 与必要前后文；
+- `context_ranges` / `protected_ranges`，避免剪掉关键语义或动作；
+- assembly timeline 与 output timeline；
+- hard cut / xfade、音轨、文字轨和章节卡；
+- `render-manifest.json`；
+- 导出后的完整解码、帧数 / 时长检查、近静音扫描、全部接点对照图与最终 QA。
+
+因此，这个仓库不是“先结构化，后面交给你自己想办法剪”。**Structure 和 Execute 是两端的稳定能力，Direct 是中间需要人参与的创意节点。**
 
 ## 一个最直观的例子：从“分析视频”到“分析内容”
 
@@ -47,41 +97,6 @@ Structure 之后，每一个已分析时间点都可以对应到结构化内容�
 **Structure 的价值，就是把视频从难以计算和组合的多模态对象，转换成可以检索、筛选、连接、比较和再次创作的数据层。**
 
 同一套结构化结果，不只服务于剪辑，也可以继续用于内容复盘、用户行为分析、跨视频比较、研究、检索和其他 AI 工作流。更完整的示例见 [`examples/content-performance-analysis.md`](examples/content-performance-analysis.md)。
-
-## 核心设计：先压缩，再创作，再把算力花在真正需要的地方
-
-```text
-Source footage / transcript / sampled frames
-      │
-      ▼
-① BROAD STRUCTURE
-低密度全局理解
-      │
-      ▼
-Compact Structured Representation
-Frame Observation Index + scenes + overview + Content Map
-      │
-      ▼
-② DIRECT  ← 人 / research / brainstorming / Director
-在独立研究 / 创意环境中形成并确认 Editorial / Script Plan
-      │
-      ▼
-③ DIRECTED DEEP STRUCTURE
-只回到脚本命中的原素材区域做高密度多模态回查
-      │
-      ▼
-④ EXECUTE
-Verified units → timeline → render manifest → QA
-```
-
-这里最重要的不是把所有环节都塞给一个“超级 Skill”。
-
-- **Broad Structure** 先把整个素材面低成本地铺开并压成紧凑表示；
-- **Direct** 保留人的创意判断，也可以结合独立的行业 / 主题研究；
-- **Directed Deep Structure** 只对确认脚本真正命中的区域重新投入高密度观察；
-- **Execute** 把已经验证的内容落到可执行时间轴和工程 QA。
-
-这套设计的目标不是承诺固定比例的 token / 算力节省，而是**避免后续每一步都重新消费昂贵的原始多模态上下文**。
 
 ## 适用场景
 
