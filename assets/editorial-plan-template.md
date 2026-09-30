@@ -1,6 +1,6 @@
 # Editorial / Script Plan
 
-> 这是创意层的计划文档。它可以在独立研究 / 编导环境中，结合 Structure 输出、行业 / 主题资料、参考案例和大量人工判断形成。重点是说清楚“想怎么讲”；具体镜头、对白、时间码、前后语境和保护区间仍由 Directed Deep Structure 回原片核实。
+> 兼容旧项目的合并式 Direct 模板。新项目优先把两次 Director 分开：第一次使用 `narrative-direction-template.md` 定“到底讲什么”，Detail Structure 后使用 `execution-plan-template.md` 定“最终怎么讲”。本模板仍可用于已有工作流，但其中未经 Detail 核实的内容不能直接进入 Execute。
 
 
 ## 外部研究与人工判断

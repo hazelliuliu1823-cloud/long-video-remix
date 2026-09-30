@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.4",
   "project_id": null,
   "version": 1,
   "goal": null,
@@ -21,7 +21,8 @@
     "overview_interval_ms": 10000,
     "batch_target_ms": 300000,
     "context_margin_ms": 20000,
-    "directed_start_interval_ms": 1000
+    "directed_start_interval_ms": 1000,
+    "action_candidate_fps": 4
   },
   "confirmed_constraints": [],
   "defaults_used": [
@@ -41,15 +42,69 @@
   "brief_ref": null,
   "editorial_plan_ref": null,
   "content_map_ref": "content-map.md",
-  "direct_policy": "external_by_default",
+  "direct_policy": "external_two_pass_by_default",
   "editorial_plan_status": "not_provided",
   "structure_state": {
     "broad_pass": "pending",
     "content_map": "pending",
     "directed_deep_pass": "pending",
     "frame_observations": "pending",
-    "deep_observations": "pending"
+    "deep_observations": "pending",
+    "action_node_candidates": "pending",
+    "structure_questions": "pending",
+    "minimum_information_floor": "pending",
+    "detail_intervals": "pending",
+    "speaker_adjudications": "pending"
   },
   "research_context_refs": [],
-  "human_decision_refs": []
+  "human_decision_refs": [],
+  "structure_policy": {
+    "minimum_information_floor": "strict",
+    "summary_cannot_replace_observations": true,
+    "explicit_empty_values": [
+      "none",
+      "unknown",
+      "not_applicable"
+    ],
+    "action_candidate_default_fps": 4,
+    "frame_detail_level": "full_observation",
+    "require_original_audio_keypoint_field": true,
+    "require_topic_judgment_field": true,
+    "require_confidence_with_basis": true,
+    "require_detail_interval_context": true,
+    "require_speaker_adjudication_artifact": true,
+    "detail_precision_target_ms": "100-500",
+    "negative_claim_policy": "not_observed_is_not_absent",
+    "evidence_conflict_policy": "resolve_by_fact_type_and_record_conflict",
+    "dialect_asr_policy": "locator_only_until_verified",
+    "long_task_checkpoint_policy": "incremental_output_resume_coverage",
+    "usable_source_bounds_must_reach_direct": true,
+    "negative_claim_dense_sampling_is_sufficient": false,
+    "negative_claim_requires_bounded_scope": true,
+    "negative_claim_requires_fact_type_continuous_or_direct_evidence": true
+  },
+  "time_policy": {
+    "canonical_source_time_key": "source_id+source_ms",
+    "canonical_unit": "ms",
+    "source_interval_semantics": "left_closed_right_open",
+    "display_timecode_is_derived": true,
+    "require_source_time_mapping": true,
+    "preserve_time_tags_across_modalities": true,
+    "execute_coordinate_spaces": [
+      "assembly",
+      "output"
+    ],
+    "track_anchor_policy": "event_anchor_plus_local_frames",
+    "time_tag_stability": "strict"
+  },
+  "execution_policy": {
+    "duration_budget_required_before_ready": true,
+    "text_overlay_not_additive_unless_structure_extended": true,
+    "feedback_invalidation_matrix": "strict",
+    "audio_narrative_role_required": true
+  },
+  "narrative_direction_ref": null,
+  "narrative_direction_status": "not_provided",
+  "execution_plan_ref": null,
+  "execution_plan_status": "not_provided"
 }

@@ -13,7 +13,9 @@
 ## 2. 结构化观察入口
 
 - `frames.jsonl`：机器可追溯的逐抽样帧证据；
-- `frame-observations.csv`：供人工 / Director / 其他 Skill 阅读的逐抽样帧结构化观察表；
+- `frame-observations.csv`：供人工 / Director / 其他 Skill 阅读的逐抽样帧基础观察表；
+- `action-node-candidates.csv`：动作 / 视线 / 站位 / 物件变化候选及默认 4fps 局部窗口；
+- `structure-questions.csv`：会影响理解的问题、回答、证据与未验证项；
 - 重要 Content Map 条目应能下钻到 `scene_id`，再继续下钻到 frame / utterance / review。
 
 ## 3. Source-order Overview
@@ -37,8 +39,8 @@
 
 ## 7. 无声互动 / 动作 / 物件 / 空间线索
 
-| 类型 | 位置 | 可见事实 | scene_refs | unknowns |
-|---|---|---|---|---|
+| 类型 | 位置 | 可见事实 | motif / change tags | action_candidate_refs | scene_refs | unknowns |
+|---|---|---|---|---|---|---|
 
 ## 8. 可能存在的前后呼应或对照
 
@@ -46,12 +48,22 @@
 
 -
 
-## 9. Coverage Gaps / Unknowns
+## 9. Coverage Gaps / Unknowns / Open Questions
 
--
+- unresolved question refs：
+- 未验证项：
+- coverage gaps：
 
 ## 10. 给 Direct 的使用提示
 
 - 哪些区域内容丰富、适合 brainstorming：
 - 哪些关联目前只有抽样证据：
 - 哪些区域如果被选入 rough plan，需要第二轮 Directed Deep Structure：
+
+## 进入 Detail / Directed Deep Structure 时继续生成
+
+- `detail-intervals.csv`：核心精查区间卡；进入原因、前情、当前背景、后续、目标问题、主题关联；
+- `deep-observations.csv`：核心区间完整高密度内容档案；
+- `speaker-adjudications.csv`：说话人 / 对象不清时的帧级口型 / 原声 / 字幕 / ASR 裁决；无歧义时保留表头。
+
+以上文件是 Structure 基础层，不得被脚本、Content Map 摘要或 edit plan 替代。

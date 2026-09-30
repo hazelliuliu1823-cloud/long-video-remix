@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "project_id": null,
   "candidate_id": null,
   "status": "draft",
@@ -10,5 +10,13 @@
   "events": [],
   "audio_tracks": [],
   "text_tracks": [],
-  "coordinate_space": "assembly"
+  "coordinate_space": "assembly",
+  "duration_budget": {
+    "sum_event_frames": null,
+    "sum_transition_overlap_frames": null,
+    "computed_output_frames": null,
+    "target_max_frames": null,
+    "status": "pending",
+    "adjustment_note": null
+  }
 }

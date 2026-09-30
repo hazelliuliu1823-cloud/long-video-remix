@@ -5,6 +5,9 @@ import hashlib
 import json
 from pathlib import Path
 
+from timeline_math import canonical_assembly_ranges, output_ranges_from_overlaps
+from validate_project import validate
+
 
 def digest(value):
     return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
@@ -27,6 +30,15 @@ def integer(value, label, minimum=0):
 
 
 def compile_manifest(root):
+    # Compiler and static validator intentionally share the same preflight gate.
+    # This prevents a timeline from compiling after the validator would reject its
+    # stage state, evidence state, source-time mapping, or output coordinates.
+    report = validate(root)
+    if report['errors']:
+        preview = '; '.join(report['errors'][:8])
+        more = f' (+{len(report["errors"]) - 8} more)' if len(report['errors']) > 8 else ''
+        raise ValueError(f'Static validation failed: {preview}{more}')
+
     timeline = read(root / 'timeline.json')
     if timeline.get('coordinate_space') != 'assembly':
         raise ValueError('Input must explicitly use coordinate_space=assembly; do not compile output twice')
@@ -40,6 +52,7 @@ def compile_manifest(root):
     transitions = {(x['from_event'], x['to_event']): x for x in transition_rows}
     if len(transitions) != len(transition_rows):
         raise ValueError('Duplicate transition')
+
     n = integer(timeline.get('fps_num'), 'fps_num', 1)
     d = integer(timeline.get('fps_den'), 'fps_den', 1)
     width = integer(timeline.get('width'), 'width', 1)
@@ -51,50 +64,51 @@ def compile_manifest(root):
     ids = [e['event_id'] for e in original_events]
     if len(set(ids)) != len(ids):
         raise ValueError('Duplicate event_id')
-    if set(transitions) != set(zip(ids[:-1], ids[1:])):
+    adjacent_pairs = list(zip(ids[:-1], ids[1:]))
+    if set(transitions) != set(adjacent_pairs):
         raise ValueError('Exactly one transition is required for every adjacent pair')
+
+    assembly_ranges = canonical_assembly_ranges(original_events, n, d)
+    for e, expected in zip(original_events, assembly_ranges):
+        if e.get('out_in_frame') != expected['assembly_in_frame'] or e.get('out_out_frame') != expected['assembly_out_frame']:
+            raise ValueError(
+                f'{e.get("event_id")}: assembly range must use cumulative timeline quantization; '
+                f'expected {expected["assembly_in_frame"]}-{expected["assembly_out_frame"]}'
+            )
+
+    overlaps = [0]
+    for i, pair in enumerate(adjacent_pairs, start=1):
+        transition = transitions[pair]
+        effect = transition.get('effect', 'hard_cut')
+        overlap = integer(transition.get('overlap_frames', 0), 'overlap_frames')
+        if effect not in ('hard_cut', 'xfade') or (effect == 'hard_cut' and overlap) or (effect == 'xfade' and overlap == 0):
+            raise ValueError('Use hard_cut with zero overlap or xfade with positive overlap')
+        overlaps.append(overlap)
+    output_ranges, total = output_ranges_from_overlaps(assembly_ranges, overlaps)
+
     events, joins, warnings = [], [], []
-    assembly_end = 0
-    lengths = []
-    overlaps = []
     for i, original in enumerate(original_events):
         e = dict(original)
-        a = integer(e.get('out_in_frame'), 'assembly start')
-        b = integer(e.get('out_out_frame'), 'assembly end', 1)
-        if a != assembly_end or b <= a:
-            raise ValueError('Assembly events must be contiguous, ordered and nonempty')
-        length = b - a
-        lengths.append(length)
-        assembly_end = b
-        overlap = 0
-        transition = None
-        if i:
-            transition = transitions[(ids[i - 1], ids[i])]
-            effect = transition.get('effect', 'hard_cut')
-            overlap = integer(transition.get('overlap_frames', 0), 'overlap_frames')
-            if effect not in ('hard_cut', 'xfade') or (effect == 'hard_cut' and overlap) or (effect == 'xfade' and overlap == 0):
-                raise ValueError('Use hard_cut with zero overlap or xfade with positive overlap')
-            if overlap >= min(lengths[-2], length):
-                raise ValueError('Overlap must be shorter than both adjacent events')
-            if i > 1 and overlaps[-1] + overlap >= lengths[-2]:
-                raise ValueError('Three-event overlap or zero stable middle segment is unsupported')
-        overlaps.append(overlap)
-        start = events[-1]['out_out_frame'] - overlap if events else 0
-        e.update(out_in_frame=start, out_out_frame=start + length,
-                 assembly_in_frame=a, assembly_out_frame=b)
+        assembly = assembly_ranges[i]
+        output = output_ranges[i]
+        e.update(
+            assembly_in_frame=assembly['assembly_in_frame'],
+            assembly_out_frame=assembly['assembly_out_frame'],
+            out_in_frame=output['out_in_frame'],
+            out_out_frame=output['out_out_frame'],
+        )
         if e.get('kind') == 'source':
             sid = e.get('source_id')
             if sid not in sources or not sources[sid].get('version'):
                 raise ValueError(f'{sid}: known source version required')
             source = sources[sid]
+            if not isinstance(source.get('time_mapping'), dict) or not source.get('time_mapping'):
+                raise ValueError(f'{sid}: explicit source time_mapping required')
             sin = integer(e.get('source_in_ms'), 'source_in_ms')
             sout = integer(e.get('source_out_ms'), 'source_out_ms', 1)
             duration = integer(source.get('duration_ms'), 'source duration', 1)
-            speed = e.get('speed', 1)
-            if type(speed) not in (float, int) or not 0 < speed < float('inf'):
-                raise ValueError('Invalid speed')
-            if not sin < sout <= duration or abs((sout - sin) / speed - length * frame_ms) > frame_ms + 0.001:
-                raise ValueError(f'{e["event_id"]}: source length and frozen frame count disagree')
+            if not sin < sout <= duration:
+                raise ValueError(f'{e["event_id"]}: source range outside source')
             if e.get('unit_id') not in units:
                 raise ValueError(f'{e["event_id"]}: missing unit')
             unit = units[e['unit_id']]
@@ -104,15 +118,44 @@ def compile_manifest(root):
                 if not sin <= protected['start_ms'] < protected['end_ms'] <= sout:
                     raise ValueError(f'{e["event_id"]}: cut drops protected range')
             e['source_version'] = source['version']
+            e['source_time_mapping'] = source['time_mapping']
         elif e.get('kind') != 'card':
             raise ValueError('Video event must be source or card')
         events.append(e)
         if i:
-            joins.append({'join_id': f'J{i:03d}', 'from_event': ids[i - 1], 'to_event': ids[i],
-                          'effect': transition.get('effect', 'hard_cut'), 'relation': transition.get('relation'),
-                          'start_frame': start, 'end_frame': start + overlap,
-                          'overlap_frames': overlap})
-    total = events[-1]['out_out_frame']
+            transition = transitions[(ids[i - 1], ids[i])]
+            overlap = overlaps[i]
+            joins.append({
+                'join_id': f'J{i:03d}',
+                'from_event': ids[i - 1],
+                'to_event': ids[i],
+                'effect': transition.get('effect', 'hard_cut'),
+                'relation': transition.get('relation'),
+                'start_frame': output['out_in_frame'],
+                'end_frame': output['out_in_frame'] + overlap,
+                'overlap_frames': overlap,
+            })
+
+    budget = timeline.get('duration_budget')
+    if timeline.get('status') == 'ready_for_render':
+        if not isinstance(budget, dict):
+            raise ValueError('ready_for_render requires duration_budget')
+        sum_event_frames = sum(r['length_frames'] for r in assembly_ranges)
+        sum_overlap_frames = sum(overlaps)
+        if budget.get('sum_event_frames') != sum_event_frames:
+            raise ValueError('duration_budget.sum_event_frames does not match cumulative-quantized events')
+        if budget.get('sum_transition_overlap_frames') != sum_overlap_frames:
+            raise ValueError('duration_budget.sum_transition_overlap_frames does not match transitions')
+        if budget.get('computed_output_frames') != total:
+            raise ValueError('duration_budget.computed_output_frames does not match compiled output')
+        target = budget.get('target_max_frames')
+        if target is None:
+            if budget.get('status') != 'checked_no_limit':
+                raise ValueError('duration budget without target must be checked_no_limit')
+        else:
+            if type(target) is not int or target <= 0 or total > target or budget.get('status') != 'within_budget':
+                raise ValueError('duration budget is not within target')
+
     event_map = {e['event_id']: e for e in events}
     for i, join in enumerate(joins):
         if not join['overlap_frames']:
@@ -131,6 +174,7 @@ def compile_manifest(root):
             raise ValueError(f'{join["join_id"]}: overlap covers protected meaning in {affected}')
         if affected:
             warnings.append(f'{join["join_id"]}: protected overlap exception needs actual review: {trans["overlap_protection_review"]}')
+
     compiled_tracks = {}
     for key in ('audio_tracks', 'text_tracks'):
         result = []
@@ -142,8 +186,8 @@ def compile_manifest(root):
                 e = event_map[item['anchor_event_id']]
                 local_a, local_b = item.get('local_in_frame'), item.get('local_out_frame')
                 if type(local_a) is not int or type(local_b) is not int or local_b <= local_a:
-                    raise ValueError('Track local range must use integer frames')
-                # Explicitly permits J/L-cuts beyond one event, within the full output.
+                    raise ValueError('Track local range must use increasing integer frames')
+                # J/L-cuts may extend beyond one event, but never outside the compiled output.
                 a, b = e['out_in_frame'] + local_a, e['out_in_frame'] + local_b
             elif item.get('coordinate_space') == 'output':
                 a, b = item.get('out_in_frame'), item.get('out_out_frame')
@@ -159,22 +203,95 @@ def compile_manifest(root):
                     raise ValueError('Text fade and hold exceed display range')
             result.append(item)
         compiled_tracks[key] = result
+
     render_options = project.get('render_options', {})
     tools = project.get('tool_versions', {})
+    tools_known = isinstance(tools, dict) and bool(tools)
     unit_keys = {}
+    unit_cache_reusable = {}
     for e in events:
-        # Deliberately excludes placement and overlay text; excludes neither trims nor length.
         fields = ['kind', 'source_id', 'source_version', 'source_in_ms', 'source_out_ms', 'speed', 'crop', 'scale', 'card_asset', 'background']
         recipe = {k: e.get(k) for k in fields}
-        recipe.update(frames=e['out_out_frame'] - e['out_in_frame'], width=width, height=height,
-                      fps=[n, d], options=render_options.get('video', {}), tools=tools)
+        reusable = tools_known
+        if e.get('kind') == 'source':
+            # Exact source-time mapping is part of the media identity for precise cuts.
+            recipe['source_time_mapping'] = e.get('source_time_mapping')
+            reusable = reusable and bool(e.get('source_version')) and bool(e.get('source_time_mapping'))
+        elif e.get('card_asset'):
+            # External card assets need an explicit asset_version to be safely reusable.
+            recipe['asset_version'] = e.get('asset_version')
+            reusable = reusable and bool(e.get('asset_version'))
+        recipe.update(
+            frames=e['out_out_frame'] - e['out_in_frame'],
+            width=width,
+            height=height,
+            fps=[n, d],
+            options=render_options.get('video', {}),
+            tools=tools,
+        )
         unit_keys[e['event_id']] = digest(recipe)
+        unit_cache_reusable[e['event_id']] = bool(reusable)
     layout = [{k: e[k] for k in ('event_id', 'out_in_frame', 'out_out_frame')} for e in events]
     clean_key = digest([unit_keys, layout, joins, render_options.get('video', {})])
-    audio_key = digest([compiled_tracks['audio_tracks'], layout, joins, {k: v.get('version') for k, v in sources.items()}, project.get('audio_policy'), render_options.get('audio', {}), tools])
-    final_key = digest([clean_key, audio_key, compiled_tracks['text_tracks'], render_options.get('final', {}), tools])
-    if not tools:
-        warnings.append('tool_versions empty: keys are planning identifiers; cache reuse is disabled')
+    clean_reusable = tools_known and all(unit_cache_reusable.values())
+
+    audio_dependencies = []
+    audio_reusable = tools_known
+    for track in compiled_tracks['audio_tracks']:
+        if track.get('source_id'):
+            sid = track['source_id']
+            source = sources.get(sid, {})
+            dependency = {'source_id': sid, 'version': source.get('version'), 'time_mapping': source.get('time_mapping')}
+            audio_dependencies.append(dependency)
+            if not source.get('version') or not isinstance(source.get('time_mapping'), dict) or not source.get('time_mapping'):
+                audio_reusable = False
+                warnings.append(f'audio source {sid} has unknown version/time_mapping: mix_audio and final cache reuse disabled')
+        elif track.get('asset_ref'):
+            dependency = {'asset_ref': track.get('asset_ref'), 'asset_version': track.get('asset_version')}
+            audio_dependencies.append(dependency)
+            if not track.get('asset_version'):
+                audio_reusable = False
+                warnings.append(f'audio asset {track.get("asset_ref")} has unknown asset_version: mix_audio and final cache reuse disabled')
+        else:
+            audio_dependencies.append({'generated_or_silent_track': track.get('track_id')})
+    audio_key = digest([
+        compiled_tracks['audio_tracks'], layout, joins, audio_dependencies,
+        project.get('audio_policy'), render_options.get('audio', {}), tools,
+    ])
+
+    # Card text is a final text-layer concern. Keep clean-video/audio caches reusable
+    # when only card wording or card text rendering changes, but force the final
+    # composited cache to change. Include explicit card_* render fields plus common
+    # text-render fields so future renderer adapters do not silently reuse stale text.
+    card_text_render_fields = {
+        'font', 'font_file', 'font_family', 'font_size_px', 'font_size_value', 'font_unit',
+        'color', 'text_color', 'position', 'align', 'alignment', 'line_spacing',
+        'margin', 'motion', 'fade_in_frames', 'stable_hold_frames', 'fade_out_frames',
+        'stroke', 'stroke_width', 'shadow', 'text_box', 'card_render', 'text_render',
+    }
+    card_text_layer = []
+    for event in events:
+        if event.get('kind') != 'card' or event.get('card_text') is None:
+            continue
+        card_item = {
+            'event_id': event.get('event_id'),
+            'card_text': event.get('card_text'),
+        }
+        for key, value in event.items():
+            if key.startswith('card_') and key not in ('card_asset', 'card_text'):
+                card_item[key] = value
+            elif key in card_text_render_fields:
+                card_item[key] = value
+        card_text_layer.append(card_item)
+
+    final_key = digest([
+        clean_key, audio_key, compiled_tracks['text_tracks'], card_text_layer,
+        render_options.get('final', {}), tools,
+    ])
+    final_reusable = bool(clean_reusable and audio_reusable and tools_known)
+    if not tools_known:
+        warnings.append('tool_versions empty: keys are planning identifiers; all cache reuse is disabled')
+
     quiet_ranges = project.get('expected_quiet_ranges', [])
     for q in quiet_ranges:
         a, b = q.get('start_frame'), q.get('end_frame')
@@ -182,14 +299,41 @@ def compile_manifest(root):
             raise ValueError('Expected quiet range needs valid output bounds and a reason')
     if quiet_ranges:
         warnings.append('Expected quiet ranges use absolute output positions; recheck after structural edits')
-    return {'schema_version': '1.1', 'project_id': timeline.get('project_id'), 'coordinate_space': 'output',
-            'fps_num': n, 'fps_den': d, 'width': width, 'height': height, 'total_frames': total,
-            'duration_seconds': total * d / n, 'events': events, 'joins': joins, **compiled_tracks,
-            'audio_required': project.get('audio_required', True),
-            'expected_quiet_ranges': quiet_ranges,
-            'cache_keys': {'units': unit_keys, 'clean_video': clean_key, 'mix_audio': audio_key, 'final': final_key},
-            'cache_reusable': bool(tools), 'warnings': warnings,
-            'input_digest': digest([timeline, transition_rows, source_rows, project, list(units.values())])}
+
+    compiled_budget = dict(budget) if isinstance(budget, dict) else {}
+    compiled_budget.update(
+        sum_event_frames=sum(r['length_frames'] for r in assembly_ranges),
+        sum_transition_overlap_frames=sum(overlaps),
+        computed_output_frames=total,
+    )
+    return {
+        'schema_version': '1.2',
+        'project_id': timeline.get('project_id'),
+        'coordinate_space': 'output',
+        'fps_num': n,
+        'fps_den': d,
+        'width': width,
+        'height': height,
+        'total_frames': total,
+        'duration_budget': compiled_budget,
+        'duration_seconds': total * d / n,
+        'events': events,
+        'joins': joins,
+        **compiled_tracks,
+        'audio_required': project.get('audio_required', True),
+        'expected_quiet_ranges': quiet_ranges,
+        'cache_keys': {'units': unit_keys, 'clean_video': clean_key, 'mix_audio': audio_key, 'final': final_key},
+        'cache_reusable_by_layer': {
+            'units': unit_cache_reusable,
+            'clean_video': bool(clean_reusable),
+            'mix_audio': bool(audio_reusable),
+            'final': bool(final_reusable),
+        },
+        # Backward-compatible aggregate flag: whether the final output cache is safely reusable.
+        'cache_reusable': bool(final_reusable),
+        'warnings': warnings,
+        'input_digest': digest([timeline, transition_rows, source_rows, project, list(units.values())]),
+    }
 
 
 if __name__ == '__main__':

@@ -11,6 +11,32 @@
 
 某一层通过不能代替后一层。用户未提供视频时可交付规范或方案，不得宣布完成实片验证。
 
+## Structure 基础层回归检查
+
+进入 Content Map、Direct 1、Direct 2 或 Execute 前，先确认 Structure 的最低信息地板没有被摘要替代：
+
+- `frames.jsonl` 中每个已分析 sampled frame 都能在 `frame-observations.csv` 找到同一 `frame_id`；
+- 每行基础观察显式保留帧号 / 时间 / 帧尾 ms、画面事实、动作 / 状态、`motif_tags`、硬字幕 / 可见文字、**原声要点及核听状态**、`change_from_previous`、`content_description`、**topic_judgment、confidence / confidence_basis**、unknowns；没有内容时使用 `none` / `unknown` / `not_applicable`，不留空；
+- 动作 / 视线 / 站位 / 物件变化候选进入 `action-node-candidates.csv`；默认 4fps 局部窗口，偏离时有例外原因；
+- 会改变场景理解、plan 或剪辑意义的问题进入 `structure-questions.csv`，其 unresolved / unverified 状态持续可见；
+- Directed Deep Structure 先保留 `detail-intervals.csv` 的进入原因 / 前情 / 当前背景 / 后续 / 目标问题，再对核心区域保留完整画面、背景、动作链、关键变化、情绪线索、硬字幕、原声及核听状态、before / after、主题判定、confidence、说话人裁决引用、问题引用、反证和未验证项；
+- `speaker-adjudications.csv` 在有说话人 / 对象歧义时保留帧级口型 / 原声 / 字幕 / ASR 裁决；无歧义时也保留带表头文件。
+- Broad Structure 的正式出口首先是这些文字化结构表单；overview、Content Map、情绪大意、Narrative Direction、Execution Plan、最终文案或 edit plan 都不能反向替代上述基础记录。
+- 抽样中未出现的动作 / 台词 / 物件不得直接写成“没有发生”；4fps 只用于加密观察和缩小窗口。negative fact 必须限定 source-time scope，并按事实类型使用覆盖完整机会窗口的连续视频、覆盖声明区间的连续原声，或能直接排除该事实的可靠反证。
+- 硬字幕 / 原声 / ASR 冲突有显式记录；方言 / 强口音 ASR 未核听时只作 locator，不作为唯一台词事实。
+- 每个关键证据保持稳定 `source_id + source time`；`frame-observations.csv` 与 `frames.jsonl` 的时间一致，Deep observation 落在对应 Detail interval，speaker adjudication 与 utterance 源区间相符。
+- 每个 source 的 `time_mapping` 与可用物理边界已记录；会限制 Direct 的 `usable_ranges / downstream_constraints` 已进入 Content Map / handoff。
+
+任何一项缺失，都属于 Structure regression，应先补回 B / E 阶段，不因后续产物已经生成而豁免。
+
+## Execute 前的规定动作
+
+- `timeline.duration_budget` 已按整数帧对平；普通覆盖式文字未被重复加到总长，真正延时的 card / hold 已成为 event；有时长上限时不得超预算进入 ready_for_render。
+- 每个进入执行的 source event 已显式列出 `deep_observation_refs`；只校验本次实际采用的 observation，确认 source 一致、source-time 覆盖采用区间、evidence_status 为 supported / partial；同 unit 其他未采用的 pending / contradicted 记录不作为阻断项。
+- audio track 已标 `narrative_role` / `treatment_reason`，不会因为提取 vocals 就把 BGM / ambience 的叙事作用默认为无效。
+- 本轮反馈已经按文字 / 声音 / 结构 / 创意分类，并按对应 invalidation 范围处理。
+- source time → assembly/output frame 的映射仍能回查，结构改动后旧绝对成片坐标没有被偷用。
+
 ## 导出后的规定动作
 
 按“渲染与工程检查”对每次最终导出进行完整解码，核对实际帧数和视频展示时长。固定帧率偏差超过1帧失败，恰好1帧查明并记录，不以done或exit 0通过。保存预期值、实测值、解码错误、成片哈希及manifest哈希。
@@ -41,8 +67,9 @@ qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_q
 ## 何时退回哪一步
 
 - 指代、条件、动作因果或原声核听有误：退回 E Directed Deep Structure；必要时补 C Content Map 的场景理解。
-- rough plan 的核心节点没有证据、反差来自截断原话、或新前后文会改变核心表达：把 evidence gap / 冲突证据退回 D Direct 调整；执行层不擅自重写主题。
-- Direct 只调整局部节点：优先复用 Broad Structure 与已验证证据，只补受影响的 E 区域。
+- Narrative Direction 的核心节点没有证据、反差来自截断原话、或新前后文会改变核心表达：把 evidence gap / 冲突证据退回 D1 Direct 调整主线；执行层不擅自重写主题。
+- Detail 证据已经成立但最终素材取舍、排序、声音 / 文字 / 时长策略尚未确认：停在 D2 Direct，不直接进入 Execute。
+- Direct 1 只调整局部节点：优先复用 Broad Structure 与已验证证据，只补受影响的 E 区域。
 - 新方向依赖此前低覆盖区域：先补 B/C 对应区域，再进入 E。
 - 声音与画面不顺：先 F 调切点；若改变意义，退回 E。
 - 来源版本不一致、时码漂移：退回 A，暂停精确导出。
@@ -57,7 +84,7 @@ qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_q
 已处理素材和区间：
 未处理或低可信区间：
 关键决定及对应证据 ID：
-当前 brief / editorial plan 及来源：
+当前 brief / Narrative Direction / Editorial Execution Plan 及来源：
 第二轮 Directed Deep Structure 已补查节点与证据缺口（并确认 `deep-observations.csv` 是否已覆盖核心区域的画面 / 内容 / 背景 / 前后状态）：
 已有文件与路径：
 实际使用的工具和能力缺口：
@@ -81,15 +108,15 @@ qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_q
 ```text
 请把随附《长视频混剪跨模型与MCP执行规范》作为本任务的工作说明。
 先盘点我提供的素材、已有记录和实际可用的视频工具，输出能力映射。
-第一轮先做 Broad Structure，建立可回查的 `frames.jsonl`、人可读 `frame-observations.csv`、场景、overview 和 Content Map；如果当前只要求内容地图，到这里正式交付。
-如果要继续混剪，请读取我提供的 brief / editorial plan；没有时先把 Content Map 交给我或独立 Director 做创意判断，不要默认替代这一层。
-拿到 rough plan 后，重新回原素材做 Directed Deep Structure，补足完整音画、上下文和保护范围，再推进到执行。
+第一轮先做 Broad / Board Structure，建立可回查的 `frames.jsonl`、逐抽样帧 `frame-observations.csv`（含帧尾、原声要点、主题判定、confidence）、`action-node-candidates.csv`（动作节点默认 4fps 局部窗口并记录最小有效单元候选）、`structure-questions.csv`、场景、overview 和 Content Map；如果当前只要求内容地图，到这里正式交付。
+如果要继续混剪，先把 Broad Structure 的正式文字化表单 + Content Map 交给我或独立 Director，形成 Narrative Direction；不要默认替代第一次创意决策。
+拿到 Narrative Direction 后，先建 `detail-intervals.csv` 明确精查区间的前情 / 当前背景 / 后续 / 目标问题，再回原素材做 Directed Deep / Detail Structure；补足完整音画、原声核听、说话人裁决、confidence、上下文、反证和保护范围。然后把完整 Detail evidence package 再交回 Director 形成 Editorial Execution Plan；只有第二次 Direct 确认后才进入 Execute。
 优先同集，保留完整对白与动作，不根据抽样帧或摘要补造未验证内容。
 已有确认信息直接沿用。遇到缺口先完成可做部分，并指出具体缺少哪段素材或哪种能力。
 素材位置：
 限定集数或范围：
 目标人物或关系（如有）：
-已有 brief / rough editorial plan：
+已有 brief / Narrative Direction / Editorial Execution Plan：
 时长和比例要求：
 交付目标：详细执行稿 / 粗剪 / 成片
 已确认方案或禁改项：
@@ -98,7 +125,7 @@ qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_q
 续接任务可使用：
 
 ```text
-请按随附执行规范续接这个项目。先读 handoff、project、sources、coverage、content-map、brief / editorial-plan 和 capability-map，再读取当前 plan mapping 引用的 scene / unit / review / 原始证据。
+请按随附执行规范续接这个项目。先读 handoff、project、sources、coverage、Structured Observation Layer、content-map、brief、`narrative-direction`、`execution-plan` 和 capability-map；兼容旧项目时再读 legacy `editorial-plan`。随后读取当前 narrative / execution mapping 引用的 scene / unit / Deep observation / review / 原始证据。
 先核对当前能力与源版本；复用已有成果，只补齐缺口，不重新概括替代原记录。
 继续完成 handoff 中的下一步。报告实际核验范围，不把前一模型的摘要写成自己的直接观察。
 ```
