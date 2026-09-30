@@ -49,5 +49,7 @@
     "directed_deep_pass": "pending",
     "frame_observations": "pending",
     "deep_observations": "pending"
-  }
+  },
+  "research_context_refs": [],
+  "human_decision_refs": []
 }

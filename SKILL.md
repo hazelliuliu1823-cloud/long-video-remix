@@ -5,15 +5,15 @@ description: 从三到五小时或多集影视、活动视频中建立可回查�
 
 # 长视频结构化与混剪执行
 
-公开仓库版本 v1.0.1 · 2026年9月29日
+公开仓库版本 v1.0.2 · 2026年9月30日
 
-本 Skill 的核心不是“一句话自动生成成片”，而是把长素材先整理成有来源、可检索、可回查的内容空间，再把人工或独立编导形成的 rough plan 可靠地压回原素材证据，并落实成真正可执行的剪辑方案。
+本 Skill 的核心不是“一句话自动生成成片”，而是先把视频、图像、对白与上下文等高成本多模态信息压缩成有来源、可检索、可回查的**紧凑结构化工作层**，让后续人工、Director 或其他 Skill 尽量基于表格 / 文本继续工作；创意方案确认后，再只把命中的区域压回原素材做高密度核验，并落实成真正可执行的剪辑方案。
 
 整体工作分为三个功能层：
 
-- **Structure**：先广覆盖建立 Content Map；有了 rough plan 后，再回原片做第二轮定向高密度 Structure。
-- **Direct**：决定“值得讲什么、为什么这样讲、怎样形成观看关系”。这一层默认由人、brainstorming 或独立 Director 流程完成。
-- **Execute**：把已确定的方向与已核实素材编译成时间轴、渲染清单、粗剪 / 成片及 QA。
+- **Structure**：把原始多模态素材转换成 `frame-observations.csv`、scene / overview、Content Map 等紧凑结构化表示；有了脚本方案后，再回原片做第二轮定向高密度 Structure。
+- **Direct**：决定“值得讲什么、为什么这样讲、怎样形成观看关系”。这一层默认在独立研究 / 编导环境中，由人结合 Structure 输出、行业 / 主题研究、brainstorming 或 Director 流程完成。
+- **Execute**：把已确认方向与已核实素材编译成时间轴、渲染清单、粗剪 / 成片及 QA。
 
 Structure 不是只做一次。标准路径是：
 
@@ -22,9 +22,10 @@ Source
   ↓
 Broad Structure
   ↓
-Content Map
+Compact Structured Representation
+(Frame observations + scenes + overview + Content Map)
   ↓
-Human / Director：Brief + Rough Editorial Plan
+Human / Research / Director：外部资料 + 人工判断 → Editorial / Script Plan
   ↓
 Directed Deep Structure
   ↺ 证据不足时返回 Direct 调整
@@ -41,7 +42,7 @@ Execute
 - 默认以角色和剧情为对象。公开活动只描述可见行为和观看感受，不由混剪推断真人私下关系、性取向或心理。
 - 不凭抽样帧补出未见动作，不凭转写补出未听台词，不把用户摘要或工具标签改写为亲眼观察。
 - **Broad Structure 不因已有 brief 过早缩窄覆盖。** brief 可以帮助标注重点，但第一轮仍要保留整体内容面、coverage 和 unknowns。
-- **Rough Editorial Plan 是创意意图，不等于素材已经证明。** 第二轮 Directed Deep Structure 必须重新回到相关原片核对。
+- **Editorial / Script Plan 是创意意图，不等于素材已经证明。** 第二轮 Directed Deep Structure 必须重新回到相关原片核对。
 - 如果第二轮证据与 rough plan 冲突，报告冲突、替代素材和缺口；默认不通过剪辑技巧强行证明原方案，也不擅自改写已确认的核心表达。
 - 同一集优先；同一事件、对白指向和关系阶段优先级高于服装相似。跨集须有明确主题联系，并让观众辨认时空变化。
 - 删段不删句，删重复不删因果。必要问答、否定、条件、迟疑、回应和动作后果共同决定最短保留范围。
@@ -55,7 +56,7 @@ Execute
 2. 读取 [MCP 适配](references/mcp-adapter.md)，发现真实能力、记录映射并完成小范围探测。只使用获授权的素材访问与处理范围。
 3. 检查已有产物。按源文件版本和配置恢复进度；不因切换模型重复扫描完整视频。
 4. 如果当前任务只要求 Structure，可在 Content Map 完成后正式交付，不必进入 Direct 或 Execute。
-5. 如果要继续混剪，读取已有 brief / editorial plan。没有时，先把 Content Map 交给用户、brainstorming 或 Director 流程形成 rough plan；本 Skill 不默认越过这一层自行决定创意主线。
+5. 如果要继续混剪，读取已有 brief / editorial plan。没有时，先把 Structure 的紧凑输出交给用户或独立研究 / 编导环境；它可以结合行业 / 主题资料、平台语境、参考案例和人工判断形成并确认 editorial / script plan。本 Skill 不默认越过这一层自行决定创意主线。
 6. 从当前可验证阶段开始，按下面的顺序推进。缺少某种观察能力时降级输出，并明确标签。
 
 ## 工作顺序
@@ -65,7 +66,7 @@ Execute
 | A 素材登记 | 确认版本、时长、时间基准、字幕匹配、能力与配置 | project、sources、capability-map | 能把后续证据定位回原素材；否则只做准备 |
 | B Broad Structure | 全时段粗扫画面和台词；逐张记录已分析抽样帧的结构化观察，保留无声段及未覆盖区域 | frames、frame-observations、transcript、coverage | 可识别覆盖与缺口；人工 / Director 不必重新从九宫格猜内容 |
 | C Content Map | 在逐抽样帧观察之上合并镜头为事件，建立 scene / 初步 unit、source-order overview 和跨场景内容地图 | scenes、units、overview、content-map | 形成足够完整且可下钻回 frame observation 的素材面；若 deliverable=content_map 可在此正式交付 |
-| D Editorial Plan Intake | 接入由人 / brainstorming / Director 形成的 brief 与 rough editorial plan，明确已确认主线、段落功能、重点线索和禁改项 | brief、editorial-plan、plan mapping | 创意方向足以指导定向深挖；不要求已有精确切点 |
+| D Editorial Plan Intake | 接入由独立研究 / 编导环境形成的 brief 与 editorial / script plan；可引用行业 / 主题资料和人工判断，明确已确认主线、段落功能、重点线索和禁改项 | brief、editorial-plan、external research refs、plan mapping | 创意方向已经人工确认到足以指导定向深挖；不要求已有精确切点 |
 | E Directed Deep Structure | 带着 rough plan 回到相关原素材，提高抽样 / 播放密度；先补完整画面、内容、背景、前后状态与原声，再做剪辑判断 | deep-observations、已核实 units、reviews、protected_ranges、evidence gaps | 每个核心节点有足够音画、内容与语境证据；不成立时退回 D 调整 |
 | F Execute | 校准文字；编译叠化后的时间轴；分层渲染；生成全接点图表 | timeline、transitions、render-manifest、edit-plan、rough-cut | 实测帧数与时长；近静音窗口有记录，再继续音画实看 |
 | G QA & Handoff | 逐接点及全片复核，做 EVA，保存问题与缓存版本 | render-audit、接点图表、qa、handoff | 技术检查与人工观看分别记录，不以成功日志代替验收 |
@@ -74,11 +75,11 @@ Execute
 
 ### 第一轮：Broad Structure
 
-目标是**扩大可见范围**，不是提前替某个选题找证明。
+目标是**扩大可见范围，并把多模态素材压成低上下文成本的结构化工作层**，不是提前替某个选题找证明。
 
 - 全时段建立基础画面与台词覆盖；
 - 对每张**已实际分析的抽样帧**建立结构化观察：可见人物、动作 / 状态、表情 / 视线、空间关系、环境背景、物件、可见文字、邻近对白、内容说明、interpretations 与 unknowns；
-- 同时保留机器可追溯的 `frames.jsonl` 与便于人工 / Director / 其他 Skill 阅读的 `frame-observations.csv`；
+- 同时保留机器可追溯的 `frames.jsonl` 与便于人工 / Director / 其他 Skill 阅读的 `frame-observations.csv`；后续创意阶段优先消费这些结构化表，而不是反复加载原始九宫格；
 - 场景、人物、事件、关系变化和无声互动都保留入口；
 - 形成 source-order overview 和跨场景 Content Map；
 - 明确抽样、字幕 / ASR、连续音画核实三种 coverage 的差别；
@@ -86,7 +87,7 @@ Execute
 
 ### 第二轮：Directed Deep Structure
 
-目标是**把 rough plan 重新压回原片证据**。
+目标是**只把已确认方案命中的节点重新压回原片证据**，把高成本观察集中在真正需要的区域。
 
 - 根据计划节点提高抽样密度或直接连续播放；
 - 先建立 `deep-observations.csv`：完整记录人物与站位、镜头 / 构图、动作链、表情 / 视线、空间关系、场景环境、关键物件和画面变化；

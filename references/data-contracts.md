@@ -45,6 +45,13 @@
 - `frame-observations.csv`、`deep-observations.csv`、`content-map.md`、`brief.md`、`editorial-plan.md` 都是人可读工作层，不替代 JSON / JSONL 原始证据。任何创意判断进入 Execute 前仍须链接回 frame / utterance / scene / unit / review / source range。
 - 不把取样帧序号当成源视频帧号。display_timecode 只用于阅读，机器使用毫秒或输出帧号。
 
+
+## 结构化工作层与上下文成本
+
+Structure 的目标之一，是把视频 / 图像 / 原声等高成本多模态输入转换成 **compact structured representation**。`frames.jsonl`、`frame-observations.csv`、scene / overview、`content-map.md` 共同构成第一轮可复用工作层；Direct 优先消费这些结构化数据，而不是反复重新加载原始视频或九宫格。
+
+这是一种有损压缩式的工作表示，但不是证据替代：所有关键记录必须保留时间码和 evidence refs，确保需要时可以重新下钻到原素材。第二轮 Directed Deep Structure 只对 editorial / script plan 命中的区域恢复更高密度多模态上下文。这样可以减少重复上下文和不必要的高密度观察，但不承诺固定比例的 token 或算力节省。
+
 ## 素材和证据记录
 
 sources 每条必填 source_id、locator、version、duration_ms。version 可以是可核查版本标识或哈希；未知为 null，并阻止复用旧缓存到精确剪辑。其他字段包括 episode、width、height、fps_num、fps_den、frame_rate_mode、audio_streams、subtitle_source、time_mapping。
@@ -125,7 +132,7 @@ verification 的 audio、visual、context 使用 pending、reviewed、not_applic
 
 Content Map 中每个可操作条目应尽量带 `scene_id`，必要时补 source range / evidence refs / coverage 状态。它可以写“可能形成对照”“值得进一步回看”等导航性解释，但必须与事实分开，不能把尚未连续核实的推测写成已成立主线。
 
-`brief.md` 与 `editorial-plan.md` 属于 Direct 层输入。它们可以在仓库外形成，也可以复制 assets 模板。对核心执行而言：
+`brief.md` 与 `editorial-plan.md` 属于 Direct 层输入。它们通常在仓库外的研究 / 编导环境形成，也可以复制 assets 模板。Direct 可以同时引用行业 / 主题研究、平台资料、参考案例和人工笔记；这些外部资料不要求采用本仓库的固定 schema。对核心执行而言：
 
 - Brief 说明要表达什么、范围、重点和约束；
 - Rough Editorial Plan 说明准备怎样组织观看关系、每段承担什么功能、希望回原片寻找什么；

@@ -1,73 +1,120 @@
 # long-video-remix
 
-> **Turn hours of footage into a searchable content map — then turn human editorial intent into an executable remix timeline.**
+> **Make video queryable before you make it editable.**
+>
+> Turn hours of multimodal footage into compact, searchable structured data — then use that structure for editing, research, content analysis and execution.
 
-`long-video-remix` 是一套面向长视频、多集素材和长时段活动视频的 AI 辅助分析与剪辑执行工作流。它先把难以浏览的长素材变成**可检索、可回查、带证据的内容地图**，再把人的编导意图重新压回原素材，落实成具体到场景、对白、时间码和保护区间的剪辑方案。
+`long-video-remix` 的核心不是“让 AI 再看一遍视频”，而是先把视频变成一种**更容易理解、更便宜读取、更容易组合**的结构化表示。
 
-**它不是“一句话自动生成短视频”的黑箱工具。** 它更关注两件更稳定、也更难做好的事：
+视频、图片、字幕 / 原声、人物、动作、场景与上下文原本都是高成本的多模态信息。Structure 会把这些信息压成可检索、可排序、可回查的表格和文本层，例如 `frame-observations.csv`、scene / overview 与 `content-map.md`。后续的人、Director 或其他 Skill 可以优先消费这些紧凑数据，而不是每次重新加载原视频、九宫格和大量图片。
 
-1. **Structure**：先把几个小时的素材整理成可检索、可回查、带证据的内容地图；
-2. **Execute**：在人或独立编导流程给出内容方向后，重新回到原素材做定向深挖，把 rough plan 落成可执行的剪辑时间轴，并完成渲染前后的工程检查。
+这带来一个很直接的变化：
 
-中间的 **Direct** ——“到底值得讲什么、为什么这样讲、哪条叙事更有意思”——属于创意核心。它可以由人完成，也可以通过 brainstorming、独立 Director Agent 或其他策划流程完成。本仓库会提供输入模板和证据支持，但默认不替代这一层创意判断。
+| 过去 | Structure 之后 |
+|---|---|
+| 一条视频一条视频重新分析 | 把多条视频变成统一的结构化数据层 |
+| 想看某个时间点，还要重新打开视频 | 直接定位到时间码对应的人物、动作、对白、背景和内容说明 |
+| 不同任务要重复读取同一批多模态素材 | 剪辑、内容研究、效果复盘、检索可以复用同一套结构化结果 |
+| 大量上下文消耗在“重新看一遍” | 高成本多模态读取集中到真正需要深挖的区域 |
 
+## 一个最直观的例子：从“分析视频”到“分析内容”
 
-## 为什么做这个
+假设你有 500 条已经发布的短视频，同时拿到了播放曲线、停留、跳出或互动数据。
 
-长视频真正难的通常不是“会不会切”，而是两件事：**先看全，再看细**。
+过去通常只能先得到：
 
-- 几小时素材无法靠一次摘要可靠理解；
-- 创意方向确定之前，不应该为了某个主题过早把所有区域扫到帧级；
-- rough plan 形成之后，又必须重新回到原片提高观察密度，核对语境、对白、动作和因果；
-- 最终还要把内容判断转换成稳定的时间轴、转场、音轨和 QA。
+> 视频 A 在 12 秒留存上升；视频 B 在 8 秒开始流失；视频 C 完播率较高。
 
-这个仓库把这条链路拆开：**Broad Structure → Human Direct → Directed Deep Structure → Execute**。
+但真正想知道的是：**用户在那个时间点到底看到了什么。**
 
-特别适合：剧情 / 综艺 / 访谈 / 纪录片 / 课程 / 活动录像等长素材的二次创作与主题混剪。
+Structure 之后，每一个已分析时间点都可以对应到结构化内容：人物、动作、表情 / 视线、空间关系、对白、屏幕文字、场景背景和叙事功能。于是用户行为数据可以直接挂到内容节点上：
 
-## 核心流程
+| 时间点 | 结构化内容 | 内容类型 | 用户表现 |
+|---|---|---|---|
+| 00:08 | 两人争执，其中一人转身离开 | 冲突 / 动作变化 | 留存上升 |
+| 00:12 | 近景反应，无对白 | 人物反应 | 重播增加 |
+| 00:19 | 长段解释性对白 | 信息说明 | 流失增加 |
+| 00:27 | 前面埋下的信息得到兑现 | 情节兑现 | 留存再次上升 |
+
+这时分析对象就不再只是“哪条视频表现好”，而可以进一步问：
+
+- 哪一类画面更容易产生停留？
+- 哪种人物动作经常对应重播？
+- 用户流失前通常出现的是长对白、静态画面，还是信息密度下降？
+- “冲突 → 反应 → 兑现”这样的结构在不同视频中表现是否稳定？
+- 能不能直接找出所有“人物沉默 + 近景反应”的片段，再比较它们的表现？
+
+**Structure 的价值，就是把视频从难以计算和组合的多模态对象，转换成可以检索、筛选、连接、比较和再次创作的数据层。**
+
+同一套结构化结果，不只服务于剪辑，也可以继续用于内容复盘、用户行为分析、跨视频比较、研究、检索和其他 AI 工作流。更完整的示例见 [`examples/content-performance-analysis.md`](examples/content-performance-analysis.md)。
+
+## 核心设计：先压缩，再创作，再把算力花在真正需要的地方
 
 ```text
-Source footage
+Source footage / transcript / sampled frames
       │
       ▼
 ① BROAD STRUCTURE
-全量粗覆盖：抽样帧、对白、场景、人物、事件、关系变化、未确认区域
-      │
-      ├─ Frame Observation Index
-      │  每张已分析抽样帧的结构化观察表
-      ▼
-Content Map
-由逐帧观察、scene、overview 汇总出的可检索素材地图
+低密度全局理解
       │
       ▼
-② DIRECT  ← 人 / brainstorming / Director
-Brief + Rough Editorial Plan
-决定想讲什么、段落功能和大致重组逻辑
+Compact Structured Representation
+Frame Observation Index + scenes + overview + Content Map
+      │
+      ▼
+② DIRECT  ← 人 / research / brainstorming / Director
+在独立研究 / 创意环境中形成并确认 Editorial / Script Plan
       │
       ▼
 ③ DIRECTED DEEP STRUCTURE
-带着 rough plan 回到原素材
-提高抽样与观察密度，形成 Deep Observation Index：
-完整画面描述 / 内容描述 / 场景与叙事背景 / 前后状态 / 原声核听 / 反证
-再收敛为更细 unit / protected ranges
-      │
-      ├── 证据不足或原计划不成立 ──→ 返回 Direct 调整 rough plan
+只回到脚本命中的原素材区域做高密度多模态回查
       │
       ▼
 ④ EXECUTE
-锁定片段 → 时间轴 → 转场 / 音轨 / 文字 → render manifest → 导出审计 / QA
+Verified units → timeline → render manifest → QA
 ```
 
-这里的 Structure 不是只做一次。
+这里最重要的不是把所有环节都塞给一个“超级 Skill”。
 
-第一轮 Structure 追求**广覆盖**：先把整体素材面展开，让人知道“这里到底有什么”。
+- **Broad Structure** 先把整个素材面低成本地铺开并压成紧凑表示；
+- **Direct** 保留人的创意判断，也可以结合独立的行业 / 主题研究；
+- **Directed Deep Structure** 只对确认脚本真正命中的区域重新投入高密度观察；
+- **Execute** 把已经验证的内容落到可执行时间轴和工程 QA。
 
-Direct 形成 rough plan 后，第二轮 Structure 追求**定向高密度**：重新进入相关场景和上下文，把第一次粗结构中不需要做到的细节补齐，直到计划可以安全进入剪辑执行。
+这套设计的目标不是承诺固定比例的 token / 算力节省，而是**避免后续每一步都重新消费昂贵的原始多模态上下文**。
 
-因此它不是简单的 `Structure → Direct → Execute` 单向流水线，而是：
+## 适用场景
 
-> **先展开整个素材空间 → 人做创意判断 → 再定向回到素材深挖 → 最终收敛成剪辑执行。**
+这套方法适合任何“素材很长、需要反复理解和再利用”的视频工作：剧情 / 综艺 / 访谈 / 纪录片 / 课程 / 活动录像，以及已经发布内容的效果复盘。
+
+它尤其适合以下情况：
+
+- 素材多到无法靠一次摘要可靠理解；
+- 同一批视频会被反复用于剪辑、研究、检索或分析；
+- 创意方向需要人参与，而不是交给黑箱一次生成；
+- 只有少量候选片段值得投入高密度多模态观察；
+- 最终还需要把内容判断落实成稳定的时间轴、转场、音轨和 QA。
+
+## 为什么是两轮 Structure
+
+一次把整部长视频扫到帧级既昂贵，也容易在创意方向尚未确定时浪费计算。这里采用两轮不同目标的 Structure：
+
+- **第一轮 Broad Structure：覆盖优先。** 用较低密度看完整素材，并把结果压成可复用的结构化工作层；
+- **第二轮 Directed Deep Structure：完整度优先。** 脚本方向确认后，只回到命中的区域补高密度画面、原声、前后语境和反证。
+
+因此，真正昂贵的多模态观察集中在少量高价值区域；而创意讨论、检索和跨视频分析可以尽量基于已经结构化的数据进行。
+
+## Structure 是可复用的工作层
+
+这层结构化数据并不是为了替代原始证据，而是为了让后续工作不必每次从原视频重新开始。它可以被人和其他模型快速浏览、过滤、排序、搜索和引用。
+
+它主要解决三个问题：
+
+- **减少重复多模态读取**：后续 Direct 不需要为了每次创意讨论都重新把原视频、九宫格或大量图片塞进上下文；
+- **降低创意阶段的上下文负担**：人工、Director 或其他 Skill 可以直接在 `frame-observations.csv`、scene / overview 和 `content-map.md` 上做组合与判断；
+- **把高成本计算集中到命中区域**：只有确认脚本涉及的段落才回到原片进入 Directed Deep Structure，高密度读取画面、原声和前后语境。
+
+这不是把原始证据丢掉。所有结构化记录仍保留 `frame_id`、`scene_id`、时间码、evidence refs 等回查路径，需要时可以重新落回原素材。
 
 ## Structure 能做什么
 
@@ -97,12 +144,15 @@ Structure 的目标不是“总结剧情”，而是把原本难以浏览的长�
 
 ## Direct 需要什么输入
 
-Direct 默认由外部完成。本仓库提供两个轻量模板：
+Direct 默认由外部完成，而且通常适合在一个**独立的研究 / 编导工作区**里完成。它的输入不只可以是 Content Map，也可以包括行业 / 主题研究、平台语境、参考案例和人的经验判断。Structure 的价值，是让这个创意环境优先消费紧凑的表格化信息，而不是反复重新读取原始多模态素材。
+
+本仓库提供两个轻量模板：
 
 - `assets/brief-template.md`：说明这次想表达什么、素材范围和约束；
-- `assets/editorial-plan-template.md`：把 brainstorming 或编导判断整理成 rough editorial plan。
+- `assets/editorial-plan-template.md`：把 research / brainstorming / 编导判断整理成 editorial / script plan。
+- 也可以直接引用仓库外的行业研究、主题资料、平台分析或人工笔记；本仓库不强制这些创意输入使用固定格式。
 
-rough plan 不需要已经精确到时间码。它只需要把创意结构说清楚，例如：
+这个阶段可以先形成 rough plan，再通过人工讨论收敛为确认的 editorial / script plan。它不需要已经精确到时间码，但需要把创意结构、外部研究依据、人的关键判断和不能改变的核心表达说清楚，例如：
 
 ```text
 主题：出去 / 回家
@@ -125,7 +175,7 @@ rough plan 不需要已经精确到时间码。它只需要把创意结构说清
 
 真正的镜头、对白、时间码、必要前情和保护区间由后续 Directed Deep Structure 完成。
 
-如果你已经有自己的编导工作流，可以直接提供现有方案，不必改写成模板。模板只用于保证必要信息不缺失。
+如果你已经有自己的研究 / 编导工作流，可以直接提供现有方案，不必改写成模板。模板只用于保证必要信息不缺失。真正进入 Directed Deep Structure 前，建议明确哪些内容已经由人确认、哪些仍只是待素材验证的假设。
 
 ## Directed Deep Structure 为什么单独存在
 
@@ -178,6 +228,8 @@ long-video-remix/
 │   ├── editorial-plan-template.md
 │   ├── project-template.json
 │   └── timeline-template.json
+├── examples/
+│   └── content-performance-analysis.md
 ├── references/
 │   ├── workflow.md
 │   ├── data-contracts.md

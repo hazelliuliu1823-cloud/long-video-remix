@@ -21,7 +21,7 @@ F Execute：时间轴与渲染
 G QA & Handoff
 ```
 
-第一次 Structure 追求**广度**，第二次 Structure 追求**与 rough plan 相关的深度**。不要在第一轮为某个主题过早押题，也不要在第二轮仅凭第一轮摘要直接精剪。
+第一次 Structure 追求**广度 + 紧凑表示**：把原始多模态信息转换成可以低成本反复阅读的结构化数据；第二次 Structure 追求**与已确认 editorial / script plan 相关的深度**。不要在第一轮为某个主题过早押题，也不要在第二轮仅凭第一轮表格直接精剪。
 
 ## 任务与默认值
 
@@ -29,9 +29,9 @@ G QA & Handoff
 
 配置必须写明：素材范围、目标人物（如有）、已知目标或开放 Structure、是否限同集、成片比例和时长、原声与配乐要求、已有底稿、交付目标、可用工具。未知项写 null；对不影响前期建档的缺项先继续工作。无指定时，以同集为优先、保留原声、只用必要解释文字；时长和比例不擅自写成用户已确认要求。
 
-`deliverable=content_map` 时，默认目标是完成 A—C 并正式交付 Content Map。`deliverable=detailed_plan` 或更后续产物时，必须在进入 E 前取得 brief / editorial plan；它们可以来自用户、人工编导、brainstorming 或独立 Director 流程。
+`deliverable=content_map` 时，默认目标是完成 A—C 并正式交付 Content Map。`deliverable=detailed_plan` 或更后续产物时，必须在进入 E 前取得 brief / editorial plan；它们可以来自用户，也可以来自独立研究 / 编导环境，在那里结合 Structure 输出、行业 / 主题资料、平台语境、参考案例和人工判断形成。
 
-已有 brief 可以在 Broad Structure 阶段作为重点标记，但不得让第一轮覆盖只剩关键词检索。Structure 的价值之一就是扩大人的可见范围，让后续 Direct 不被最初假设锁死。
+已有 brief 可以在 Broad Structure 阶段作为重点标记，但不得让第一轮覆盖只剩关键词检索。Structure 的价值之一就是扩大人的可见范围，并把昂贵的多模态上下文压成可反复复用的表格 / 文本层，让后续 Direct 不被最初假设锁死，也不必在每次创意讨论时重复读取原视频。
 
 默认不主动渲染。只有明确要求或任务已包含试剪时才调用渲染；下载、上传、付费和访问私有资源均受当前环境授权约束。不得发布、发给他人或覆盖源视频。
 
@@ -69,7 +69,7 @@ G QA & Handoff
 
 coverage 分别记录画面抽样、字幕或转写、连续音画复核的时间区间与状态。全时段完成抽样不等于全时段实看。任何未处理、失败或低清区域都保持可见；特别记录片头片尾是否有正片内容。
 
-Broad Structure 的完成条件不是“已经知道该剪什么”，而是：素材主要时间范围已经建立基础索引，场景和对白可以回查，coverage 与 unknowns 清楚，人或 Director 有足够完整的素材面继续判断。
+Broad Structure 的完成条件不是“已经知道该剪什么”，而是：素材主要时间范围已经建立基础索引，场景和对白可以回查，coverage 与 unknowns 清楚，并已经形成足够紧凑的结构化工作层，使人、Director 或其他 Skill 可以主要基于表格 / Content Map 继续判断。
 
 ## C Content Map：场景理解与结构化输出
 
@@ -97,7 +97,7 @@ Content Map 可以提示“这里可能值得继续看”，但不把这种提�
 
 ## D Editorial Plan Intake：接入外部 Direct
 
-Direct 是创意层。默认由人、brainstorming、独立 Director Agent 或用户现有方法完成。本 Skill 在这一阶段主要做**接入、澄清结构和建立回查目标**，不是重新替用户自由选题。
+Direct 是创意层。默认在仓库之外的**独立研究 / 编导工作区**完成：它可以读取 Broad Structure 的表格化输出和 Content Map，同时结合行业 / 主题研究、平台语境、参考案例和人的经验判断，再通过 brainstorming、Director Agent 或其他方法形成脚本方案。本 Skill 在这一阶段主要做**接入、澄清结构和建立回查目标**，不是重新替用户自由选题。
 
 最小输入可以只是一份自然语言 brief；更推荐提供 rough editorial plan。可使用 `assets/brief-template.md` 和 `assets/editorial-plan-template.md`，也可以直接接入已有文档。
 
@@ -114,11 +114,11 @@ rough plan 至少应让后续系统知道：
 
 把 rough plan 映射到 Content Map：每个计划节点链接已有 scene / unit / evidence；没有对应项的节点登记为 evidence gap。不要为了让 plan 看起来完整而把弱证据升级为事实。
 
-如果用户明确授权本 Skill 辅助 brainstorming，可以给出基于 Content Map 的建议，但要与后续执行记录分开，并明确这是 Direct 层草案。默认情况下，已确认的核心表达优先，不自行改成另一条主题。
+如果用户明确授权本 Skill 辅助 brainstorming，可以给出基于 Content Map 的建议，但要与外部研究、人工判断和后续执行记录分开，并明确这是 Direct 层草案。默认情况下，已确认的核心表达优先，不自行改成另一条主题。
 
 ## E Directed Deep Structure：带着计划回原片
 
-这是第二轮 Structure，也是从“rough plan”进入“可剪方案”的关键步骤。
+这是第二轮 Structure，也是从“已确认的创意 / 脚本方案”进入“可剪方案”的关键步骤。它只对计划命中的区域重新消费高密度多模态信息。
 
 对 editorial plan 中每个节点重新回到原素材，不仅复用第一轮摘要。先读取对应 scene / unit / transcript / frames / frame-observations，再提高信息密度。第二轮的顺序是**先重新把核心区域看完整，再决定怎么剪**：
 
