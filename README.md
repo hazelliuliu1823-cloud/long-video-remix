@@ -1,53 +1,57 @@
 # long-video-remix
 
-> **Structure the source. Execute the edit. Keep direction human.**
->
-> Turn hours of multimodal footage into compact, searchable structured data — then turn a confirmed editorial plan into an evidence-backed, executable remix timeline.
+**Structure long videos once. Reuse the data across edits.**
 
-`long-video-remix` 有两个核心能力：**Structure** 和 **Execute**。
+> Structure the source. Execute the edit. Keep direction human.
 
-| 核心能力 | 它解决什么问题 | 主要产物 |
-|---|---|---|
-| **Structure** | 把视频、图片、字幕 / 原声、人物、动作、场景与上下文这些高成本多模态信息，压成更容易理解、检索和复用的结构化数据 | `frame-observations.csv`、`action-node-candidates.csv`、`structure-questions.csv`、scenes、`overview.md`、`content-map.md`、`deep-observations.csv` |
-| **Execute** | 把 Detail 已核实、Direct 2 已确认的素材取舍与执行方案编译成真正可剪、可渲染、可检查的工程结果；证据核验属于前一层 Directed Deep / Detail Structure | verified units、`protected_ranges`、双时间轴、`render-manifest.json`、render audit / QA |
+长视频每换一个想法、改一轮方案，都重新读取数小时画面和原声，会重复消耗多模态处理成本。本项目先把素材变成**紧凑、可检索、可回查的表格与文本**，让后续工作优先复用结构化信息；人确定主线后，只对命中区域深挖，再把确认方案编译成可执行的剪辑时间轴。
 
-中间的 **Direct** 是创意接口，而不是默认塞进一个“超级 Skill”里自动完成；在完整流程里它会出现两次。第一次基于 Broad Structure 的**正式文字化结构表单 + Content Map**确定“到底讲什么”；第二次在 Detailed Structure 补全证据后确定“最终具体怎么讲”。
+| 核心价值 | 怎么实现 |
+|---|---|
+| **低成本复用** | Broad 建全局内容地图；创意讨论、检索和改稿复用数据，Detail 集中核实被选区域 |
+| **结构足够丰富** | 保留逐抽样帧事实、动作变化、对白 / 说话人依据、上下文、情绪线索、问题、未验证项和源时间 |
+| **创意由人掌握** | 两次 Direct：先定“讲什么”，证据补齐后再定“具体怎么讲”；Execute 落实已确认决定 |
+| **执行可检查** | 证据与源版本绑定、切点与对白保护、授权取段与顺序、时间轴校验、分层缓存和导出审计 |
 
-如果只记住一条链路，就是：
+目标是减少反复理解原始多模态素材的开销。抽帧、ASR、定向回看与 GPU 渲染仍需资源；具体成本取决于素材、模型和工具，本项目未承诺固定降幅。
 
-```text
-Raw multimodal footage
-      │
-      ▼
-① BROAD STRUCTURE
-      │
-      ▼
-② STRUCTURED OBSERVATION LAYER
-逐抽样帧 / 分片段观察表 + action nodes + Q&A + scenes / overview
-      │
-      ▼
-③ CONTENT MAP + emotional / relationship cues
-      │
-      ▼
-④ DIRECT 1  ← Human / Research / Director
-Narrative Direction：到底讲什么？
-      │
-      ▼
-⑤ DIRECTED DEEP / DETAIL STRUCTURE
-只对主线命中的区域做高密度音画回查与证据补全
-      │
-      ▼
-⑥ DIRECT 2  ← Human / Director
-Editorial Execution Plan：这些材料最终怎么讲？
-      │
-      ▼
-⑦ EXECUTE
-Verified units → timeline → render manifest → QA
+**v1.0.5** 补齐独立源音轨的对白检查与确认摘要，包括卡片对白、未关联音轨和异源仅音频；保留此前的证据绑定、执行授权、源范围及完整音轨核听检查。查看 [更新说明](RELEASE_NOTES.md) · [QA 结果](v1.0.5-QA.md) · [安装与更新](INSTALL.md)。
+
+## 快速开始
+
+1. 安装完整文件夹，复制 assets/project-template.json 建立独立项目，登记源与可用模型 / 视频工具。
+2. 完成 Broad 的正式观察层和 Content Map；只做结构化时可在此交付，后续剪辑可复用。
+3. 人 / Director 定主线，Detail 核实命中区域，再由 Direct 2 确认最终取舍、顺序和处理，保存机器授权。
+4. 执行静态校验与编译，渲染适配器在消费清单前检查授权：
+
+```sh
+python3 scripts/validate_project.py PROJECT
+python3 scripts/compile_render_manifest.py PROJECT
+python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.json
 ```
 
-这套设计不是只解决“怎么把视频看懂”，也不是只解决“怎么把视频切出来”。它处理的是从**长素材理解**到**工程执行**之间最容易丢信息的整条链路：
+原始音画处理与实际渲染由当前环境的模型、视频 MCP、FFmpeg 或其他适配器完成。随包脚本提供授权记录准备、静态检查、时间轴编译和导出审计，渲染器按 [MCP 适配](references/mcp-adapter.md) 接入。
 
-> **先把素材结构化，让人和模型更便宜地工作；再把人的创意可靠地压回原片，直到形成可执行、可核查的剪辑结果。**
+## 工作路径
+
+| 环节 | 产出与决定 |
+|---|---|
+| Broad Structure → Structured Observation Layer → Content Map | 全局观察表、场景 / 动作 / 问题索引，保留覆盖与缺口 |
+| Direct 1 · Narrative Direction | 人 / Director 确定主线、候选区域和待核问题 |
+| Directed Deep / Detail Structure + Edit Boundary | 核实连续音画、前后语境、反证和安全可剪范围；证据不足返回 Direct 1 |
+| Direct 2 · Editorial Execution Plan | 确认最终事件、顺序、声音 / 文字、转场和允许调整 |
+| Execute → Render / QA | 按证据与机器授权编译、接入渲染，再完成技术检查与动态听看 |
+
+## 丰富结构如何可靠进入执行
+
+固定信息地板保留事实、派生解释与 unknowns；source-time 标签使每个判断能回原片；增量落盘和恢复减少重复扫描。v1.0.3 将采用的 evidence、boundary、review 和独立源音轨绑定当前素材版本，并对照 Direct 2 检查实际范围与顺序。
+
+未就绪草稿只能显式用 `--planning` 编译为不可渲染清单。v1.0.5 从视频及每条源音轨的实际取段与明确采用 ID 检查对白；无视频关联、scene / action 标签均不能关闭保留政策。音轨独有对白及其核听证据进入确认摘要；完整取段（包括 J/L-cut 扩展）须链接当前有效的核听记录。删句或截尾须有具体已确认依据，完整且已核实的异步声音仍可执行。运行结果继续区分技术通过与最终听看验收。
+
+工程字段与迁移见 [执行完整性契约](references/execution-integrity.md)；可运行示例见 examples/synthetic-ready（合成记录，无真实媒体）。同一结构层还可用于 [内容效果分析](examples/content-performance-analysis.md)。
+
+<details>
+<summary><strong>完整方法、Structure 表单、Direct 职责与工程说明</strong></summary>
 
 ## 为什么 Structure 值得单独做
 
@@ -64,12 +68,13 @@ Verified units → timeline → render manifest → QA
 
 ## Execute 为什么同样是核心
 
-Structure 解决“素材怎么看得清、怎么复用”，但最终要做成视频，还需要把已经确认的创意方案变成**不会丢语义、不会错因果、可以真正渲染和验收**的时间轴。
+Structure 解决“素材怎么看得清、怎么复用”，但最终要做成视频，还需要把已经确认的创意方案变成**保留证据与保护范围、可以渲染和核查**的时间轴。
 
 Execute 负责把 Directed Deep Structure 已经核实过的素材继续收敛成：
 
 - verified units 与必要前后文；
 - `context_ranges` / `protected_ranges`，避免剪掉关键语义或动作；
+- `edit-boundaries.csv`：把“内容结束”与“真正可切”分开，记录音频尾部、动作 / 反应收束、preferred in/out、safe windows、must-keep ranges 和 cut risk；
 - assembly timeline 与 output timeline；
 - hard cut / xfade、音轨、文字轨和章节卡；
 - `render-manifest.json`；
@@ -253,12 +258,16 @@ Directed Deep / Detail Structure 完成后，Director 第二次接收的是完�
 long-video-remix/
 ├── README.md
 ├── CHANGELOG.md
+├── INSTALL.md
+├── RELEASE_NOTES.md
+├── v1.0.3-QA.md
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
 ├── assets/
 │   ├── frame-observation-template.csv
 │   ├── deep-observation-template.csv
+│   ├── edit-boundary-template.csv
 │   ├── detail-interval-template.csv
 │   ├── speaker-adjudication-template.csv
 │   ├── action-node-candidate-template.csv
@@ -268,13 +277,16 @@ long-video-remix/
 │   ├── narrative-direction-template.md
 │   ├── execution-plan-template.md
 │   ├── editorial-plan-template.md
+│   ├── execution-authorization-template.json
 │   ├── project-template.json
 │   └── timeline-template.json
 ├── examples/
-│   └── content-performance-analysis.md
+│   ├── content-performance-analysis.md
+│   └── synthetic-ready/
 ├── references/
 │   ├── workflow.md
 │   ├── data-contracts.md
+│   ├── execution-integrity.md
 │   ├── montage-rules.md
 │   ├── render-engineering.md
 │   ├── qa-handoff.md
@@ -282,10 +294,16 @@ long-video-remix/
 │   ├── structure-regression-matrix.md
 │   ├── mcp-adapter.md
 │   └── worked-example.md
+├── tests/
+│   ├── test_execution_integrity.py
+│   └── fixtures/ready-project.json
 └── scripts/
     ├── validate_project.py
     ├── compile_render_manifest.py
     ├── timeline_math.py
+    ├── execution_integrity.py
+    ├── prepare_execution_authorization.py
+    ├── check_render_authorization.py
     └── audit_render.py
 ```
 
@@ -306,11 +324,12 @@ long-video-remix/
 3. 把 Narrative Direction 接回项目，对命中区域进行 Directed Deep / Detail Structure，并生成 `deep-observations.csv`，把核心区域的画面、内容、背景、前后状态、原声证据、反证和保护范围补全；
 4. 把完整 Detail evidence package 再交回 Director，形成 Editorial Execution Plan；
 5. Execute 只依据已确认 execution plan，把 verified units / protected ranges 编译为 edit plan 和 timeline；
-6. 运行：
+6. 先按 [执行完整性契约](references/execution-integrity.md) 保存当前证据绑定和 Direct 2 的机器授权，再运行：
 
 ```text
 python3 scripts/validate_project.py 项目目录
 python3 scripts/compile_render_manifest.py 项目目录
+python3 scripts/check_render_authorization.py 项目目录 项目目录/render-manifest.json
 ```
 
 7. 使用实际渲染器生成视频后运行：
@@ -339,3 +358,5 @@ python3 scripts/audit_render.py 成片.mp4 项目目录/render-manifest.json --o
 ## License
 
 MIT License。你可以使用、修改和再分发本项目；保留原始版权与许可声明即可。详见 `LICENSE`。
+
+</details>

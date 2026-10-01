@@ -1,7 +1,37 @@
 # Changelog
 
+## v1.0.5 — Independent Source Audio Dialogue · 2026-10-01
+
+- Fixed F4: derive and validate utterances independently for every adopted source audio track, including card-only speech, unassociated extra tracks and audio-only sources. Full current utterance evidence and audio verification are required before preservation decisions.
+- Included audio-only utterances and their dedicated reviews in adopted_evidence_digest. Changes invalidate unchanged confirmation; recompilation must still reject stale evidence.
+- Preserved source-event synchronization and existing event-level exceptions. Independent speech permits asynchronous output placement, compatible continuation across cards and valid track-level audio_required_range exceptions; explicit policy changes require a track-level reason.
+- Added independent speech regression cases and v1.0.4 migration guidance. Retained all formal CSV templates, original core scripts, two Direct stages, layered caches, render audit and previously declared capability boundaries.
+
+## v1.0.4 — Dialogue Selection & Full Audio Review Coverage · 2026-10-01
+
+- Fixed F1: validate explicitly adopted utterances and known same-source speech intersecting actual video / associated audio selections before checking self-declared protection ranges. Missing, stale or unverified adopted speech cannot be filtered out by an underdeclared audio boundary.
+- Fixed F2: dialogue preservation is triggered by adopted speech / speech metadata independently of continuity_type. Scene or action labels cannot allow muted, replaced or misaligned preserved dialogue. Explicit policy changes require a confirmed event-level reason.
+- Fixed F3: every source audio track requires independent current audio review_refs covering its complete source range, including J/L-cut extensions. Track-only reviews enter the adopted evidence digest; creative exceptions do not grant review coverage.
+- Added explicit adopted_utterance_refs to ready source events, migration instructions, positive and negative regression cases, and a refreshed synthetic-ready example.
+- Preserved the six formal Structure CSV templates, two Direct stages, timeline math, layered caches and render audit. Broad coverage, sampling / semantic proof, Deep protection transfer and non-dialogue audio closure remain explicitly bounded.
+
+## v1.0.3 — Structured Representation & Execution Integrity · 2026-10-01
+
+- Added current-source / time-mapping bindings for adopted observations, boundaries, reviews, unit verification, utterances, video events and source audio tracks; stale evidence blocks ready execution.
+- Added a machine-readable Direct 2 execution authorization, with selected events / units / boundaries, exact sequence, adopted evidence snapshot, track / transition recipes and explicit permitted adjustments. Decision or evidence changes invalidate its fingerprints.
+- Extended existing Edit Boundary protection to source-audio coverage, duration, source/output synchronization and fades; explicit supported J/L-cut and creative tail-cut exceptions remain possible.
+- Enforced source_scope, usable_ranges, optional allowed_scope and typed source-range constraints against actual video and audio adoption.
+- Required precise override targets, violated rules, current successful review coverage and confirmed creative decisions; placeholder and unrelated overlap/boundary reviews no longer release execution.
+- Default compilation now rejects non-ready or unauthorized drafts; --planning carries render_allowed=false. Added a current-input / manifest-integrity guard for renderer adapters.
+- Added output fps to mix_audio cache identity while retaining the existing layered cache design, cumulative timeline math and render-audit script.
+- Reworked the README first screen around lower repeated multimodal-understanding cost, reusable rich structure and human creative direction. Preserved complete technical content and added installation, migration, release, executable regression and synthetic-ready files.
+- Preserved the six formal Structure tables, two Direct stages and original render QA. This release does not claim automatic proof of all coverage, sampling or semantic judgments.
+
 ## v1.0.2 — Compact multimodal structure for lower-context reuse
 
+- Added a hard **Edit Boundary / Continuity Layer** between Detailed Structure and Direct 2: `edit-boundaries.csv` records real audio tails, action/reaction settle points, preferred in/out, safe windows, must-keep ranges, handles and cut risk.
+- `ready_for_render` now requires every selected source event to reference an explicit edit boundary; default cuts must land inside the safe windows and preserve must-keep ranges. Deliberate boundary violations require an explicit override reason and review references.
+- Added boundary-aware validation / compilation so subtitle or ASR endpoints cannot silently become cut points, while preserving all existing Structure, two-Direct, evidence, timeline, cache and render-QA behavior.
 - Fixed final-layer cache identity for generated card text: changing `card_text` or card text-render parameters now invalidates only the final composited cache, while clean-video and audio caches remain reusable when otherwise safe.
 - Fixed validator preflight when Directed Deep / Detail is incomplete: Deep indexes are initialized safely and evidence-linkage checks are skipped until the stage is complete, so ready-state violations return structured validation/compiler errors instead of crashing.
 - Refined Execute evidence linkage from coarse `unit_id` aggregation to explicit event-level `deep_observation_refs`; adopted observations are now checked for source identity, source-time coverage, and current evidence status, while unrelated observations in the same unit do not block execution.

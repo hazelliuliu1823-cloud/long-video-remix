@@ -5,7 +5,7 @@ description: 从三到五小时或多集影视、活动视频中建立可回查�
 
 # 长视频结构化与混剪执行
 
-公开仓库版本 v1.0.2 · 2026年9月30日
+公开仓库版本 v1.0.5 · 2026年10月1日
 
 本 Skill 的核心不是“一句话自动生成成片”，而是先把视频、图像、对白与上下文等高成本多模态信息压缩成有来源、可检索、可回查的**紧凑结构化工作层**，让后续人工、Director 或其他 Skill 尽量基于表格 / 文本继续工作；创意方案确认后，再只把命中的区域压回原素材做高密度核验，并落实成真正可执行的剪辑方案。
 
@@ -82,9 +82,9 @@ Render / QA
 | B Broad / Board Structure | 全时段粗扫画面和台词；逐张记录已分析抽样帧的完整基础观察；保留帧尾、原声要点、主题判定与 confidence；标记相邻帧变化、意象、动作节点候选，并对候选开 4fps 局部窗口；记录问题回答与未验证项；登记可用素材物理边界并增量落盘 / 更新 coverage | frames、frame-observations、action-node-candidates、structure-questions、transcript、coverage、usable source bounds | 基础观察层完整且可识别覆盖与缺口；源时间映射稳定；人工 / Director 不必重新从九宫格猜内容 |
 | C Structured Working Layer + Content Map | 在逐抽样帧表之上形成 scene / segment 观察、source-order overview、情绪 / 关系线索和跨场景 Content Map；这些都是 Broad Structure 的正式文字化结构输出，不是用 Content Map 替代表单 | frame-observations、action-node-candidates、structure-questions、scenes / segment observations、overview、content-map、emotional / relationship cues | 形成足够完整且可下钻回 frame observation 的素材面；若 deliverable=content_map 可在此正式交付 |
 | D1 Direct — Narrative Direction | 人 / Director 读取正式结构化表单 + Content Map + 外部研究，抽选“到底讲什么”：核心命题、Narrative Spine、candidate regions、需要 Detail 验证的问题和禁改项 | brief、narrative-direction、external research refs、narrative mapping | 主线已人工确认到足以指导定向深挖；不要求已有精确切点 |
-| E Directed Deep / Detail Structure | 带着 Narrative Direction 回到相关原素材，先建立精查区间卡，再提高抽样 / 播放密度；补完整画面、内容、背景、前后状态、原声、说话人裁决、主题判定与 confidence，再形成 verified units / protected ranges | detail-intervals、deep-observations、speaker-adjudications、已核实 units、reviews、protected_ranges、evidence gaps | 每个核心节点有足够音画、内容与语境证据；主线不成立时退回 D1 调整 |
+| E Directed Deep / Detail Structure | 带着 Narrative Direction 回到相关原素材，先建立精查区间卡，再提高抽样 / 播放密度；补完整画面、内容、背景、前后状态、原声、说话人裁决、主题判定与 confidence；进一步识别完整可剪单元的音频 / 动作 / 反应边界，给出 preferred in/out、safe in/out windows、must-keep ranges 与 cut risk，再形成 verified units / protected ranges | detail-intervals、deep-observations、speaker-adjudications、edit-boundaries、已核实 units、reviews、protected_ranges、evidence gaps | 每个核心节点有足够音画、内容与语境证据，并有可追溯 edit boundary；主线不成立时退回 D1 调整 |
 | D2 Direct — Editorial Execution Plan | Director 读取 Detail Structure 的完整证据包，决定“这些材料最终怎么讲”：最终取舍、顺序、段落功能、声音 / 文字策略、时长分配、允许调整与禁改项 | execution-plan、selected verified units、final narrative mapping | 最终执行方案已确认；关键节点 evidence_status 不为 pending / contradicted |
-| F Execute | 只落实已确认 execution plan：先通过阶段 / Direct / evidence 机械门槛，再用累计时长统一量化事件边界并完成时长预算对账；按反馈类型确定失效范围；标明声音的叙事作用；再编译叠化后的时间轴、分层渲染并生成全接点图表 | timeline（含 duration budget）、transitions、render-manifest、edit-plan、rough-cut | 两次 Direct 均 confirmed；每个入选 source event 显式引用实际采用的 Deep observation，且 source / source-time 覆盖 / evidence_status 均合法；预算守恒；源时间→成片时间映射可追；实测帧数与时长；近静音窗口有记录，再继续音画实看 |
+| F Execute | 只落实已确认 execution plan：先通过阶段 / Direct / evidence / edit-boundary 机械门槛，再用累计时长统一量化事件边界并完成时长预算对账；按反馈类型确定失效范围；标明声音的叙事作用；再编译叠化后的时间轴、分层渲染并生成全接点图表 | timeline（含 duration budget 与 boundary refs）、transitions、render-manifest、edit-plan、rough-cut | 两次 Direct 均 confirmed；每个入选 source event 显式引用实际采用的 Deep observation 与 edit boundary，默认切点落在 safe windows 并覆盖 must-keep ranges；若故意越界必须显式 override 并绑定具体规则、区间、当前有效 review 与已确认创作决定；Direct 2 机器授权、当前 source/time-mapping 证据、许可取段和原声音轨连续性检查均通过；预算守恒；源时间→成片时间映射可追；实测帧数与时长；近静音窗口有记录，再继续音画实看 |
 | G QA & Handoff | 逐接点及全片复核，做 EVA，保存问题与缓存版本 | render-audit、接点图表、qa、handoff | 技术检查与人工观看分别记录，不以成功日志代替验收 |
 
 ## Structure 的两种密度
@@ -116,7 +116,7 @@ Render / QA
 - 写清这一核心区域**实际发生了什么**，并补充 setting_context、narrative_context、before_state、after_state；
 - 从台词命中扩展到完整问答、动作链和必要前后文；保留原声要点、硬字幕 / ASR 冲突和核听状态。说话人或对象不清时进入 `speaker-adjudications.csv`，按事实类型综合帧级口型、可见人物、连续原声与可靠硬字幕裁决 speaker / addressee；ASR 默认只作 locator / 辅助信号，方言或强口音未经核听不得单独定案；
 - facts、interpretations、unknowns 分开；每个核心观察保留 `topic_judgment`、`confidence` 与 `confidence_basis`，主题判定必须落到该帧 / 节点承担的具体叙事作用，不能只写抽象标签；检查反证、误读风险和时空关系；
-- 在完整理解之后，再把初步 unit 收敛为可剪 unit，并形成 context_ranges、protected_ranges 与 isolated_use_risk；
+- 在完整理解之后，再把初步 unit 收敛为可剪 unit，并形成 context_ranges、protected_ranges 与 isolated_use_risk；同时必须建立 Edit Boundary / Continuity Layer：区分内容范围、真实音频尾部、动作 / 反应收束，输出 preferred in/out、safe in/out windows、must-keep ranges、handles 与 cut risk。字幕消失、ASR 结束或抽样帧中的动作停止都不能直接当作自然切点；
 - 如果 Narrative Direction 不成立，把具体问题返回 Direct 1，而不是直接替用户重写核心创意；如果证据成立，则把完整 Detail evidence package 交回 Direct 2，由 Director 形成最终 Editorial Execution Plan 后才进入 Execute。
 
 ## 决策时读取
@@ -127,6 +127,7 @@ Render / QA
 - 在已确认 Narrative Direction / execution plan 下保住完整对白、连续性与正确重组关系：读取 [重组与剪辑规则](references/montage-rules.md)。
 - 首次出片或返工：读取 [渲染与工程检查](references/render-engineering.md)，按文字校准、时间轴编译、分层渲染、解码实测、全接点检查顺序执行。
 - 交付前、移交另一模型：读取 [检查与交接](references/qa-handoff.md)。
+- 准备 Direct 2 执行记录、进入正式编译或接入渲染器：读取 [执行完整性契约](references/execution-integrity.md)，将采用证据与源版本绑定，明确 adopted_utterance_refs 和源音轨 review_refs；逐源音轨核对白保护及完整取段核听，包括卡片、未关联与异源仅音频。关联视频时另核同步；独立声音按成片放置核完整对白、政策原因及 track 级例外。continuity_type 不关闭保留对白政策；指纹计算不等于实际观察或人工确认。
 - 每次改版或重新封装后：读取 [核心能力回归检查](references/regression-checklist.md) 与 [Structure 能力对照矩阵](references/structure-regression-matrix.md)，确认 Board/Broad / Detail / Direct / Execute 主线和基础信息层没有被弱化。
 - 需要演示两轮 Structure、外部 Direct 和 Execute 的衔接：读取 [执行示例](references/worked-example.md)。示例均为虚构，不是当前素材。
 
