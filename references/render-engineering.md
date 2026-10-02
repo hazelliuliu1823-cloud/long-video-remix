@@ -20,7 +20,7 @@
 
 音轨、文字轨和封面定位应保存 anchor_event_id 与段内 local_in_frame/local_out_frame；编译后转换为成片位置。跨段文字若不随某一段移动，可明确 coordinate_space=output，但每次结构变动后必须人工重核它的绝对位置。相邻片段重叠区有两个源画面，不能用一条全局减法反推唯一源帧。
 
-有 protected_ranges 的对白与关键动作不应落在被叠化遮挡或淡音削弱的区间。用额外 handles 或改切点解决；确需例外时填写针对该接点的 overlap_protection_review，记录实际核查依据，不能用无意义占位文字放行。
+有 protected_ranges 的对白与关键动作不应落在被叠化遮挡或淡音削弱的区间。用额外 handles 或改切点解决；确需例外时填写针对该接点的 `overrides`：`violated_rule=protected_overlap`，绑定被影响的源区间、成功且版本一致的 review 及 Direct 2 创作决定。`overlap_protection_review` 的自由文字不再单独放行；详见 [执行完整性契约](execution-integrity.md)。
 
 ## 时长预算守恒
 
@@ -112,3 +112,9 @@ python3 scripts/audit_render.py 成片.mp4 项目目录/render-manifest.json --o
 第一条生成编译时间轴和分层缓存键；它不会自行渲染。第二条完整解码、扫描近静音、按成片时间轴生成接点单帧和对照表；它不会判断剧情。根据 render-manifest 调用真实 MCP 或本地渲染流程后再运行第二条。审计结束后仍要正常速度播放全片，填写 qa。
 
 技术依据：FFmpeg 官方 [xfade、silencedetect及相关过滤器说明](https://ffmpeg.org/ffmpeg-filters.html)、[解码与流复制说明](https://ffmpeg.org/ffmpeg.html)、[ffprobe帧计数说明](https://ffmpeg.org/ffprobe.html)。查阅日期为2026年9月29日。
+
+## v1.0.3 渲染入口
+
+正式编译默认只接受已授权的 ready_for_render 项目。规划草稿必须显式用 `--planning`；输出为 `render_allowed=false`。渲染适配器消费清单前运行 `check_render_authorization.py PROJECT MANIFEST`，检查授权、证据和输入是否仍是当前版本，并拒绝被改写的清单。外部渲染器须接入这一步，仓库不会控制绕过该入口的第三方程序。
+
+声音缓存包含输出 fps 依赖；改变输出时基须重新确认授权并重编译。技术编译通过继续保留 playback_verified=false，动态听看按原流程执行。

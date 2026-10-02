@@ -1,10 +1,24 @@
-# 安装与更新 · v1.0.5
+# 安装与更新 · v1.0.6
 
 解压后得到 `long-video-remix/` 完整目录。SKILL.md、references、assets、scripts 和 agents 必须一起保留；只复制 SKILL.md 会丢失契约和检查能力。
 
 ## 安装
 
-把完整 `long-video-remix` 文件夹放入目标工具支持的 Skill 目录；原位置已有同名版本时先备份，再替换完整文件夹。项目素材和工作数据放在独立项目目录，不放进安装目录。
+使用本地 Claude Code 或 Codex 时，选择对应命令。以下命令用于首次安装；已有同名目录时先备份，再更新或替换完整文件夹。
+
+```sh
+# Claude Code
+mkdir -p ~/.claude/skills && git clone https://github.com/hazelliuliu1823-cloud/long-video-remix.git ~/.claude/skills/long-video-remix
+
+# Codex
+mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/long-video-remix.git ~/.agents/skills/long-video-remix
+```
+
+解压安装包时，也可将完整 `long-video-remix` 文件夹放入 `~/.claude/skills/`（Claude Code）或 `~/.agents/skills/`（Codex）。项目素材和工作数据放在独立项目目录，不放进安装目录。
+
+用 Git 安装的副本可在安装目录执行 `git pull --ff-only` 更新。仓库安装获取当前分支版本；需要固定 v1.0.6 时，使用对应安装包。安装或更新后检查工具的技能列表。
+
+目录依据：[Claude Code 本地 skills](https://code.claude.com/docs/en/skills) · [Codex 本地 skills](https://learn.chatgpt.com/docs/build-skills)，核对日期：2026年10月2日。
 
 这是 Skill 与配套脚本安装包。画面读取、ASR、实际渲染通过当前环境的模型、视频 MCP 或渲染器连接，按 references/mcp-adapter.md 发现并验证能力。
 
@@ -13,6 +27,8 @@
 - 静态校验、授权记录、编译与回归：Python 3.9+，只用标准库。
 - 导出审计：FFmpeg / ffprobe；生成接点拼图时额外需要 Pillow。
 - 模型、视频 MCP、渲染器的依赖按实际适配器配置，不在包内下载大模型或素材。
+
+Python 3.9 已做语法兼容检查，尚未在 3.9 解释器上实际运行回归；153 项回归的已验证运行环境为 Python 3.12。
 
 ## 验证安装包
 
@@ -26,6 +42,14 @@ python3 scripts/check_render_authorization.py examples/synthetic-ready examples/
 ```
 
 示例全部是合成记录，只验证数据链与工程入口；没有真实视频，不用它证明长视频理解或观看效果。
+
+## 从 v1.0.5 更新
+
+保留已有项目、六套正式 CSV 表头和观察数据。按 v1.0.6 继续工作时，Structure 无法取得的字段通过 `structure-exceptions.jsonl` 明确声明，继续可做部分；Detail 交付 `keyframe-references.json`、可取得的真实图片与 `execution-handoff.md`（直接含下游完整交付要求）。
+
+Direct 2 同时提供 `execution-plan.md` 与 `execution-reference.md`。project 增加对应 refs、`execution_reference_asset_refs`（无图片时 []）与 `execution_package_policy="plan_and_reference"`。reference 使用一两个样本锁定整体风格，不逐镜头配对。已有授权流程追加 reference 文档 / 样本指纹，按已有确认更新 draft / 授权并重新编译；不重做已核实的原片观察。
+
+旧项目未声明新 policy 时保持原机械行为；新 policy 的文件 / 指纹检查不替代执行包内容审阅和最终 Reference Compliance。无法提取关键帧可明确异常后继续，但未核实证据、缺失源时间及完整对白保护仍按原规则处理。完整契约见 [执行包规范](references/execution-package.md)。
 
 ## 从 v1.0.4 更新
 

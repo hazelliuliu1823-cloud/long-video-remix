@@ -25,6 +25,8 @@ G QA & Handoff
 
 第一次 Structure 追求**广度 + 紧凑表示**：正式产出逐抽样帧 / 分片段观察表、动作节点、Q&A、scene / overview 等文字化结构数据，并在其上形成 Content Map；第一次 Direct 只负责确定 Narrative Direction。第二次 Structure 追求**与已确认 Narrative Direction 相关的证据深度**；Detail 完成后必须再次回到 Director 形成 Editorial Execution Plan，之后才进入 Execute。不要在第一轮为某个主题过早押题，也不要把第二轮证据直接当成最终剪辑方案。
 
+Structure 字段无法取得时，保留原 schema 并明确异常后继续可做部分；E 随证据交付关键帧和独立 handoff，D2 输出完整 Execution Package。具体字段与样式参考规则见 [异常与执行包契约](execution-package.md)，不增加阶段。
+
 ## 任务与默认值
 
 接收视频文件或授权地址、已有九宫格、字幕、转写和分析文档。优先复用已完成工作，但先核对它们对应的源视频版本与时间轴。用户只提供九宫格时可以建画面索引，不能据此交付已核实的对白剪辑。
@@ -94,7 +96,7 @@ Broad Structure 或 Directed Deep Structure 发现明显动作变化候选时，
 
 coverage 分别记录画面抽样、字幕或转写、连续音画复核的时间区间与状态。全时段完成抽样不等于全时段实看。任何未处理、失败或低清区域都保持可见；特别记录片头片尾是否有正片内容。
 
-Broad Structure 的完成条件不是“已经知道该剪什么”，而是：素材主要时间范围已经建立基础索引，场景和对白可以回查，coverage 与 unknowns 清楚；`frame-observations.csv` 与 `frames.jsonl` 一一对应；动作节点候选文件与结构化问题表已生成（没有候选 / 问题时也保留带表头的空表）；基础字段没有被摘要或 Content Map 替代。只有这些基础层完成后，才算形成足够紧凑的结构化工作层，使人、Director 或其他 Skill 可以继续判断。
+Broad Structure 的完成条件不是“已经知道该剪什么”，而是：素材主要时间范围已经建立基础索引，场景和对白可以回查，coverage 与 unknowns 清楚；`frame-observations.csv` 与 `frames.jsonl` 一一对应；动作节点候选文件与结构化问题表已生成（没有候选 / 问题时也保留带表头的空表）；基础字段没有被摘要或 Content Map 替代。基础层实际完成后才记 complete；字段 / 产物无法取得时保留结构、报告异常与 coverage 缺口，再继续可做的整理、草案和交接，不能为完成状态补造观察。
 
 ### 可用素材边界与长任务 checkpoint
 
@@ -179,9 +181,14 @@ Content Map 可以提示“这里可能值得继续看”，但不把这种提�
 - 第二轮同样遵守 negative evidence rule：没有在抽样里出现的动作只能算 `not_observed`；4fps 或更密抽样仍不能单独证明区间级“没有发生”。视觉否定结论要覆盖完整机会窗口的连续视频，语音否定结论要覆盖声明区间的连续原声，或存在可直接排除该事实的可靠反证。
 - 检查 Narrative Direction 可能忽略的反证、玩笑语境、时间差、关系阶段和异场反应；
 - 在上述内容理解完成后，再把第一轮粗 unit 收敛为可剪 unit，确认 context_ranges、protected_ranges、isolated_use_risk 和 verification；
+- **建立 Edit Boundary / Continuity Layer**：对每个可能交给 Direct 2 的核心连续素材，分别核定内容范围、真实音频起止与尾部、动作链起止、反应 / settle 结束；给出 preferred in/out、safe in/out windows、must-keep ranges、handles、cut risk 与 evidence refs。字幕 / ASR 时间只作线索，不能直接当切点；
 - 为接续关系准备连续性、比较、倒叙、章节变化等依据。
 
 记录审阅者身份或能力来源、时间范围和结果。只有文件实际被读取不等于被看懂；音频抽取成功也不等于原声已核听。不能处理音频或连续视频时，请有能力的工具或用户核查；同时继续可做的索引和草案。
+
+### E 的关键帧与跨模型 handoff
+
+随 Detail 固定交付 `keyframe-references.json`（通常 1–3 张真实原片代表帧）与 `execution-handoff.md`，参见 [执行包契约](execution-package.md)。图片只提供素材视觉依据；提取失败或没有可定位的帧时保留清单 / 字段并声明异常，继续可做部分。handoff 携带已确认主题、所选源区间与证据 / 保护范围、图片与文件入口、异常，以及下游完整 Execution Package 的输出要求；接收模型即使没有安装此 Skill 也能直接继续。此处不替 D2 作视觉 / 制作决定。
 
 ### 何时返回 Direct 1
 
@@ -195,11 +202,11 @@ Content Map 可以提示“这里可能值得继续看”，但不把这种提�
 
 此时输出具体 evidence gap、冲突证据和可替代素材，返回 D 调整。允许多次 D ↔ E 循环。不要因为已经投入精查成本就强行保留原计划。
 
-## D2 Direct：Editorial Execution Plan — 再决定“最终怎么讲”
+## D2 Direct：Execution Package — 再决定“最终怎么讲”
 
-E 阶段完成后，不直接进入 Execute。把 `detail-intervals.csv`、`deep-observations.csv`、speaker adjudications、verified units、context / protected ranges、counterevidence、evidence gaps 和 source-time refs 交回 Director。
+E 阶段完成后，不直接进入 Execute。以独立 handoff 把 `detail-intervals.csv`、`deep-observations.csv`、speaker adjudications、verified units、context / protected ranges、counterevidence、evidence gaps、source-time refs 和真实关键帧交回 Director；直接附上后续执行包的必需组成，不能依赖同一环境的 Skill 上下文。
 
-第二次 Direct 基于**已经核实的材料能力**形成最终 Editorial Execution Plan，至少明确：
+第二次 Direct 基于**已经核实的材料能力**形成完整 Execution Package，其中 Editorial Execution Plan 至少明确：
 
 - 最终选择 / 排除的 verified units；
 - 段落顺序与每段 narrative function；
@@ -209,11 +216,11 @@ E 阶段完成后，不直接进入 Execute。把 `detail-intervals.csv`、`deep
 - 转场 / 时空提示等执行意图；
 - 可替换范围、允许执行层调整的边界、不得改变的核心表达。
 
-可使用 `assets/execution-plan-template.md`。如果 Detailed Structure 暴露出主线级冲突，先退回 D1；如果只是素材取舍 / 排序 / 执行策略问题，在 D2 内解决。只有 execution plan 被确认，且关键 evidence_status 不为 pending / contradicted，才进入 F Execute。`ready_for_render` 是机械状态，不是文字口径：项目必须同时满足 Broad / Content Map / Detail 完成、两次 Direct 状态均为 `confirmed`、对应文档真实存在，以及 `render_authorized=true`。每个入选 source event 还必须显式列出本次真正采用的 `deep_observation_refs`；这些 observation 的 source 必须与 event 一致，source-time 覆盖本次采用区间，状态为 `supported / partial`。同一 unit 中未采用的 pending / contradicted observation 不阻断本次执行。静态校验或编译器任一项不通过都不得进入渲染。
+同时填写 `assets/execution-reference-template.md`，冻结具体文字规格、画面关系、声音 / 转场、少量风格样本的应用规则、资源入口与 QA 判据；逐条文字全文及出现 / 消失锚点在计划中给出。通常一两个样本即可，不要求每个字幕或镜头对应 reference。完整要求见 [执行包契约](execution-package.md)。可使用 `assets/execution-plan-template.md`。如果 Detailed Structure 暴露出主线级冲突，先退回 D1；如果只是素材取舍 / 排序 / 执行策略问题，在 D2 内解决。只有计划及 reference 组成的执行包被确认，且关键 evidence_status 不为 pending / contradicted，并且每个入选 source segment 已引用可用 edit boundary，才进入 F Execute。`ready_for_render` 是机械状态，不是文字口径：项目必须同时满足 Broad / Content Map / Detail 完成、两次 Direct 状态均为 `confirmed`、对应文档真实存在，以及 `render_authorized=true`。每个入选 source event 还必须显式列出本次真正采用的 `deep_observation_refs` 与 `edit_boundary_ref`；这些 observation 的 source 必须与 event 一致，source-time 覆盖本次采用区间，状态为 `supported / partial`。默认 source_in/out 必须落在 boundary 的 safe windows 并覆盖 must-keep ranges；有意越界只能通过显式 override + 创作理由 + review refs。同一 unit 中未采用的 pending / contradicted observation 不阻断本次执行。静态校验或编译器任一项不通过都不得进入渲染。
 
 ## F Execute：执行与粗剪
 
-实际出片前读取“渲染与工程检查”。先完成 **duration budget ledger**：源片段按目标 fps 使用**累计时长统一量化**确定 assembly 边界，不允许每段各自四舍五入后再相加；validator 与 compiler 必须共用同一套累计量化与 overlap 计算。再以累计量化后的事件帧数求和，减去相邻 transition overlap，得到预计成片帧数；黑场卡 / freeze / hold 等真正新增时间必须作为事件计入，普通覆盖式文字停留不单独加时。若文字阅读时间放不进现有画面，必须在结构层显式延长事件、加 card / hold、减字或调整别处预算，不能把文字时长重复加到总长。预算未对平不得标记 ready_for_render。
+输入为 Source Clips + Detail Structure + execution-plan + execution-reference + Constraints；Execute 只在既有规则与允许调整内制作，不补定核心风格。实际出片前读取“渲染与工程检查”。先完成 **duration budget ledger**：源片段按目标 fps 使用**累计时长统一量化**确定 assembly 边界，不允许每段各自四舍五入后再相加；validator 与 compiler 必须共用同一套累计量化与 overlap 计算。再以累计量化后的事件帧数求和，减去相邻 transition overlap，得到预计成片帧数；黑场卡 / freeze / hold 等真正新增时间必须作为事件计入，普通覆盖式文字停留不单独加时。若文字阅读时间放不进现有画面，必须在结构层显式延长事件、加 card / hold、减字或调整别处预算，不能把文字时长重复加到总长。预算未对平不得标记 ready_for_render。
 
 随后按反馈类型先判断失效范围，再动文件：纯文字层反馈只重烧文字层；声音策略改变失效音频 + final；切点 / 段长 / 转场改变重新编译 timeline 并使所有依赖坐标的下游失效；核心主线 / 段落功能变化退回 Direct，并只重做受影响的 Directed Deep Structure。
 
@@ -221,15 +228,17 @@ E 阶段完成后，不直接进入 Execute。把 `detail-intervals.csv`、`deep
 
 再用锚点和对照帧校准文字，按实际叠化帧数编译 render-manifest；所有成片文字、音轨放置、封面定位和接点核查使用此版本成片坐标。分开保存视频单元、无字底片、混音和文字烧录产物，便于局部返工。
 
-先生成 edit-plan，再编译 timeline。详细稿包含成片参数、主线、源素材取舍、逐段画面、原声、创作者文字、字号位置、转场、封面、禁止项和待验证项。画面、声音、文字分别设计，同一主句可跨原片正反打保留。
+先生成 edit-plan，再编译 timeline。详细稿包含成片参数、主线、源素材取舍、逐段画面、原声、创作者文字、字号位置、转场、封面、禁止项和待验证项。画面、声音、文字按 D2 执行包的各层规格落实，同一主句可跨原片正反打保留；若执行稿还缺必要参数，指出缺口并回 D2 补定，不擅自补写风格或表达。
 
-粗剪先保留必要原声及最少的场景提示，验证结构，再加配乐和包装。按照转场逐个观看接点，再正常速度看全片。原片音乐无法干净衔接时优先换切点、加长段落或接受明确场景切换；不假设淡化即可解决所有音乐断裂。
+粗剪先保留必要原声及最少的场景提示，验证结构，再按执行包中已确认的策略处理配乐和包装。按照转场逐个观看接点，再正常速度看全片。原片音乐无法干净衔接时优先换切点、加长段落或接受明确场景切换；不假设淡化即可解决所有音乐断裂。
 
 用户只要执行稿时，交付 detailed_plan；未生成粗剪则 rough_cut_verified=false。用户要成片而当前没有渲染能力时，交付能够直接执行的计划与明确缺口，不谎称已剪好。
 
 每次导出先完整解码实测帧数和展示时长，再做全片低电平扫描，并从该成片自动生成全部接点对照图。技术错误先修复；近静音和接点图进入实际核听、播放，不能用截图代替动态检查。
 
 ## G QA、保存与恢复
+
+在原 EVA 中增加 Reference Compliance：对照少量已确认样本与全片规则，检查文字层级、位置、画面关系、强调方式和风格漂移；不检查逐镜头配对数量。静态规则检查和真实导出观看分开记录，未实看保持 not_tested。
 
 每批成功后保存结果和 coverage；长任务把“已完成区间 / 未完成区间 / 最近可靠 checkpoint / 可恢复入口”一起保存；每阶段结束保存 handoff。缓存键由源文件版本、处理区间、参数、工具及模型版本组成。换源版本或 time mapping 时重新核对时间标签并失效精确下游坐标；调整 Broad Structure 抽样密度只重做受影响区间；Direct 调整通常复用第一轮 Content Map 与已验证证据，不重扫全片。
 
@@ -238,3 +247,9 @@ E 阶段完成后，不直接进入 Execute。把 `detail-intervals.csv`、`deep
 切点或片段长度变化，强制失效对应片段及下游缓存；不能只看同名文件是否存在。将片段 manifest、渲染参数及实际时长纳入缓存判定。纯文字改动可复用无字底片和已确认音轨；卡片或转场时长变化则须重新编译并更新所有下游位置。
 
 下一模型先读 handoff、project、capability-map、sources、coverage、Structured Observation Layer、content-map、Narrative Direction 与 Editorial Execution Plan，再按需读取相关 scene / unit / review / evidence。不得仅凭前一模型的 overview、Narrative Direction 或 execution plan 把未看部分写成已验证。
+
+## v1.0.3 执行完整性接入
+
+沿用 A—G 与两次 Direct。Detail 的实际观察记录与 edit boundary 追加源版本、时间映射指纹；单位 verification 与采用 reviews / utterances 保留同样绑定。完成 Direct 2 时，将已经确认的取舍保存为 execution-authorization.json：采用事件、顺序、unit / boundary、音轨、文字、转场与允许调整。Execute 读取这些记录并检查实际采用范围、原声对白和例外依据，再编译。
+
+授权不增加固定审批关卡：当前用户已经确认且包含执行时，据该授权继续工作；缺证据时补实际观察，机器记录不能代替观察。按 [执行完整性契约](execution-integrity.md) 创建字段，并在外部渲染前运行 check_render_authorization.py。

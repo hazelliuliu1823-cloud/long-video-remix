@@ -27,12 +27,16 @@
 - 每个关键证据保持稳定 `source_id + source time`；`frame-observations.csv` 与 `frames.jsonl` 的时间一致，Deep observation 落在对应 Detail interval，speaker adjudication 与 utterance 源区间相符。
 - 每个 source 的 `time_mapping` 与可用物理边界已记录；会限制 Direct 的 `usable_ranges / downstream_constraints` 已进入 Content Map / handoff。
 
-任何一项缺失，都属于 Structure regression，应先补回 B / E 阶段，不因后续产物已经生成而豁免。
+缺字段或缺结构且没有异常说明，属于 Structure regression，应补回 B / E。原字段 / 产物保留且已显式声明无法获得的原因、影响与下游处理时，继续可做的整理 / 草案 / 交接，不把未知项当成事实，也不豁免正式渲染门槛。
 
 ## Execute 前的规定动作
 
+- Detail 的真实关键帧清单、可用图片、独立 `execution-handoff.md` 及异常随包交付；handoff 已直接写明下游完整输出要求。
+- 已确认 Execution Package 同时包含计划与 `execution-reference.md`：必要文字全文 / 时间锚点、具体样式、音轨 / 接点、资产 / 约束和 QA 判据齐全，Execute 无需另定核心风格。reference 通常一两个，锁定整体规则，不逐镜头配对。
+
 - `timeline.duration_budget` 已按整数帧对平；普通覆盖式文字未被重复加到总长，真正延时的 card / hold 已成为 event；有时长上限时不得超预算进入 ready_for_render。
 - 每个进入执行的 source event 已显式列出 `deep_observation_refs`；只校验本次实际采用的 observation，确认 source 一致、source-time 覆盖采用区间、evidence_status 为 supported / partial；同 unit 其他未采用的 pending / contradicted 记录不作为阻断项。
+- 每个 source event 已引用 `edit_boundary_ref`；默认 source_in/out 落在 safe-in / safe-out windows 并覆盖 must-keep ranges。若 boundary override=true，必须确认它是有意创作选择，并有 reason + review refs，而不是切点未核准。
 - audio track 已标 `narrative_role` / `treatment_reason`，不会因为提取 vocals 就把 BGM / ambience 的叙事作用默认为无效。
 - 本轮反馈已经按文字 / 声音 / 结构 / 创意分类，并按对应 invalidation 范围处理。
 - source time → assembly/output frame 的映射仍能回查，结构改动后旧绝对成片坐标没有被偷用。
@@ -59,10 +63,11 @@
 | Redundancy | 画面、台词、花字、结尾是否重复解释 | 指定主要表达载体，删重复 |
 | Source | 每个判断、画面、台词能否回查到正确版本 | 修复引用与时间映射 |
 | Mobile | 手机上是否看清、字幕遮挡和裁切是否合适 | 以实际手机检查记录为准 |
+| ReferenceCompliance | 是否遵守已确认的文字层级、位置、颜色 / 字号、画面关系、情绪强调与视觉规则，是否有风格漂移 | 对照少量 reference 和全片规则修正，不逐镜头匹配 |
 
 qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_questions、rough_cut_verified、final_playback_verified。checks 每项记录 name、status、method、evidence、finding、action。status 只用 pass、fail、not_tested、not_applicable。
 
-无真实导出文件时 Audio 的计划逻辑可以检查，但实际听感必须记 not_tested；Mobile 未实看也记 not_tested。不能为了完成清单填全部 pass。
+无真实导出文件时 Audio 的计划逻辑可以检查，但实际听感必须记 not_tested；Mobile 未实看也记 not_tested；ReferenceCompliance 未实际对照查看最终导出时同样记 not_tested，静态规格检查另记。不能为了完成清单填全部 pass。
 
 ## 何时退回哪一步
 
@@ -86,6 +91,9 @@ qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_q
 关键决定及对应证据 ID：
 当前 brief / Narrative Direction / Editorial Execution Plan 及来源：
 第二轮 Directed Deep Structure 已补查节点与证据缺口（并确认 `deep-observations.csv` 是否已覆盖核心区域的画面 / 内容 / 背景 / 前后状态）：
+关键帧清单 / 实际图片 / 提取异常：
+Detail 的独立 execution-handoff 及其内嵌下游输出要求：
+Execution Package（计划 / reference / 风格样本 / 资产 / 约束 / QA）及确认来源：
 已有文件与路径：
 实际使用的工具和能力缺口：
 源版本及时间映射注意事项：
@@ -110,7 +118,7 @@ qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_q
 先盘点我提供的素材、已有记录和实际可用的视频工具，输出能力映射。
 第一轮先做 Broad / Board Structure，建立可回查的 `frames.jsonl`、逐抽样帧 `frame-observations.csv`（含帧尾、原声要点、主题判定、confidence）、`action-node-candidates.csv`（动作节点默认 4fps 局部窗口并记录最小有效单元候选）、`structure-questions.csv`、场景、overview 和 Content Map；如果当前只要求内容地图，到这里正式交付。
 如果要继续混剪，先把 Broad Structure 的正式文字化表单 + Content Map 交给我或独立 Director，形成 Narrative Direction；不要默认替代第一次创意决策。
-拿到 Narrative Direction 后，先建 `detail-intervals.csv` 明确精查区间的前情 / 当前背景 / 后续 / 目标问题，再回原素材做 Directed Deep / Detail Structure；补足完整音画、原声核听、说话人裁决、confidence、上下文、反证和保护范围。然后把完整 Detail evidence package 再交回 Director 形成 Editorial Execution Plan；只有第二次 Direct 确认后才进入 Execute。
+拿到 Narrative Direction 后，先建 `detail-intervals.csv` 明确精查区间的前情 / 当前背景 / 后续 / 目标问题，再回原素材做 Directed Deep / Detail Structure；补足完整音画、原声核听、说话人裁决、confidence、上下文、反证和保护范围。然后固定交付真实关键帧与独立 execution-handoff，并在其中直接写明 execution-plan、制作 reference、文字 / 声音 / 转场、Reference Application Rules、资源 / 约束和 QA 要求；再交回 Director 形成完整 Execution Package。一两个风格样本锁定全片规则，不逐镜头对应；只有第二次 Direct 确认后才进入 Execute。
 优先同集，保留完整对白与动作，不根据抽样帧或摘要补造未验证内容。
 已有确认信息直接沿用。遇到缺口先完成可做部分，并指出具体缺少哪段素材或哪种能力。
 素材位置：
@@ -125,7 +133,7 @@ qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_q
 续接任务可使用：
 
 ```text
-请按随附执行规范续接这个项目。先读 handoff、project、sources、coverage、Structured Observation Layer、content-map、brief、`narrative-direction`、`execution-plan` 和 capability-map；兼容旧项目时再读 legacy `editorial-plan`。随后读取当前 narrative / execution mapping 引用的 scene / unit / Deep observation / review / 原始证据。
+请按随附执行规范续接这个项目。先读 handoff、project、sources、coverage、Structured Observation Layer、content-map、brief、`narrative-direction`、`execution-handoff`、`keyframe-references`、`execution-plan`、`execution-reference`、异常说明和 capability-map；兼容旧项目时再读 legacy `editorial-plan`。随后读取当前 narrative / execution mapping 引用的 scene / unit / Deep observation / review / 原始证据。
 先核对当前能力与源版本；复用已有成果，只补齐缺口，不重新概括替代原记录。
 继续完成 handoff 中的下一步。报告实际核验范围，不把前一模型的摘要写成自己的直接观察。
 ```
@@ -133,3 +141,7 @@ qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_q
 ## 交付表达
 
 交付时列清：完成的是规范、计划、粗剪还是成片；覆盖了哪些素材；实际核验到哪一层；仍有哪些具体问题。若没有材料可处理，就交付可执行规范和输入清单，不假装已经处理过长视频。
+
+## v1.0.3 授权与证据交接
+
+交接保留 execution-authorization.json、采用证据的 source_signature / time_mapping_digest、清单 input_digest / manifest_digest 与 render_allowed。规划清单不得当作已允许渲染；素材或确认文件改变后先判断证据 / 方案失效范围，再重新核实、裁决和编译。机器检查通过与最终听看通过继续分开记录。

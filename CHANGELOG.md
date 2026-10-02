@@ -1,5 +1,32 @@
 # Changelog
 
+Public release packaging targets v1.0.6. Earlier entries are retained as development history; their dates do not imply published GitHub Releases or tags.
+
+## v1.0.6 — Structure Exceptions & Execution Package · 2026-10-01
+
+- Kept existing stages, two Direct decisions and locked Structure schemas; added explicit unavailable / uncertain / partial declarations with reason, impact and downstream handling so feasible Structure / draft / handoff work continues without fabricated facts.
+- Added a small real-source Keyframe Reference deliverable inside Detail, with extraction exceptions and source-time traceability.
+- Added a self-contained Detail handoff that carries narrative context, selected clips, evidence / protection, images and the downstream complete Execution Package requirements across model boundaries.
+- Defined Direct 2 output as Execution Plan + Production Reference, with actionable text / audio / transition specifications, assets, constraints and QA; added reusable handoff / reference templates.
+- Replaced per-visual matching with Reference Application Rules: one or two representative style samples define whole-video design rules; no per-shot / subtitle mapping.
+- Made Execute consume the full confirmed package and added Reference Compliance to existing QA. Declared reference document / asset changes invalidate old confirmation and render entry; undeclared legacy project behavior remains unchanged.
+- Preserved all original CSV templates, historical examples / tests, timeline math, rendering algorithms, caches, dialogue protection and authorization requirements.
+
+### 2026-10-02 — Keyframe integrity fixes
+
+- Checked keyframe source units and source times against unit ranges and existing frame records.
+- Included actual keyframe image bytes in input fingerprints so replacing an image invalidates an old render entry.
+- Required unavailable keyframes to match a synchronized exception declaration.
+- Added 15 regression cases; all 153 tests passed in the engineering validation.
+
+### 2026-10-02 — Bilingual documentation and release preparation
+
+- Added a complete English README with reciprocal language links; Chinese remains the default.
+- Shortened the introduction while retaining lower-cost reuse, rich structure, human Direct decisions, reliable Execute, the folded method, and the content-performance example.
+- Corrected both file trees, archived historical QA under docs/qa, and updated affected links and SHA256SUMS.
+- Added English skill-description keywords, concrete local installation commands, and a source-material rights statement; aligned copyright attribution with hazelliuliu1823-cloud.
+- Kept scripts, tests, templates, contracts, agent metadata, and examples unchanged.
+
 ## v1.0.5 — Independent Source Audio Dialogue · 2026-10-01
 
 - Fixed F4: derive and validate utterances independently for every adopted source audio track, including card-only speech, unassociated extra tracks and audio-only sources. Full current utterance evidence and audio verification are required before preservation decisions.
@@ -77,7 +104,7 @@
 - Updated README, workflow, data contracts, worked example, handoff rules and agent metadata accordingly.
 - No change to the core Direct boundary, timeline compiler, renderer-neutral architecture or render-audit scripts.
 
-## v1.0.0 — Initial public release
+## v1.0.0 — Initial workflow
 
 - Broad Structure → Human Direct → Directed Deep Structure → Execute.
 - Content Map / Brief / Editorial Plan templates.

@@ -1,3 +1,19 @@
+# v1.0.6 — Structure Exceptions & Execution Package
+
+本版以 v1.0.5 为底稿，只落实已确认的七项修改：固定字段下明确异常并继续可做部分；Detail 固定交付真实关键帧；Detail 形成独立 handoff 并携带下游完整输出要求；Direct 2 输出完整 Execution Package；少量 reference 锁定全片规则；Execute 接收完整包；原 QA 增加 Reference Compliance。
+
+新增可复用契约与四份模板见 [执行包规范](references/execution-package.md)。通常一两个风格样本即可，不要求每个镜头或字幕对应 reference。关键帧缺失要声明原因 / 影响 / 下游处理，不能用生成图冒充原片，也不能把异常变成渲染豁免。
+
+原有流程、两次 Direct、正式 CSV 表头、证据与时间标签、Edit Boundary、对白保护、授权、渲染算法及分层缓存保留。仅为完整包补充文件 / reference 指纹检查，使制作规则改变时旧确认失效；未声明新 package policy 的旧项目保持原机械行为。机器不证明参考图质量或文档完备性，最终风格按 Reference Compliance 实际对照观看。
+
+安装 / 迁移见 [INSTALL.md](INSTALL.md)，本轮范围与实际验证见 [v1.0.6-QA.md](docs/qa/v1.0.6-QA.md)。
+
+2026年10月2日封版修补（版本仍为 v1.0.6）：核对关键帧与 unit / 已有帧记录的来源和时间一致性；实际关键帧图片纳入输入指纹，图片被覆盖后旧渲染入口须重新编译；unavailable 强制匹配同步异常声明。新增 15 项回归，全部 153 项通过。原工程流程和实现保持不变。
+
+2026年10月2日公开文档整理（版本仍为 v1.0.6）：完整中英 README 保留低成本复用、丰富结构、人工 Direct 与可靠 Execute 的定位；补齐文件树和本地安装命令、英文 description 与素材使用权说明，作者署名统一为 hazelliuliu1823-cloud。历史 QA 归档至 [docs/qa](docs/qa/README.md)，其原始验证记录保留；安装包校验和重新生成。
+
+---
+
 # v1.0.5 — Independent Source Audio Dialogue
 
 长视频先形成可检索、可回查的结构化工作层。后续选题、改稿和多版本剪辑优先复用这层数据，只对命中区域重新进行高密度音画核实，减少重复处理整段多模态素材的开销。人保留两次创意决定，系统根据确认方案完成工程执行。
@@ -11,6 +27,6 @@
 
 此前 F1—F3 的修补与音轨完整取段核听要求保留。Broad / Detail 分工、六套 Structure 正式表、两次 Direct、Edit Boundary、时间标签、累计量化、分层缓存和 render audit 保留。没有预设成本降幅；抽帧、ASR、定向回看和 GPU 渲染仍需计算资源。
 
-安装 / 迁移见 [INSTALL.md](INSTALL.md)，本轮实际验证见 [v1.0.5-QA.md](v1.0.5-QA.md)。已有 v1.0.4 项目保留全部结构化资料，完成独立对白对账后，按已有创作授权更新 Direct 2 记录并重新编译。
+安装 / 迁移见 [INSTALL.md](INSTALL.md)，本轮实际验证见 [v1.0.5-QA.md](docs/qa/v1.0.5-QA.md)。已有 v1.0.4 项目保留全部结构化资料，完成独立对白对账后，按已有创作授权更新 Direct 2 记录并重新编译。
 
 Broad 覆盖、采样与说话人语义证明、Deep 保护转移以及非对白声音的整体收束继续保留原职责边界。合成验证不证明真实长视频理解质量或最终观感；最终听看仍独立记录，外部渲染适配器须接入入口检查。

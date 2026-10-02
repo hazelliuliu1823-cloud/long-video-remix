@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from timeline_math import canonical_assembly_ranges, output_ranges_from_overlaps
+from execution_integrity import validate_integrity
 
 
 def validate(root):
@@ -59,6 +60,49 @@ def validate(root):
 
     def nonblank(value):
         return isinstance(value, str) and bool(value.strip())
+
+    def csv_refs(value):
+        if not isinstance(value, str):
+            return []
+        raw = value.strip()
+        if raw.lower() in ('', 'none', 'unknown', 'not_applicable'):
+            return []
+        return [part.strip() for part in raw.split(';') if part.strip()]
+
+    def csv_ms(value, label, allow_na=False):
+        raw = (value or '').strip() if isinstance(value, str) else value
+        if allow_na and isinstance(raw, str) and raw.lower() in ('none', 'unknown', 'not_applicable'):
+            return None
+        try:
+            result = int(raw)
+        except (TypeError, ValueError):
+            require(False, f'{label}: must be integer milliseconds' + (' or not_applicable' if allow_na else ''))
+            return None
+        if result < 0:
+            require(False, f'{label}: must be nonnegative milliseconds')
+            return None
+        return result
+
+    def csv_ranges(value, label):
+        raw = (value or '').strip() if isinstance(value, str) else ''
+        if raw.lower() in ('', 'none', 'unknown', 'not_applicable'):
+            return []
+        result = []
+        for token in [part.strip() for part in raw.split(';') if part.strip()]:
+            pieces = token.split('-', 1)
+            if len(pieces) != 2:
+                require(False, f'{label}: range must use start-end;start-end source-ms syntax')
+                continue
+            try:
+                a, b = int(pieces[0]), int(pieces[1])
+            except ValueError:
+                require(False, f'{label}: range endpoints must be integer milliseconds')
+                continue
+            if not 0 <= a < b:
+                require(False, f'{label}: invalid range {token}')
+                continue
+            result.append((a, b))
+        return result
 
     def index(rows, key):
         result = {}
@@ -312,6 +356,7 @@ def validate(root):
     # Always initialize Deep evidence indexes so incomplete stage state produces
     # normal validation errors instead of UnboundLocalError later in preflight.
     deep_index = {}
+    boundary_index = {}
     for uid, unit in units.items():
         valid = interval(unit.get('source_id'), unit.get('start_ms'), unit.get('end_ms'), uid)
         protected = unit.get('protected_ranges', [])
@@ -331,10 +376,16 @@ def validate(root):
                 require(transcript[tid].get('source_id') == unit.get('source_id'), f'{uid}: utterance source mismatch')
 
     if deep_complete:
+        require(project.get('narrative_direction_status') == 'confirmed',
+                'completed Detail Structure requires confirmed Direct 1 Narrative Direction')
+        direction_ref = project.get('narrative_direction_ref')
+        require(nonblank(direction_ref) and (root / direction_ref).is_file(),
+                'completed Detail Structure requires Narrative Direction file')
         complete_values = ('complete', 'completed', 'done')
         require(structure_state.get('deep_observations') in complete_values, 'Directed Deep Structure complete requires structure_state.deep_observations=complete')
         require(structure_state.get('detail_intervals') in complete_values, 'Directed Deep Structure complete requires structure_state.detail_intervals=complete')
         require(structure_state.get('speaker_adjudications') in complete_values, 'Directed Deep Structure complete requires structure_state.speaker_adjudications=complete')
+        require(structure_state.get('edit_boundaries') in complete_values, 'Directed Deep Structure complete requires structure_state.edit_boundaries=complete')
 
         detail_headers, detail_rows = load_csv('detail-intervals.csv')
         required_detail_columns = {
@@ -446,12 +497,229 @@ def validate(root):
             require((row.get('evidence_status') or '').strip() in ('pending', 'supported', 'contradicted', 'partial'),
                     f'{label}: invalid evidence_status')
 
+        boundary_headers, boundary_rows = load_csv('edit-boundaries.csv')
+        required_boundary_columns = {
+            'boundary_id','detail_interval_id','plan_node_id','source_id','unit_id','observation_refs','continuity_type',
+            'content_start_ms','content_end_ms','audio_start_ms','audio_end_ms','audio_tail_end_ms',
+            'action_start_ms','action_end_ms','reaction_or_settle_end_ms','preferred_in_ms','safe_in_start_ms','safe_in_end_ms',
+            'preferred_out_ms','safe_out_start_ms','safe_out_end_ms','must_keep_ranges','left_handle_ms','right_handle_ms',
+            'boundary_reason','cut_risk','evidence_refs','confidence','boundary_status'
+        }
+        require(required_boundary_columns.issubset(set(boundary_headers)),
+                'edit-boundaries.csv: missing required edit-boundary columns')
+        require(bool(boundary_rows), 'Directed Deep Structure complete requires at least one edit boundary')
+        for number, row in enumerate(boundary_rows, start=2):
+            label = f'edit-boundaries.csv row {number}'
+            boundary_id = (row.get('boundary_id') or '').strip()
+            if require(bool(boundary_id), f'{label}: boundary_id must be explicit'):
+                require(boundary_id not in boundary_index, f'{label}: duplicate boundary_id {boundary_id}')
+                boundary_index[boundary_id] = row
+            for key in required_boundary_columns - {
+                'content_start_ms','content_end_ms','audio_start_ms','audio_end_ms','audio_tail_end_ms',
+                'action_start_ms','action_end_ms','reaction_or_settle_end_ms','preferred_in_ms','safe_in_start_ms','safe_in_end_ms',
+                'preferred_out_ms','safe_out_start_ms','safe_out_end_ms','left_handle_ms','right_handle_ms'
+            }:
+                require(nonblank(row.get(key)), f'{label}: {key} must be explicit, use none/not_applicable when empty')
+            sid = (row.get('source_id') or '').strip()
+            unit_id = (row.get('unit_id') or '').strip()
+            detail_id = (row.get('detail_interval_id') or '').strip()
+            continuity = (row.get('continuity_type') or '').strip()
+            status = (row.get('boundary_status') or '').strip()
+            require(continuity in ('dialogue','action','reaction','music','scene','mixed'), f'{label}: invalid continuity_type')
+            require(status in ('pending','supported','partial','contradicted'), f'{label}: invalid boundary_status')
+            if require(unit_id in units, f'{label}: unknown unit_id {unit_id}'):
+                require(units[unit_id].get('source_id') == sid, f'{label}: unit/source mismatch')
+            detail = detail_index.get(detail_id)
+            if require(detail is not None, f'{label}: unknown detail_interval_id {detail_id}'):
+                require((detail.get('source_id') or '').strip() == sid, f'{label}: detail/source mismatch')
+                da = csv_ms(detail.get('start_ms'), f'{label}.detail.start_ms')
+                db = csv_ms(detail.get('end_ms'), f'{label}.detail.end_ms')
+            else:
+                da = db = None
+
+            c0 = csv_ms(row.get('content_start_ms'), f'{label}.content_start_ms')
+            c1 = csv_ms(row.get('content_end_ms'), f'{label}.content_end_ms')
+            pin = csv_ms(row.get('preferred_in_ms'), f'{label}.preferred_in_ms')
+            sin0 = csv_ms(row.get('safe_in_start_ms'), f'{label}.safe_in_start_ms')
+            sin1 = csv_ms(row.get('safe_in_end_ms'), f'{label}.safe_in_end_ms')
+            pout = csv_ms(row.get('preferred_out_ms'), f'{label}.preferred_out_ms')
+            sout0 = csv_ms(row.get('safe_out_start_ms'), f'{label}.safe_out_start_ms')
+            sout1 = csv_ms(row.get('safe_out_end_ms'), f'{label}.safe_out_end_ms')
+            lh = csv_ms(row.get('left_handle_ms'), f'{label}.left_handle_ms')
+            rh = csv_ms(row.get('right_handle_ms'), f'{label}.right_handle_ms')
+            required_nums = (c0,c1,pin,sin0,sin1,pout,sout0,sout1,lh,rh)
+            if all(v is not None for v in required_nums):
+                interval(sid, sin0, sout1, f'{label}.boundary envelope')
+                require(sin0 <= pin < sin1 <= sout0 <= pout <= sout1,
+                        f'{label}: expected safe_in_start <= preferred_in < safe_in_end <= safe_out_start <= preferred_out <= safe_out_end')
+                require(pin <= c0 < c1 <= pout, f'{label}: content range must stay inside preferred boundaries')
+                if da is not None and db is not None:
+                    require(da <= sin0 < sout1 <= db, f'{label}: boundary envelope must stay inside detail interval')
+                    require(pin - da >= lh, f'{label}: left_handle_ms exceeds available Detail handle')
+                    require(db - pout >= rh, f'{label}: right_handle_ms exceeds available Detail handle')
+
+            audio_vals = [csv_ms(row.get(k), f'{label}.{k}', allow_na=True) for k in ('audio_start_ms','audio_end_ms','audio_tail_end_ms')]
+            action_vals = [csv_ms(row.get(k), f'{label}.{k}', allow_na=True) for k in ('action_start_ms','action_end_ms','reaction_or_settle_end_ms')]
+            if continuity in ('dialogue','music','mixed'):
+                require(all(v is not None for v in audio_vals), f'{label}: {continuity} boundary requires audio start/end/tail times')
+                if all(v is not None for v in audio_vals) and sin1 is not None and sout0 is not None:
+                    a0,a1,at = audio_vals
+                    require(a0 < a1 <= at, f'{label}: audio times must satisfy start < end <= tail_end')
+                    require(sin1 <= a0, f'{label}: safe-in window must end before required audio expression starts')
+                    require(at <= sout0, f'{label}: safe-out window must start after required audio tail ends')
+            if continuity in ('action','reaction','mixed'):
+                require(all(v is not None for v in action_vals), f'{label}: {continuity} boundary requires action start/end/reaction-settle times')
+                if all(v is not None for v in action_vals) and sin1 is not None and sout0 is not None:
+                    a0,a1,settle = action_vals
+                    require(a0 < a1 <= settle, f'{label}: action times must satisfy start < end <= settle_end')
+                    require(sin1 <= a0, f'{label}: safe-in window must end before required action starts')
+                    require(settle <= sout0, f'{label}: safe-out window must start after action/reaction settles')
+
+            keep_ranges = csv_ranges(row.get('must_keep_ranges'), f'{label}.must_keep_ranges')
+            require(bool(keep_ranges), f'{label}: must_keep_ranges must contain at least one explicit source-ms range')
+            if sin1 is not None and sout0 is not None:
+                for a,b in keep_ranges:
+                    require(sin1 <= a < b <= sout0,
+                            f'{label}: must-keep range {a}-{b} must be preserved by every safe in/out choice')
+                    interval(sid, a, b, f'{label}.must_keep_ranges')
+
+            refs = csv_refs(row.get('observation_refs'))
+            require(bool(refs), f'{label}: observation_refs must name the Deep observations supporting this boundary')
+            support = []
+            for ref in refs:
+                if not require(ref in deep_index, f'{label}: unknown Deep observation {ref}'):
+                    continue
+                obs = deep_index[ref]
+                require((obs.get('source_id') or '').strip() == sid, f'{label}: Deep observation {ref} source mismatch')
+                require((obs.get('detail_interval_id') or '').strip() == detail_id, f'{label}: Deep observation {ref} detail interval mismatch')
+                try:
+                    oa, ob = int((obs.get('start_ms') or '').strip()), int((obs.get('end_ms') or '').strip())
+                except ValueError:
+                    oa = ob = None
+                if oa is not None and ob is not None and pin is not None and pout is not None:
+                    if max(oa,pin) < min(ob,pout):
+                        support.append((max(oa,pin), min(ob,pout)))
+            if pin is not None and pout is not None:
+                require(ranges_cover(support, pin, pout), f'{label}: observation_refs do not fully cover preferred boundary range')
+
     timeline = load('timeline.json', {})
     events = timeline.get('events', [])
     if not require(isinstance(events, list), 'timeline.events must be array'):
         events = []
     event_index = index(events, 'event_id')
     ready = timeline.get('status') == 'ready_for_render'
+    # v1.0.6 keeps the original schemas and render gates. Exception declarations
+    # report unknowns; they never remove an error or certify an unobserved fact.
+    exception_ref = project.get('structure_exceptions_ref')
+    exception_rows = []
+    if nonblank(exception_ref) and (root / exception_ref).exists():
+        exception_rows = load(exception_ref, [])
+        required = {'exception_id', 'stage', 'artifact', 'record_id', 'field',
+                    'status', 'reason', 'impact', 'downstream_handling'}
+        index(exception_rows, 'exception_id')
+        for row in exception_rows:
+            if not isinstance(row, dict):
+                continue
+            label = f'structure exception {row.get("exception_id")}'
+            require(required.issubset(row), f'{label}: missing exception fields')
+            require(row.get('status') in ('unavailable', 'uncertain', 'partial'),
+                    f'{label}: invalid status')
+            require(row.get('stage') in ('B', 'C', 'E'), f'{label}: invalid stage')
+            require(row.get('impact') in ('low', 'medium', 'high'), f'{label}: invalid impact')
+            require(row.get('record_id') is None or nonblank(row.get('record_id')),
+                    f'{label}: record_id must be an ID or null')
+            for key in ('artifact', 'field', 'reason', 'downstream_handling'):
+                require(nonblank(row.get(key)), f'{label}: {key} must be explicit')
+            warnings.append(f'{label}: {row.get("status")}; {row.get("reason")}; '
+                            f'downstream: {row.get("downstream_handling")}')
+    package_policy = project.get('execution_package_policy')
+    if package_policy is not None:
+        require(package_policy == 'plan_and_reference', 'invalid execution_package_policy')
+    if package_policy == 'plan_and_reference':
+        if deep_complete:
+            for key in ('keyframe_references_ref', 'execution_handoff_ref'):
+                ref = project.get(key)
+                if require(nonblank(ref), f'completed Detail requires {key}'):
+                    require((root / ref).is_file(), f'completed Detail requires file: {ref}')
+                    if key == 'execution_handoff_ref' and (root / ref).is_file():
+                        require(bool((root / ref).read_text(encoding='utf-8').strip()),
+                                'completed Detail requires non-empty execution handoff')
+            ref = project.get('keyframe_references_ref')
+            if nonblank(ref) and (root / ref).is_file():
+                rows = load(ref, [])
+                index(rows, 'frame_id')
+                required = {'frame_id', 'source_id', 'timestamp_ms', 'image_ref',
+                            'source_segment', 'narrative_role', 'notes', 'status',
+                            'reason', 'impact', 'downstream_handling'}
+                if not rows:
+                    require(any(isinstance(x, dict) and x.get('artifact') == ref
+                                and x.get('field') == '*' for x in exception_rows),
+                            'empty keyframe references require an explicit artifact exception')
+                for row in rows:
+                    if not isinstance(row, dict):
+                        continue
+                    label = f'keyframe {row.get("frame_id")}'
+                    require(required.issubset(row), f'{label}: missing keyframe fields')
+                    status = row.get('status')
+                    require(status in ('available', 'unavailable', 'uncertain', 'partial'),
+                            f'{label}: invalid status')
+                    timestamp = row.get('timestamp_ms')
+                    sid = row.get('source_id')
+                    unit_ref = row.get('source_segment')
+                    unit = units.get(unit_ref) if isinstance(unit_ref, str) else None
+                    if status == 'available' or nonblank(unit_ref):
+                        require(unit is not None, f'{label}: unknown source_segment unit')
+                    if unit is not None:
+                        if nonblank(sid):
+                            require(sid == unit.get('source_id'),
+                                    f'{label}: source_segment source mismatch')
+                        if integer(timestamp):
+                            require(integer(unit.get('start_ms')) and integer(unit.get('end_ms'))
+                                    and unit['start_ms'] <= timestamp < unit['end_ms'],
+                                    f'{label}: timestamp_ms is outside source_segment')
+                    frame_id = row.get('frame_id')
+                    frame = frames.get(frame_id) if isinstance(frame_id, str) else None
+                    if frame is not None:
+                        if nonblank(sid):
+                            require(sid == frame.get('source_id'),
+                                    f'{label}: source_id must match existing frame')
+                        if integer(timestamp):
+                            require(timestamp == frame.get('timestamp_ms'),
+                                    f'{label}: timestamp_ms must match existing frame')
+                    if status == 'available':
+                        require(sid in sources, f'{label}: unknown source')
+                        require(integer(timestamp) and sid in sources
+                                and 0 <= timestamp < sources[sid]['duration_ms'],
+                                f'{label}: available image requires reliable source timestamp')
+                        image_ref = row.get('image_ref')
+                        require(nonblank(image_ref) and (root / image_ref).is_file(),
+                                f'{label}: available image file is missing')
+                    else:
+                        for key in ('reason', 'downstream_handling'):
+                            require(nonblank(row.get(key)), f'{label}: {key} must be explicit')
+                        require(row.get('impact') in ('low', 'medium', 'high'),
+                                f'{label}: invalid impact')
+                        require(timestamp is None or integer(timestamp),
+                                f'{label}: unknown timestamp must be null')
+                        if status == 'unavailable':
+                            require(any(isinstance(x, dict) and x.get('stage') == 'E'
+                                        and x.get('artifact') == ref and x.get('status') == 'unavailable'
+                                        and ((x.get('record_id') == frame_id
+                                              and x.get('field') in ('image_ref', '*'))
+                                             or (x.get('record_id') is None and x.get('field') == '*'))
+                                        for x in exception_rows),
+                                    f'{label}: unavailable requires a matching exception declaration')
+                        warnings.append(f'{label}: {status}; {row.get("reason")}')
+        if ready:
+            ref = project.get('execution_reference_ref')
+            if require(nonblank(ref), 'ready_for_render requires execution_reference_ref'):
+                require((root / ref).is_file() and bool((root / ref).read_text(encoding='utf-8').strip()),
+                        'ready_for_render requires a non-empty execution reference document')
+            assets = project.get('execution_reference_asset_refs', [])
+            if require(isinstance(assets, list), 'execution_reference_asset_refs must be an array'):
+                for asset in assets:
+                    require(nonblank(asset) and (root / asset).is_file(),
+                            'declared execution reference asset is missing')
     if ready:
         require(bool(events), 'ready_for_render has no events')
         require(positive(timeline.get('width')) and positive(timeline.get('height')), 'ready_for_render requires output dimensions')
@@ -481,6 +749,8 @@ def validate(root):
                 'ready_for_render requires feedback invalidation policy')
         require(execution_policy.get('audio_narrative_role_required') is True,
                 'ready_for_render requires audio narrative-role policy')
+        require(execution_policy.get('edit_boundary_required_before_ready') is True,
+                'ready_for_render requires edit-boundary policy')
     fps_num, fps_den = timeline.get('fps_num'), timeline.get('fps_den')
     fps_ok = positive(fps_num) and positive(fps_den)
     if events:
@@ -653,6 +923,42 @@ def validate(root):
                 require(ranges_cover(support_ranges, start_ms, end_ms),
                         f'{eid}: referenced Deep observations do not fully cover selected source range')
 
+            boundary_ref = event.get('edit_boundary_ref')
+            if not require(isinstance(boundary_ref, str) and bool(boundary_ref.strip()),
+                           f'{eid}: selected source event requires edit_boundary_ref'):
+                continue
+            boundary = boundary_index.get(boundary_ref)
+            if not require(boundary is not None, f'{eid}: unknown edit boundary {boundary_ref}'):
+                continue
+            boundary_observation_refs = csv_refs(boundary.get('observation_refs'))
+            require(set(boundary_observation_refs).issubset(set(string_refs)),
+                    f'{eid}: edit boundary evidence observations must be included in deep_observation_refs')
+            require((boundary.get('source_id') or '').strip() == sid, f'{eid}: edit boundary source mismatch')
+            require((boundary.get('unit_id') or '').strip() == event.get('unit_id'), f'{eid}: edit boundary unit mismatch')
+            require((boundary.get('boundary_status') or '').strip() in ('supported','partial'),
+                    f'{eid}: edit boundary must be supported/partial')
+            sin0 = csv_ms(boundary.get('safe_in_start_ms'), f'{eid}.boundary.safe_in_start_ms')
+            sin1 = csv_ms(boundary.get('safe_in_end_ms'), f'{eid}.boundary.safe_in_end_ms')
+            sout0 = csv_ms(boundary.get('safe_out_start_ms'), f'{eid}.boundary.safe_out_start_ms')
+            sout1 = csv_ms(boundary.get('safe_out_end_ms'), f'{eid}.boundary.safe_out_end_ms')
+            keep_ranges = csv_ranges(boundary.get('must_keep_ranges'), f'{eid}.boundary.must_keep_ranges')
+            override = event.get('boundary_override') is True
+            if not override and integer(start_ms) and integer(end_ms) and None not in (sin0,sin1,sout0,sout1):
+                require(sin0 <= start_ms < sin1, f'{eid}: source_in_ms must fall inside edit boundary safe-in window')
+                require(sout0 <= end_ms <= sout1, f'{eid}: source_out_ms must fall inside edit boundary safe-out window')
+                for a,b in keep_ranges:
+                    require(start_ms <= a < b <= end_ms, f'{eid}: cut drops boundary must-keep range {a}-{b}')
+            elif override:
+                require(nonblank(event.get('boundary_override_reason')), f'{eid}: boundary_override requires reason')
+                override_refs = event.get('boundary_override_review_refs')
+                if require(isinstance(override_refs, list) and bool(override_refs), f'{eid}: boundary_override requires review refs'):
+                    valid_override_refs = [ref for ref in override_refs if isinstance(ref, str) and ref in reviews]
+                    require(len(valid_override_refs) == len(override_refs), f'{eid}: boundary_override has unknown review ref')
+                    require(any(reviews[ref].get('source_id') == sid for ref in valid_override_refs),
+                            f'{eid}: boundary_override review refs must include the same source')
+            else:
+                require(event.get('boundary_override') in (None, False), f'{eid}: boundary_override must be boolean when provided')
+
     for key in ('audio_tracks', 'text_tracks'):
         tracks = timeline.get(key, [])
         if not require(isinstance(tracks, list), f'{key}: must be array'):
@@ -683,6 +989,16 @@ def validate(root):
 
     if ready and any(e.get('kind') == 'source' for e in event_index.values()):
         require(bool(timeline.get('audio_tracks')), 'ready_for_render requires explicit audio decisions')
+    # v1.0.3 binds the existing Structure/Direct records to the actual execution.
+    # Keep draft/Structure-only projects editable without asserting readiness.
+    if ready and fps_ok and output_by_id:
+        try:
+            integrity = validate_integrity(root, project, sources, units, deep_index, boundary_index,
+                                           reviews, timeline, transitions, output_by_id, total_output)
+            errors.extend(integrity['errors'])
+            warnings.extend(integrity['warnings'])
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
+            errors.append(f'execution integrity: malformed input: {exc}')
     return {'status': 'fail' if errors else 'pass', 'scope': 'core static references and timing only', 'checked': checked, 'skipped': skipped, 'errors': errors, 'warnings': warnings}
 
 

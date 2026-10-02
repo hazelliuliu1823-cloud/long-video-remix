@@ -25,6 +25,7 @@
 | 完整 Detail 内容档案 | `deep-observations.csv` | Deep complete 时至少一行；画面、动作链、背景、内容、原声、before/after 等必填 |
 | 说话人帧级裁决 | `speaker-adjudications.csv` | Deep complete 时文件必须存在；有歧义则逐条裁决，只有字幕 / 画面不得假装 resolved |
 | protected ranges / 最小保留意义 | `units.jsonl.protected_ranges` | Execute / ready_for_render 继续由 validator 检查 |
+| 可剪边界 / 连续性 | `edit-boundaries.csv` | Detail 产物；Direct 2 / Execute 必须引用 safe windows / must-keep ranges |
 | 否定性事实举证 | negative evidence rule | 稀疏 / 4fps 密集抽样只能给 not_observed / unknown；negative fact 必须限定 scope，并按事实类型使用连续视频 / 连续原声或可直接排除该事实的可靠反证 |
 | 字幕 / 原声 / ASR 冲突 | transcript + `speaker-adjudications.csv` | 按事实类型裁决；方言 / 强口音 ASR 默认 locator_only |
 | 素材物理可用边界 | `sources.json.usable_ranges/downstream_constraints` | Broad complete 时必须显式记录并传入 Content Map / handoff |

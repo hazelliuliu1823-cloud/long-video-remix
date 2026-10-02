@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Compile an assembly plan to output frames. Does not render media."""
 import argparse
+import csv
 import hashlib
 import json
 from pathlib import Path
 
 from timeline_math import canonical_assembly_ranges, output_ranges_from_overlaps
 from validate_project import validate
+from execution_integrity import project_inputs_digest
 
 
 def digest(value):
@@ -29,17 +31,46 @@ def integer(value, label, minimum=0):
     return value
 
 
-def compile_manifest(root):
+def read_csv_index(path, key):
+    if not path.exists():
+        return {}
+    with path.open('r', encoding='utf-8-sig', newline='') as fh:
+        rows = list(csv.DictReader(fh))
+    result = {}
+    for row in rows:
+        value = (row.get(key) or '').strip()
+        if value:
+            if value in result:
+                raise ValueError(f'Duplicate {key}: {value}')
+            result[value] = row
+    return result
+
+
+def parse_ranges(value):
+    raw = (value or '').strip()
+    if raw.lower() in ('', 'none', 'unknown', 'not_applicable'):
+        return []
+    result = []
+    for token in [part.strip() for part in raw.split(';') if part.strip()]:
+        a, b = token.split('-', 1)
+        result.append({'start_ms': int(a), 'end_ms': int(b)})
+    return result
+
+
+def compile_manifest(root, planning=False):
     # Compiler and static validator intentionally share the same preflight gate.
     # This prevents a timeline from compiling after the validator would reject its
     # stage state, evidence state, source-time mapping, or output coordinates.
+    timeline = read(root / 'timeline.json')
+    project = read(root / 'project.json', {})
+    if not planning and (timeline.get('status') != 'ready_for_render' or project.get('render_authorized') is not True):
+        raise ValueError('Render compilation requires ready_for_render and render_authorized=true; use --planning for a non-renderable draft')
     report = validate(root)
     if report['errors']:
         preview = '; '.join(report['errors'][:8])
         more = f' (+{len(report["errors"]) - 8} more)' if len(report['errors']) > 8 else ''
         raise ValueError(f'Static validation failed: {preview}{more}')
 
-    timeline = read(root / 'timeline.json')
     if timeline.get('coordinate_space') != 'assembly':
         raise ValueError('Input must explicitly use coordinate_space=assembly; do not compile output twice')
     project = read(root / 'project.json', {})
@@ -48,6 +79,7 @@ def compile_manifest(root):
     if len(sources) != len(source_rows):
         raise ValueError('Duplicate source_id')
     units = {u['unit_id']: u for u in read(root / 'units.jsonl', [])}
+    boundaries = read_csv_index(root / 'edit-boundaries.csv', 'boundary_id')
     transition_rows = read(root / 'transitions.json', [])
     transitions = {(x['from_event'], x['to_event']): x for x in transition_rows}
     if len(transitions) != len(transition_rows):
@@ -117,6 +149,23 @@ def compile_manifest(root):
             for protected in unit.get('protected_ranges', []):
                 if not sin <= protected['start_ms'] < protected['end_ms'] <= sout:
                     raise ValueError(f'{e["event_id"]}: cut drops protected range')
+            boundary_ref = e.get('edit_boundary_ref')
+            if boundary_ref:
+                boundary = boundaries.get(boundary_ref)
+                if boundary is None:
+                    raise ValueError(f'{e["event_id"]}: unknown edit boundary {boundary_ref}')
+                e['edit_boundary'] = {
+                    'boundary_id': boundary_ref,
+                    'continuity_type': boundary.get('continuity_type'),
+                    'preferred_in_ms': int(boundary['preferred_in_ms']),
+                    'preferred_out_ms': int(boundary['preferred_out_ms']),
+                    'safe_in_start_ms': int(boundary['safe_in_start_ms']),
+                    'safe_in_end_ms': int(boundary['safe_in_end_ms']),
+                    'safe_out_start_ms': int(boundary['safe_out_start_ms']),
+                    'safe_out_end_ms': int(boundary['safe_out_end_ms']),
+                    'must_keep_ranges': parse_ranges(boundary.get('must_keep_ranges')),
+                    'cut_risk': boundary.get('cut_risk'),
+                }
             e['source_version'] = source['version']
             e['source_time_mapping'] = source['time_mapping']
         elif e.get('kind') != 'card':
@@ -165,15 +214,18 @@ def compile_manifest(root):
         for e in (events[i], events[i + 1]):
             if e['kind'] != 'source':
                 continue
-            for p in units[e['unit_id']].get('protected_ranges', []):
+            protected_ranges = list(units[e['unit_id']].get('protected_ranges', []))
+            if isinstance(e.get('edit_boundary'), dict):
+                protected_ranges.extend(e['edit_boundary'].get('must_keep_ranges', []))
+            for p in protected_ranges:
                 pa = e['out_in_frame'] + (p['start_ms'] - e['source_in_ms']) / e.get('speed', 1) / frame_ms
                 pb = e['out_in_frame'] + (p['end_ms'] - e['source_in_ms']) / e.get('speed', 1) / frame_ms
                 if max(pa, join['start_frame']) < min(pb, join['end_frame']):
                     affected.append(e['event_id'])
-        if affected and not trans.get('overlap_protection_review'):
+        if affected and not trans.get('overrides'):
             raise ValueError(f'{join["join_id"]}: overlap covers protected meaning in {affected}')
         if affected:
-            warnings.append(f'{join["join_id"]}: protected overlap exception needs actual review: {trans["overlap_protection_review"]}')
+            warnings.append(f'{join["join_id"]}: explicitly authorized protected-overlap exception; playback review remains required')
 
     compiled_tracks = {}
     for key in ('audio_tracks', 'text_tracks'):
@@ -256,7 +308,7 @@ def compile_manifest(root):
             audio_dependencies.append({'generated_or_silent_track': track.get('track_id')})
     audio_key = digest([
         compiled_tracks['audio_tracks'], layout, joins, audio_dependencies,
-        project.get('audio_policy'), render_options.get('audio', {}), tools,
+        project.get('audio_policy'), render_options.get('audio', {}), tools, [n, d],
     ])
 
     # Card text is a final text-layer concern. Keep clean-video/audio caches reusable
@@ -306,8 +358,16 @@ def compile_manifest(root):
         sum_transition_overlap_frames=sum(overlaps),
         computed_output_frames=total,
     )
-    return {
-        'schema_version': '1.2',
+    result = {
+        'schema_version': '1.4',
+        'timeline_status': timeline.get('status'),
+        'render_authorized': project.get('render_authorized') is True,
+        'render_allowed': not planning,
+        'compilation_mode': 'planning' if planning else 'render',
+        'eligibility': 'planning_only' if planning else 'validated_for_render',
+        'execution_authorization_ref': project.get('execution_authorization_ref'),
+        'execution_authorization_digest': project.get('execution_authorization_digest'),
+        'playback_verified': False,
         'project_id': timeline.get('project_id'),
         'coordinate_space': 'output',
         'fps_num': n,
@@ -332,20 +392,23 @@ def compile_manifest(root):
         # Backward-compatible aggregate flag: whether the final output cache is safely reusable.
         'cache_reusable': bool(final_reusable),
         'warnings': warnings,
-        'input_digest': digest([timeline, transition_rows, source_rows, project, list(units.values())]),
+        'input_digest': project_inputs_digest(root),
     }
+    result['manifest_digest'] = digest(result)
+    return result
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('project_directory', type=Path)
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--planning', action='store_true', help='Compile a planning-only manifest with render_allowed=false')
     args = parser.parse_args()
     try:
-        manifest = compile_manifest(args.project_directory)
+        manifest = compile_manifest(args.project_directory, planning=args.planning)
         destination = args.output or args.project_directory / 'render-manifest.json'
         destination.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-        print(json.dumps({'status': 'compiled_not_rendered', 'file': str(destination), 'frames': manifest['total_frames'], 'warnings': manifest['warnings']}, ensure_ascii=False))
+        print(json.dumps({'status': 'planning_only' if args.planning else 'compiled_not_rendered', 'render_allowed': manifest['render_allowed'], 'file': str(destination), 'frames': manifest['total_frames'], 'warnings': manifest['warnings']}, ensure_ascii=False))
     except (ValueError, KeyError, TypeError, OSError) as exc:
         print(json.dumps({'status': 'error', 'error': str(exc)}, ensure_ascii=False))
         raise SystemExit(1)
