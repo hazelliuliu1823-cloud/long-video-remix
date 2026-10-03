@@ -1,4 +1,4 @@
-# 安装与更新 · v1.0.6
+# 安装与更新 · v1.0.7
 
 解压后得到 `long-video-remix/` 完整目录。SKILL.md、references、assets、scripts 和 agents 必须一起保留；只复制 SKILL.md 会丢失契约和检查能力。
 
@@ -16,7 +16,7 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 
 解压安装包时，也可将完整 `long-video-remix` 文件夹放入 `~/.claude/skills/`（Claude Code）或 `~/.agents/skills/`（Codex）。项目素材和工作数据放在独立项目目录，不放进安装目录。
 
-用 Git 安装的副本可在安装目录执行 `git pull --ff-only` 更新。仓库安装获取当前分支版本；需要固定 v1.0.6 时，使用对应安装包。安装或更新后检查工具的技能列表。
+用 Git 安装的副本可在安装目录执行 `git pull --ff-only` 更新。仓库安装获取当前分支版本；需要固定 v1.0.7 时，使用对应安装包。安装或更新后检查工具的技能列表。
 
 目录依据：[Claude Code 本地 skills](https://code.claude.com/docs/en/skills) · [Codex 本地 skills](https://learn.chatgpt.com/docs/build-skills)，核对日期：2026年10月2日。
 
@@ -43,9 +43,13 @@ python3 scripts/check_render_authorization.py examples/synthetic-ready examples/
 
 示例全部是合成记录，只验证数据链与工程入口；没有真实视频，不用它证明长视频理解或观看效果。
 
+## 从 v1.0.6 更新
+
+本次为双语使用示例与发布文档更新。更新完整安装目录即可，工程脚本、正式表单和项目 schema 保持原样；已有项目资料和已确认方案继续复用。四个常用提问示例位于中英 README 的“快速开始”之后。
+
 ## 从 v1.0.5 更新
 
-保留已有项目、六套正式 CSV 表头和观察数据。按 v1.0.6 继续工作时，Structure 无法取得的字段通过 `structure-exceptions.jsonl` 明确声明，继续可做部分；Detail 交付 `keyframe-references.json`、可取得的真实图片与 `execution-handoff.md`（直接含下游完整交付要求）。
+保留已有项目、六套正式 CSV 表头和观察数据。按 v1.0.7 继续工作时，Structure 无法取得的字段通过 `structure-exceptions.jsonl` 明确声明，继续可做部分；Detail 交付 `keyframe-references.json`、可取得的真实图片与 `execution-handoff.md`（直接含下游完整交付要求）。
 
 Direct 2 同时提供 `execution-plan.md` 与 `execution-reference.md`。project 增加对应 refs、`execution_reference_asset_refs`（无图片时 []）与 `execution_package_policy="plan_and_reference"`。reference 使用一两个样本锁定整体风格，不逐镜头配对。已有授权流程追加 reference 文档 / 样本指纹，按已有确认更新 draft / 授权并重新编译；不重做已核实的原片观察。
 

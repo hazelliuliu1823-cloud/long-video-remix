@@ -46,6 +46,42 @@ python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.js
 
 Raw audiovisual processing and actual rendering are handled by the models, video MCP, FFmpeg, or other adapters available in the current environment. The bundled scripts prepare authorization records, run static checks, compile timelines, and audit exports. Connect a renderer through the [MCP adapter contract](references/mcp-adapter.md).
 
+## Common prompt examples
+
+Replace the placeholders with your sources, narrative direction, or working files, and choose the example that fits your current task.
+
+### 1. No topic yet: start with Broad Structure
+
+**What to ask:**
+
+> Please run Broad Structure on 〔source video(s)〕 across the full source duration and build traceable structured records. Deliver observations for each analyzed sample frame, scene and action indexes, questions and unverified items, a source-order overview, and a Content Map. State the completed coverage and gaps. Stop at the Broad stage for this request.
+
+**What you get:** A Broad source package with the observation tables, overview, Content Map, and coverage records. Each record retains its source and time location.
+
+### 2. Broad is complete: what stories could this material tell?
+
+**What to ask:**
+
+> Based on 〔Broad source package〕, propose a small number of clearly distinct creative directions for me to choose from. For each direction, explain the core idea, narrative spine, corresponding source regions, current evidence, and questions that Detail needs to verify.
+
+**What you get:** Candidate directions and a draft narrative direction for Direct 1. A human or an independent AI Director can propose the directions; discussion and confirmation make them the basis for targeted review.
+
+### 3. The narrative direction is confirmed: which regions need detailed review?
+
+**What to ask:**
+
+> The confirmed narrative direction is 〔direction〕, and the expression that must be preserved is 〔key point〕. Use 〔Broad source package〕 to locate the intervals that need Detail Structure. For each interval, list the source video, time range, reason for selection, necessary surrounding context, and questions to verify. Deliver the detailed-review task list first.
+
+**What you get:** An interval list ready for detailed review, explaining why each interval needs review and what to verify. Exact edit points are left for verification in Detail.
+
+### 4. The intervals are selected: complete Detail and prepare the handoff
+
+**What to ask:**
+
+> Follow 〔confirmed narrative direction〕 and 〔detailed-review task list〕 to return to the original footage for Detail Structure. Verify the complete visuals, dialogue, speakers, actions, and surrounding context; separate facts, interpretations, and unverified items. Provide complete editable units, preferred edit points, safe edit-point windows, dialogue and actions that must be kept, and edit risks. Deliver the Detail evidence tables, real source keyframes, and a self-contained handoff, and explain whether the material supports the original narrative direction.
+
+**What you get:** A Detail evidence package with interval and deep-observation records, speaker verification, edit boundaries, real source keyframes, and a handoff file. The handoff states the execution-package requirements for the next Direct stage and explicitly marks incomplete items.
+
 ## Workflow
 
 | Stage | Outputs and decisions |

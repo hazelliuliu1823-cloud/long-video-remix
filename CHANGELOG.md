@@ -1,6 +1,14 @@
 # Changelog
 
-Public release packaging targets v1.0.6. Earlier entries are retained as development history; their dates do not imply published GitHub Releases or tags.
+Public release packaging targets v1.0.7. Earlier entries are retained as development history; their dates do not imply published GitHub Releases or tags.
+
+## v1.0.7 — Prompt Examples & Bilingual Guide · 2026-10-03
+
+- Included four matching Chinese and English README prompt examples with their expected deliverables: start Broad Structure, propose directions from Broad, locate Detail intervals for a confirmed direction, and complete Detail with a self-contained handoff.
+- Kept the existing first-screen positioning, workflow illustration, core-value table, folded method, and content-performance example.
+- Updated the release version, installation and update guidance, release notes, and package checksums. Existing v1.0.6 project data and confirmed plans remain reusable.
+- Preserved all engineering scripts, tests, templates, contracts, examples, agent metadata, and historical QA records byte for byte.
+- Re-ran all 153 regression tests under Python 3.12.14 and the synthetic example's validation, compilation, and render-authorization checks; all passed. Real-video analysis and playback were not re-tested for this documentation release.
 
 ## v1.0.6 — Structure Exceptions & Execution Package · 2026-10-01
 

@@ -1,3 +1,42 @@
+# v1.0.7 — 常用提问示例 / Prompt Examples
+
+2026-10-03
+
+本次更新集中在双语使用说明，帮助使用者按当前任务提出请求，并明确每一阶段应拿到什么。
+
+## 四个常用提问示例
+
+- 还没有选题：先做 Broad Structure，交付结构化观察表、全片概览、Content Map 和覆盖记录。
+- Broad 已完成：提出候选创作方向，供人讨论并确认主线。
+- 主线已确认：定位需要做 Detail 的区间，交付精查任务单。
+- 区间已选好：完成 Detail，交付证据、剪辑边界、真实关键帧与可独立阅读的 handoff。
+
+中英 README 的示例均位于“快速开始”之后。原有首屏、核心价值、流程示意、折叠方法和内容效果分析示例保留。
+
+## 版本与兼容
+
+版本统一为 v1.0.7，安装说明、CHANGELOG 和校验清单同步更新。本次为文档与发布整理，工程脚本、测试、模板、契约、示例、agent 配置及历史 QA 保持原字节。已有项目资料和已确认方案继续复用。
+
+## 实际验证
+
+- Python 3.12.14：153 项回归全部通过。
+- 合成示例：静态校验、时间轴编译、渲染授权检查全部通过。
+- 文档链接、包内文件校验和与压缩包完整性检查通过。
+
+本次验证不包含真实长视频分析或成片播放；合成示例检查工程链路。
+
+安装与更新见 [INSTALL.md](INSTALL.md)，历史验证记录见 [docs/qa](docs/qa/README.md)。
+
+## English
+
+This documentation release includes four matching Chinese and English prompt examples and their expected deliverables: Broad Structure, creative-direction proposals, targeted Detail intervals, and Detail evidence with a self-contained handoff.
+
+The existing introduction, workflow illustration, core values, folded method, and content-performance example are retained. Engineering scripts, tests, templates, contracts, examples, agent metadata, and historical QA are unchanged.
+
+All 153 regression tests passed under Python 3.12.14. The synthetic example passed validation, timeline compilation, and render-authorization checks. Documentation links, package checksums, and archive integrity were checked. Real-video analysis and playback were not re-tested.
+
+---
+
 # v1.0.6 — Structure Exceptions & Execution Package
 
 本版以 v1.0.5 为底稿，只落实已确认的七项修改：固定字段下明确异常并继续可做部分；Detail 固定交付真实关键帧；Detail 形成独立 handoff 并携带下游完整输出要求；Direct 2 输出完整 Execution Package；少量 reference 锁定全片规则；Execute 接收完整包；原 QA 增加 Reference Compliance。
