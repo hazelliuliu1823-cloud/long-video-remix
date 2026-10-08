@@ -1,0 +1,67 @@
+{
+  "version": "1.2.0",
+  "date": "2026-10-08",
+  "base": "v1.1.0 (second review round)",
+  "reviewed_upload": "long-video-remix-v1_2_0-github-ready-bilingual.zip",
+  "reviewed_upload_sha256": "c4061e688a693b879603626a73ed9fa4ad18042d180e8969bf6b09c119991641",
+  "scope": [
+    "Detail delivers individually saved source keyframes with the keyframe index and handoff",
+    "Direct 2 delivers one or two real-keyframe mockups that lock the film's style, with parameters, assets and a reusable layout entry",
+    "Execute reuses the same design; QA checks style match between output and mockup"
+  ],
+  "review_round": {
+    "accepted": [
+      "style match replaces pixel-level reproduction wording",
+      "mockup rules consolidated in references/execution-package.md; templates keep fields, handoff template keeps a short self-contained summary",
+      "font-licence risk note for commercial use",
+      "non-blocking validator reminder when a ready_for_render package declares no mockup / reference image",
+      "v1.2.0 QA record"
+    ],
+    "declined_by_user": [
+      "frame-exact output-frame mapping and comparison script",
+      "measured-time / lossless keyframe extraction requirement",
+      "mockup regeneration consistency check"
+    ]
+  },
+  "changed_files_vs_v1_1_0": [
+    "CHANGELOG.md",
+    "INSTALL.md",
+    "README.en.md",
+    "README.md",
+    "RELEASE_NOTES.md",
+    "SKILL.md",
+    "assets/execution-handoff-template.md",
+    "assets/execution-plan-template.md",
+    "assets/execution-reference-template.md",
+    "docs/qa/README.md",
+    "references/execution-package.md",
+    "references/qa-handoff.md",
+    "references/workflow.md",
+    "scripts/validate_project.py",
+    "tests/test_execution_package.py"
+  ],
+  "added_files_vs_v1_1_0": [
+    "docs/qa/v1.2.0-QA.json",
+    "docs/qa/v1.2.0-QA.md"
+  ],
+  "validation": {
+    "tests_run": 192,
+    "tests_passed": 192,
+    "tests_added_this_version": 2,
+    "environment": "Python 3.12.3, FFmpeg 6.1.1, Pillow",
+    "mutation_check": "the reminder test fails on the uploaded v1.2.0 build",
+    "synthetic_ready": "validate pass; the example does not use plan_and_reference, so it does not exercise the visual handoff",
+    "sizes_bytes": {
+      "SKILL.md": 23447,
+      "SKILL.md_cap": 23842,
+      "references/workflow.md": 31650,
+      "workflow_cap": 31845,
+      "references/execution-package.md": 12616
+    }
+  },
+  "limits": [
+    "the visual handoff has no automated checks beyond the non-blocking reminder; mockup quality and style match are human review",
+    "no real video was rendered or compared against a mockup for this release",
+    "font licensing is only flagged, not checked"
+  ]
+}

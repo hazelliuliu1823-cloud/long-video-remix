@@ -188,7 +188,7 @@ Content Map 可以提示“这里可能值得继续看”，但不把这种提�
 
 ### E 的关键帧与跨模型 handoff
 
-随 Detail 固定交付 `keyframe-references.json`（通常 1–3 张真实原片代表帧）与 `execution-handoff.md`，参见 [执行包契约](execution-package.md)。图片只提供素材视觉依据；提取失败或没有可定位的帧时保留清单 / 字段并声明异常，继续可做部分。handoff 携带已确认主题、所选源区间与证据 / 保护范围、图片与文件入口、异常，以及下游完整 Execution Package 的输出要求；接收模型即使没有安装此 Skill 也能直接继续。此处不替 D2 作视觉 / 制作决定。
+随 Detail 固定交付 `keyframe-references.json`（通常 1–3 张代表帧）、单独保存的真实原图与 `execution-handoff.md`，参见 [执行包契约](execution-package.md)。图片只提供素材视觉依据；提取失败或没有可定位的帧时保留清单 / 字段并声明异常，继续可做部分。handoff 携带已确认主题、所选源区间与证据 / 保护范围、图片与文件入口、异常，以及下游完整 Execution Package 的输出要求；接收模型即使没有安装此 Skill 也能直接继续。此处不替 D2 作视觉 / 制作决定。
 
 ### 何时返回 Direct 1
 
@@ -216,7 +216,7 @@ E 阶段完成后，不直接进入 Execute。以独立 handoff 把 `detail-inte
 - 转场 / 时空提示等执行意图；
 - 可替换范围、允许执行层调整的边界、不得改变的核心表达。
 
-同时填写 `assets/execution-reference-template.md`，冻结具体文字规格、画面关系、声音 / 转场、少量风格样本的应用规则、资源入口与 QA 判据；逐条文字全文及出现 / 消失锚点在计划中给出。通常一两个样本即可，不要求每个字幕或镜头对应 reference。完整要求见 [执行包契约](execution-package.md)。可使用 `assets/execution-plan-template.md`。如果 Detailed Structure 暴露出主线级冲突，先退回 D1；如果只是素材取舍 / 排序 / 执行策略问题，在 D2 内解决。只有计划及 reference 组成的执行包被确认，且关键 evidence_status 不为 pending / contradicted，并且每个入选 source segment 已引用可用 edit boundary，才进入 F Execute。`ready_for_render` 是机械状态，不是文字口径：项目必须同时满足 Broad / Content Map / Detail 完成、两次 Direct 状态均为 `confirmed`、对应文档真实存在，以及 `render_authorized=true`。每个入选 source event 还必须显式列出本次真正采用的 `deep_observation_refs` 与 `edit_boundary_ref`；这些 observation 的 source 必须与 event 一致，source-time 覆盖本次采用区间，状态为 `supported / partial`。默认 source_in/out 必须落在 boundary 的 safe windows 并覆盖 must-keep ranges；有意越界只能通过显式 override + 创作理由 + review refs。同一 unit 中未采用的 pending / contradicted observation 不阻断本次执行。静态校验或编译器任一项不通过都不得进入渲染。
+按 [执行包契约](execution-package.md) 用真实关键帧做一两个锁定风格的 mockup，填写 `assets/execution-reference-template.md`；逐条文字及出现 / 消失锚点写入计划（`assets/execution-plan-template.md`）。如果 Detailed Structure 暴露出主线级冲突，先退回 D1；如果只是素材取舍 / 排序 / 执行策略问题，在 D2 内解决。只有计划及 reference 组成的执行包被确认，且关键 evidence_status 不为 pending / contradicted，并且每个入选 source segment 已引用可用 edit boundary，才进入 F Execute。`ready_for_render` 是机械状态，不是文字口径：项目必须同时满足 Broad / Content Map / Detail 完成、两次 Direct 状态均为 `confirmed`、对应文档真实存在，以及 `render_authorized=true`。每个入选 source event 还必须显式列出本次真正采用的 `deep_observation_refs` 与 `edit_boundary_ref`；这些 observation 的 source 必须与 event 一致，source-time 覆盖本次采用区间，状态为 `supported / partial`。默认 source_in/out 必须落在 boundary 的 safe windows 并覆盖 must-keep ranges；有意越界只能通过显式 override + 创作理由 + review refs。同一 unit 中未采用的 pending / contradicted observation 不阻断本次执行。静态校验或编译器任一项不通过都不得进入渲染。
 
 ## F Execute：执行与粗剪
 

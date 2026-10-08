@@ -1,3 +1,25 @@
+# v1.2.0 — 关键帧与视觉样稿交付 / Keyframe Mockup Handoff
+
+2026-10-08
+
+在 v1.1.0 基础上，把 Direct 2 的视觉设计显性化，并让后续执行复用同一套设计。
+
+- **Detail 原图交付：** 核心关键帧单独保存，连同清单和 handoff 交给 Direct 2。
+- **Direct 2 视觉样稿：** 用真实关键帧、实际文字和目标输出画幅制作可打开的 mockup；一两个代表样稿锁定整体风格，实际采用的相片页 / 录像框等版式纳入样稿。
+- **执行可复现：** Execution Package 同时交付字体、布局参数、必要资源和布局源文件或渲染方法；Execute 复用这些内容；mockup 的核心是锁定风格，QA 核对成片与 mockup 风格是否匹配，不要求逐帧或逐像素对应。缺失样稿明确待补。商用发布时注意字体授权。
+
+更新现有规范与模板，新增两份 v1.2.0 QA 记录，不新增创作阶段或脚本，不改正式 CSV 表头及 schema。SKILL.md 为 23,447 / 23,842 字节；192 项工程回归通过。**本版新增的视觉交付内容几乎没有自动化检查**：唯一的机器检查是进入 ready_for_render 时若未登记任何 mockup / 参考图，给出提醒（不阻断）；样稿质量与风格是否匹配仍须人工审阅，工程回归不代替真实视频的视觉验收。
+
+审阅修复（同为 v1.2.0）：验收标准由“像素级复现”改为“风格匹配”；mockup 规则集中写在 `references/execution-package.md`，其他文档与模板只保留字段或摘要（handoff 模板为可独立阅读保留简短完整说明）；增加字体授权风险提示；补齐本版 QA 记录。迁移见 [INSTALL.md](INSTALL.md)。
+
+## English
+
+Built on v1.1.0. Detail hands over individual original keyframes. Direct 2 produces actual full-canvas mockups from those frames and the intended text, with typography, layout parameters, required resources and a reusable layout source or rendering method. One or two representative samples normally establish the film's style; show special layouts when used.
+
+Execute reuses the same design and resources. Mockups exist to lock the style: QA checks that the output matches the mockup's style, with no frame-exact or pixel-exact requirement. Missing mockups remain explicitly pending. Check font licences before commercial release. Two v1.2.0 QA records are added; existing instructions and templates are updated without adding creative stages or scripts or changing formal CSV headers or schema versions. All 192 engineering tests pass. The new visual handoff has almost no automated checks: the only one is a non-blocking reminder at ready_for_render when no mockup or reference image is declared; mockup quality and style match still need human review. A review round in v1.2.0 replaced pixel-level wording with style matching, consolidated the mockup rules in `references/execution-package.md`, added the font-licence note and the v1.2.0 QA record. See [INSTALL.md](INSTALL.md).
+
+---
+
 # v1.1.0 — 以 v1.0.7 为底的精简版 / Lean Detail Rebuild
 
 2026-10-07

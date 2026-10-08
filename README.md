@@ -48,7 +48,7 @@ python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.js
 
 本地原片抽帧优先用 `scripts/extract_frames.py`；MCP / 代理等按 [MCP 适配](references/mcp-adapter.md) 保留实测时间与源绑定。脚本的 `signals` 模式标出画面变化与有声区间，`strip` 模式输出逐帧条用于定切点。E 阶段的取证、切点与问题闭环见 [Detail 证据获取](references/detail-evidence.md)。
 
-**v1.1.0：** 以 v1.0.7 为底的精简版——抽帧时间标签改为实测、Detail 读图按内容定密度、切点逐帧确认、被否决 / 未解决的问题在 handoff 中用一张表闭环，并给 SKILL.md 设了大小上限。迁移见 [INSTALL.md](INSTALL.md)。
+**v1.2.0：** 在 v1.1.0 基础上补齐视觉交付：Detail 单独交付关键帧原图，Direct 2 制作真实画面的 mockup，并交付设计参数、资源与可复用布局入口，Execute 按同一套设计制作，并核对成片风格与 mockup 是否匹配。保留实测时间标签、问题闭环与指令大小上限。迁移见 [INSTALL.md](INSTALL.md)。
 
 ## 常用提问示例
 
@@ -355,7 +355,9 @@ long-video-remix/
 │       ├── v1.0.6-QA.md
 │       ├── v1.0.6-QA.json
 │       ├── v1.1.0-QA.md
-│       └── v1.1.0-QA.json
+│       ├── v1.1.0-QA.json
+│       ├── v1.2.0-QA.md
+│       └── v1.2.0-QA.json
 ├── examples/
 │   ├── content-performance-analysis.md
 │   └── synthetic-ready/

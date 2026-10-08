@@ -98,6 +98,21 @@ class ExecutionPackageTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             check(self.root, manifest)
 
+    def test_missing_mockup_is_a_reminder_not_a_block(self):
+        report = validate(self.root)
+        self.assertEqual(report['status'], 'pass', report['errors'])
+        self.assertTrue(any('no mockup' in x for x in report['warnings']), report['warnings'])
+        self.assertTrue(compile_manifest(self.root)['render_allowed'])
+
+    def test_declared_mockup_removes_the_reminder(self):
+        # A byte fixture tests declaration only; it is not a claimed mockup image.
+        self.files['mockup-01.dat'] = 'Synthetic mockup placeholder bytes.\n'
+        self.files['project.json']['execution_reference_asset_refs'] = ['mockup-01.dat']
+        self.save()
+        report = validate(self.root)
+        self.assertEqual(report['status'], 'pass', report['errors'])
+        self.assertFalse(any('no mockup' in x for x in report['warnings']), report['warnings'])
+
     def test_missing_exception_reason_is_not_silently_accepted(self):
         self.files['structure-exceptions.jsonl'][0]['reason'] = ''
         self.save()

@@ -97,7 +97,7 @@
 ## 同包制作参考与 QA
 
 - execution_reference_ref：execution-reference.md
-- execution_reference_asset_refs：实际采用的一两个风格样本文件；未使用图片时写 [] 并说明。
+- execution_reference_asset_refs：实际采用的 mockup / 风格样本；缺少图片时写 [] 并说明待补项。
 - 具体文字 / 画面 / 声音 / 转场规则及资产入口：见同包 reference。
 - Reference Application Rules：样本提炼为全片规则，不要求每个字幕 / 镜头单独配对。
 - QA：原内容 / 技术 / 听看项 + ReferenceCompliance，未实看保持 not_tested。

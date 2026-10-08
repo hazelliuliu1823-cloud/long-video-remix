@@ -48,7 +48,7 @@ Raw audiovisual processing and actual rendering are handled by the models, video
 
 Prefer `scripts/extract_frames.py` for local identity-mapped sources; for MCP / proxies, follow the [MCP adapter](references/mcp-adapter.md), retaining measured times and source bindings. The script's `signals` mode marks visual-change and sound segments; `strip` returns frame-by-frame edit-point strips. See [Detail evidence](references/detail-evidence.md) for evidence and question closure.
 
-**v1.1.0:** a lean rebuild on v1.0.7 - measured frame timestamps, content-driven Detail sampling, frame-accurate edit points, one closure table in the handoff for contradicted / unresolved questions, and a size cap on SKILL.md. See [INSTALL.md](INSTALL.md) for migration.
+**v1.2.0:** builds on v1.1.0 with visual handoff: Detail delivers individual source keyframes; Direct 2 supplies actual mockups, design parameters, required assets and a reusable layout entry point; Execute uses the same design and checks that the output matches the mockup's style. Measured timestamps, question closure and instruction-size caps remain. See [INSTALL.md](INSTALL.md) for migration.
 
 ## Common prompt examples
 
@@ -355,7 +355,9 @@ long-video-remix/
 │       ├── v1.0.6-QA.md
 │       ├── v1.0.6-QA.json
 │       ├── v1.1.0-QA.md
-│       └── v1.1.0-QA.json
+│       ├── v1.1.0-QA.json
+│       ├── v1.2.0-QA.md
+│       └── v1.2.0-QA.json
 ├── examples/
 │   ├── content-performance-analysis.md
 │   └── synthetic-ready/

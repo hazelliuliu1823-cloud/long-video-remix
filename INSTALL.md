@@ -1,4 +1,4 @@
-# 安装与更新 · v1.1.0
+# 安装与更新 · v1.2.0
 
 解压后得到 `long-video-remix/` 完整目录。SKILL.md、references、assets、scripts 和 agents 必须一起保留；只复制 SKILL.md 会丢失契约和检查能力。
 
@@ -16,7 +16,7 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 
 解压安装包时，也可将完整 `long-video-remix` 文件夹放入 `~/.claude/skills/`（Claude Code）或 `~/.agents/skills/`（Codex）。项目素材和工作数据放在独立项目目录，不放进安装目录。
 
-用 Git 安装的副本可在安装目录执行 `git pull --ff-only` 更新。仓库安装获取当前分支版本；需要固定 v1.1.0 时，使用对应安装包。安装或更新后检查工具的技能列表。
+用 Git 安装的副本可在安装目录执行 `git pull --ff-only` 更新。仓库安装获取当前分支版本；需要固定 v1.2.0 时，使用对应安装包。安装或更新后检查工具的技能列表。
 
 目录依据：[Claude Code 本地 skills](https://code.claude.com/docs/en/skills) · [Codex 本地 skills](https://learn.chatgpt.com/docs/build-skills)，核对日期：2026年10月2日。
 
@@ -28,7 +28,7 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 - 抽帧与时间信号（`extract_frames.py`）、导出审计：FFmpeg / ffprobe；生成拼图时额外需要 Pillow。
 - 模型、视频 MCP、渲染器的依赖按实际适配器配置，不在包内下载大模型或素材。
 
-Python 3.9 已做语法兼容检查，尚未在 3.9 解释器上实际运行回归；186 项回归的本轮已验证运行环境为 Python 3.12.14 + FFmpeg 6.1.1 + Pillow。缺少 FFmpeg 或 Pillow 时，抽帧相关测试会跳过。
+Python 3.9 已做语法兼容检查，尚未在 3.9 解释器上实际运行回归；192 项回归的本轮已验证运行环境为 Python 3.12.3 + FFmpeg 6.1.1 + Pillow。缺少 FFmpeg 或 Pillow 时，抽帧相关测试会跳过。
 
 ## 验证安装包
 
@@ -42,6 +42,12 @@ python3 scripts/check_render_authorization.py examples/synthetic-ready examples/
 ```
 
 示例全部是合成记录，只验证数据链与工程入口；没有真实视频，不用它证明长视频理解或观看效果。
+
+## 从 v1.1.0 更新
+
+更新完整安装目录，保留已有项目数据、真实关键帧和已确认叙事。v1.2.0 更新交付规范与模板，沿用现有脚本、正式 CSV 表头及 schema：Detail 单独保存并交付关键帧原图；Direct 2 用真实关键帧制作完整画面 mockup，随 Execution Package 交付设计参数、必要资源和可复用布局入口；Execute 用同一套参数制作，再核对成片与 mockup 风格是否匹配（不要求逐帧或逐像素对应）。通常一两个代表样稿即可；特殊版式按本次实际使用提供。商用发布时注意字体授权。进入 ready_for_render 时若未登记任何 mockup / 参考图，validator 会给出提醒但不阻断。
+
+已有执行包要采用本版规范时，补齐上述实际文件和入口；缺失项标待补，不把参数表算作已完成 mockup。设计或样稿变化沿用既有 Direct 2 授权流程。详见 [执行包规范](references/execution-package.md)。
 
 ## 从 v1.0.7 更新
 

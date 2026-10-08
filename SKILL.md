@@ -5,7 +5,7 @@ description: 从三到五小时或多集影视、活动视频中建立可回查�
 
 # 长视频结构化与混剪执行
 
-公开仓库版本 v1.1.0 · 2026年10月7日
+公开仓库版本 v1.2.0 · 2026年10月8日
 
 本 Skill 的核心不是“一句话自动生成成片”，而是先把视频、图像、对白与上下文等高成本多模态信息压缩成有来源、可检索、可回查的**紧凑结构化工作层**，让后续人工、Director 或其他 Skill 尽量基于表格 / 文本继续工作；创意方案确认后，再只把命中的区域压回原素材做高密度核验，并落实成真正可执行的剪辑方案。
 
@@ -83,7 +83,7 @@ Render / QA
 | C Structured Working Layer + Content Map | 在逐抽样帧表之上形成 scene / segment 观察、source-order overview、情绪 / 关系线索和跨场景 Content Map；这些都是 Broad Structure 的正式文字化结构输出，不是用 Content Map 替代表单 | frame-observations、action-node-candidates、structure-questions、scenes / segment observations、overview、content-map、emotional / relationship cues | 形成足够完整且可下钻回 frame observation 的素材面；若 deliverable=content_map 可在此正式交付 |
 | D1 Direct — Narrative Direction | 人 / Director 读取正式结构化表单 + Content Map + 外部研究，抽选“到底讲什么”：核心命题、Narrative Spine、candidate regions、需要 Detail 验证的问题和禁改项 | brief、narrative-direction、external research refs、narrative mapping | 主线已人工确认到足以指导定向深挖；不要求已有精确切点 |
 | E Directed Deep / Detail Structure | 带着 Narrative Direction 回到相关原素材，先建立精查区间卡，再提高抽样 / 播放密度；补完整画面、内容、背景、前后状态、原声、说话人裁决、主题判定与 confidence；进一步识别完整可剪单元的音频 / 动作 / 反应边界，给出 preferred in/out、safe in/out windows、must-keep ranges 与 cut risk，再形成 verified units / protected ranges，并导出少量真实关键帧与独立 handoff | detail-intervals、deep-observations、speaker-adjudications、edit-boundaries、已核实 units、reviews、protected_ranges、evidence gaps、keyframe-references、execution-handoff | 每个核心节点有足够音画、内容与语境证据，并有可追溯 edit boundary；主线不成立时退回 D1 调整 |
-| D2 Direct — Execution Package | Director 读取 Detail handoff、证据与关键帧，决定“这些材料最终怎么讲”：最终取舍、顺序、逐条文字与声音、时长 / 转场及具体样式；一两个风格参考锁定全片规则，不逐镜头映射 | execution-plan、execution-reference、selected verified units、final narrative mapping | 最终执行方案已确认；关键节点 evidence_status 不为 pending / contradicted |
+| D2 Direct — Execution Package | Director 读取 Detail handoff、证据与真实关键帧，定取舍、顺序、文字 / 声音与时长 / 转场；用一两个关键帧 mockup 和参数锁定全片风格与已采用版式，不逐镜头映射 | execution-plan、execution-reference（mockup + 复现参数）、selected verified units、final narrative mapping | 最终执行方案已确认；关键节点 evidence_status 不为 pending / contradicted |
 | F Execute | 接收素材、Detail、计划、reference 与约束组成的已确认 Execution Package：先通过阶段 / Direct / evidence / edit-boundary 机械门槛，再用累计时长统一量化事件边界并完成时长预算对账；按反馈类型确定失效范围；标明声音的叙事作用；再编译叠化后的时间轴、分层渲染并生成全接点图表 | timeline（含 duration budget 与 boundary refs）、transitions、render-manifest、edit-plan、rough-cut | 两次 Direct 均 confirmed；每个入选 source event 显式引用实际采用的 Deep observation 与 edit boundary，默认切点落在 safe windows 并覆盖 must-keep ranges；若故意越界必须显式 override 并绑定具体规则、区间、当前有效 review 与已确认创作决定；Direct 2 机器授权、当前 source/time-mapping 证据、许可取段和原声音轨连续性检查均通过；预算守恒；源时间→成片时间映射可追；实测帧数与时长；近静音窗口有记录，再继续音画实看 |
 | G QA & Handoff | 逐接点及全片复核，做 EVA 和 Reference Compliance，保存问题与缓存版本 | render-audit、接点图表、qa、handoff | 技术检查与人工观看分别记录，不以成功日志代替验收 |
 

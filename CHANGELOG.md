@@ -1,6 +1,13 @@
 # Changelog
 
-Public release packaging targets v1.1.0. Earlier entries are retained as development history; their dates do not imply published GitHub Releases or tags.
+Public release packaging targets v1.2.0. Earlier entries are retained as development history; their dates do not imply published GitHub Releases or tags.
+
+## v1.2.0 — Keyframe Mockup Handoff · 2026-10-08
+
+- Detail delivers individual original keyframes with its existing index and handoff. Direct 2 uses real keyframes to produce full-canvas mockups and binds them to typography, layout parameters, required resources and a reusable layout source or rendering method.
+- Execute reuses the same design and resources; mockups lock the style, and QA checks style match between output and mockup without frame-exact or pixel-exact requirements. One or two representative samples normally establish the film's style; include special layouts only when used. Missing images or rendering capability are recorded as pending, without substituting generated evidence or treating parameters as a completed mockup.
+- Updated existing instructions, templates and bilingual release documentation; added two v1.2.0 QA records, with no new creative stages or scripts and no changes to formal CSV headers or schema versions. SKILL.md remains 23,447 of 23,842 bytes.
+- Review round (still v1.2.0): acceptance wording changed from pixel-level reproduction to style match; mockup rules consolidated in `references/execution-package.md` (templates keep fields; the handoff template keeps a short self-contained summary); font-licence risk noted for commercial use; `validate_project.py` warns, without blocking, when a ready_for_render package declares no mockup / reference image; added `docs/qa/v1.2.0-QA.*`. 2 tests added (192 total) under Python 3.12.3 + FFmpeg 6.1.1 + Pillow; the new visual handoff otherwise has no automated checks.
 
 ## v1.1.0 — Lean Detail Rebuild on v1.0.7 · 2026-10-07
 

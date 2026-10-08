@@ -36,7 +36,7 @@
 ## 原片关键帧
 
 - keyframe-references.json：
-- 真实图片文件与 source timestamp：
+- 单独保存、实际随包附带的原片关键帧图片与 source timestamp：
 - 每张图对应的素材节点 / narrative role：
 - 提取失败或定位不确定项（status / reason / impact / downstream_handling）：
 
@@ -50,9 +50,9 @@ Director 2 基于以上已核实素材和 Narrative Direction 决定最终呈现
 2. **Visual / Text Reference / execution-reference.md**：字体及可用资源、字号与单位、字重 / 颜色、位置 / 对齐、换行 / 行数、描边 / 背景、阅读停留、动效；明确输出分辨率、原片裁切 / 缩放和文字与画面的关系。
 3. **Audio Specification**：每条原声 / 环境音 / BGM / 旁白的政策、源取段、成片放置、增益、速度、淡化、完整对白保护；没有配乐需求时不默认添加。
 4. **Transition Specification**：每个接点采用什么及帧数；黑场 / card / hold 若增时，要计入事件与总长。
-5. **Reference Application Rules**：一两个代表性风格样本锁定整体视觉语言，再将规则一致应用到全片；不要求每个镜头或字幕单独映射 reference。原片关键帧是素材依据，不能单独代替文字设计规格。没有出图能力时声明缺口并给出可执行参数。
+5. **Mockup（锁定风格）**：用随附真实关键帧、实际文字和目标输出画幅做一两个可打开的完整画面样稿，锁定全片风格（含本次采用的相片页 / 录像框等版式）；附字体（商用注意授权）、字号、位置 / 边距、裁切与框体等参数及可复用生成入口，说明哪些标记实际进入视频。执行沿用同一套设计，不逐镜头映射。缺原图或出图能力时标待补并先交参数；依赖该视觉的制作前补齐可查看样稿。
 6. **Asset / Constraints**：可读素材、证据、关键帧、字体和参考资源；允许调整、禁改项、status / reason / impact / downstream_handling。封面等仅在本任务要求时提供，其余记 not_applicable。
-7. **QA Criteria**：内容、保护范围、时间、文字可读性、音轨 / 接点与 Reference Compliance；静态检查和真实播放分开，未实看写 not_tested。
+7. **QA Criteria**：内容、保护范围、时间、文字可读性、音轨 / 接点与 Reference Compliance（成片与 mockup 风格匹配即可，不要求逐帧或逐像素对应）。静态检查和真实播放分开，未实看写 not_tested。
 8. **原有机器授权**：已有项目继续使用 execution-authorization.json，保存采用范围、顺序、允许调整与证据 / 决策指纹；草稿不自动升为 confirmed。reference 文档 / 实际样本改变后，旧确认失效，须按已有授权裁决并更新。
 
 时间继续以 source_id + source ms 定位，文字 / 音轨放置优先使用 event anchor + local frames；正式成片坐标按现有时间轴编译对账。异常可以随包继续推进可做部分，但不能豁免证据、完整对白、Edit Boundary、源许可或正式渲染条件。

@@ -730,6 +730,11 @@ def validate(root):
                 for asset in assets:
                     require(nonblank(asset) and (root / asset).is_file(),
                             'declared execution reference asset is missing')
+                if not assets:
+                    # v1.2.0: a missing mockup may travel with the package as a declared gap,
+                    # so this is a reminder, not a block.
+                    warnings.append('ready_for_render: no mockup / reference image in execution_reference_asset_refs; '
+                                    'execution-reference must state the pending mockup and why')
     if ready:
         require(bool(events), 'ready_for_render has no events')
         require(positive(timeline.get('width')) and positive(timeline.get('height')), 'ready_for_render requires output dimensions')

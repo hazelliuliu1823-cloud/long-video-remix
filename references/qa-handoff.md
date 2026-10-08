@@ -32,7 +32,7 @@
 ## Execute 前的规定动作
 
 - Detail 的真实关键帧清单、可用图片、独立 `execution-handoff.md` 及异常随包交付；handoff 已直接写明下游完整输出要求。
-- 已确认 Execution Package 同时包含计划与 `execution-reference.md`：必要文字全文 / 时间锚点、具体样式、音轨 / 接点、资产 / 约束和 QA 判据齐全，Execute 无需另定核心风格。reference 通常一两个，锁定整体规则，不逐镜头配对。
+- 已确认 Execution Package 同时包含计划与 `execution-reference.md`：必要文字全文 / 时间锚点、具体样式、音轨 / 接点、资产 / 约束和 QA 判据齐全，Execute 无需另定核心风格。锁定风格的 mockup 与参数随包交付（要求见 [执行包契约](execution-package.md)）；未完成样稿明确待补项。
 
 - `timeline.duration_budget` 已按整数帧对平；普通覆盖式文字未被重复加到总长，真正延时的 card / hold 已成为 event；有时长上限时不得超预算进入 ready_for_render。
 - 每个进入执行的 source event 已显式列出 `deep_observation_refs`；只校验本次实际采用的 observation，确认 source 一致、source-time 覆盖采用区间、evidence_status 为 supported / partial；同 unit 其他未采用的 pending / contradicted 记录不作为阻断项。
@@ -63,7 +63,7 @@
 | Redundancy | 画面、台词、花字、结尾是否重复解释 | 指定主要表达载体，删重复 |
 | Source | 每个判断、画面、台词能否回查到正确版本 | 修复引用与时间映射 |
 | Mobile | 手机上是否看清、字幕遮挡和裁切是否合适 | 以实际手机检查记录为准 |
-| ReferenceCompliance | 是否遵守已确认的文字层级、位置、颜色 / 字号、画面关系、情绪强调与视觉规则，是否有风格漂移 | 对照少量 reference 和全片规则修正，不逐镜头匹配 |
+| ReferenceCompliance | 成片与 mockup 风格是否匹配（字体 / 字重、层级、颜色、版式位置与比例、裁切与框体），全片是否保持同一风格 | 按 reference 修正风格偏差；不要求逐帧或逐像素对应 |
 
 qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_questions、rough_cut_verified、final_playback_verified。checks 每项记录 name、status、method、evidence、finding、action。status 只用 pass、fail、not_tested、not_applicable。
 
