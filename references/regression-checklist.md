@@ -91,3 +91,16 @@ tests/test_independent_audio_dialogue.py 覆盖卡片对白、同源额外音轨
 - E 固定提供真实关键帧清单与自包含 handoff；handoff 直接含下游 Execution Package 要求，不依赖同一 Skill 环境。
 - D2 同时交付计划与制作 reference，文字 / 声音 / 转场 / 资产 / 约束 / QA 参数足够执行；少量样本锁定全片规则，不逐镜头或字幕映射。
 - Execute 接收完整包，Reference Compliance 进入原 QA；声明 reference 改动后旧确认 / 渲染入口失效，旧项目与原对白 / 授权 / 时间轴 / 缓存回归继续通过。
+
+## v1.1.0 精简版回归
+
+- `extract_frames.py` 输出的每张图，画面内容必须对应其 `source_ms`（用逐帧亮度编码视频反查真实帧号，不能只比较标签）；可变帧率素材同样成立。
+- 本地脚本拒绝非 identity / 非本地输入，其他环境按适配器核验实测时间；目录清理须有专用标识并只清理登记输出，项目 / 源目录及外来文件受保护；逐帧条过长时拒绝。
+- `signals` 能在源时间上定位局部运动、硬切与有声时段（合成用例误差 ≤ 2 帧）。
+- Detail 未完成时，已有 Detail 文件的表头、ID、范围、枚举、引用与切点顺序即被检查。
+- Detail 完成时：目标问题为稳定 ID 且被观察回指；绑定区间的问题必须在该区间目标列表中；`unresolved` 有具体缺口与 next_check；`contradicted / unresolved` 列入 handoff Question Closure Ledger 且状态一致、处理具体。
+- `ready_for_render`：按实际区间 / 观察关联判断入选节点；重复 ID、来源 / 区间 / 节点及 ledger 关联不一致不得放行；`unresolved` 阻止渲染，`contradicted` 须有对应节点的人工 `confirmed_by`。
+- SKILL.md 与 workflow.md 不超过 v1.0.7 大小，detail-evidence.md 不超过 8KB。
+- 问题闭环表的标题含 "Question Closure Ledger" 或“问题闭环”即被识别（可附中文说明）；找不到这样的标题时给出明确提示，其他表格中的同名问题行不能代替确认。
+- 观察与区间节点、问题与关联区间的一致性规则在 INSTALL 中列为迁移项，并有对应回归。
+- MCP 抽帧适配器探测须记录 `timestamp_method`；`computed` 的适配器不用于 Detail 事实与切点。

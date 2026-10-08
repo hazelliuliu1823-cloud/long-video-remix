@@ -1,4 +1,4 @@
-# 安装与更新 · v1.0.7
+# 安装与更新 · v1.1.0
 
 解压后得到 `long-video-remix/` 完整目录。SKILL.md、references、assets、scripts 和 agents 必须一起保留；只复制 SKILL.md 会丢失契约和检查能力。
 
@@ -16,7 +16,7 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 
 解压安装包时，也可将完整 `long-video-remix` 文件夹放入 `~/.claude/skills/`（Claude Code）或 `~/.agents/skills/`（Codex）。项目素材和工作数据放在独立项目目录，不放进安装目录。
 
-用 Git 安装的副本可在安装目录执行 `git pull --ff-only` 更新。仓库安装获取当前分支版本；需要固定 v1.0.7 时，使用对应安装包。安装或更新后检查工具的技能列表。
+用 Git 安装的副本可在安装目录执行 `git pull --ff-only` 更新。仓库安装获取当前分支版本；需要固定 v1.1.0 时，使用对应安装包。安装或更新后检查工具的技能列表。
 
 目录依据：[Claude Code 本地 skills](https://code.claude.com/docs/en/skills) · [Codex 本地 skills](https://learn.chatgpt.com/docs/build-skills)，核对日期：2026年10月2日。
 
@@ -25,10 +25,10 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 ## 运行环境
 
 - 静态校验、授权记录、编译与回归：Python 3.9+，只用标准库。
-- 导出审计：FFmpeg / ffprobe；生成接点拼图时额外需要 Pillow。
+- 抽帧与时间信号（`extract_frames.py`）、导出审计：FFmpeg / ffprobe；生成拼图时额外需要 Pillow。
 - 模型、视频 MCP、渲染器的依赖按实际适配器配置，不在包内下载大模型或素材。
 
-Python 3.9 已做语法兼容检查，尚未在 3.9 解释器上实际运行回归；153 项回归的已验证运行环境为 Python 3.12。
+Python 3.9 已做语法兼容检查，尚未在 3.9 解释器上实际运行回归；186 项回归的本轮已验证运行环境为 Python 3.12.14 + FFmpeg 6.1.1 + Pillow。缺少 FFmpeg 或 Pillow 时，抽帧相关测试会跳过。
 
 ## 验证安装包
 
@@ -42,6 +42,33 @@ python3 scripts/check_render_authorization.py examples/synthetic-ready examples/
 ```
 
 示例全部是合成记录，只验证数据链与工程入口；没有真实视频，不用它证明长视频理解或观看效果。
+
+## 从 v1.0.7 更新
+
+v1.1.0 以 v1.0.7 为底，只加四件事，不改正式 CSV 表头，不新增创作阶段：
+
+1. **抽帧标签实测。** 本地原片且 identity 映射时优先用 `scripts/extract_frames.py`；MCP / 代理等按 [MCP 适配](references/mcp-adapter.md) 保留实测时间与源绑定，不改写既有映射。脚本的 `signals` 模式输出变化与声音候选，`strip` 输出逐帧条。旧版输出重抽时使用新目录；普通帧索引不能作为清空目录的许可。
+2. **Detail 取证规则。** 新增 `references/detail-evidence.md`（只在 E 阶段读取）：全覆盖、按内容定密度、每个时间点只读一次；细动作不凭缩略图下结论；切点先夹住再逐帧；密集读图不拆给子代理。
+3. **两道门槛。** Detail 文件一出现，`validate_project.py` 就做结构检查。Detail 完成时，`target_questions` 必须是稳定 `question_id` 并被观察回指；`contradicted / unresolved` 问题列入 handoff 的 Question Closure Ledger；入选成片的节点不得带 `unresolved`，带 `contradicted` 须有人工 `confirmed_by`。
+4. **SKILL.md 大小上限。** `tests/test_size_budget.py` 把 SKILL.md 限制在 v1.0.7 的大小以内，新增规则须先删等量内容。
+
+**项目迁移。** 以下各项只在 Detail 标记完成时检查；建议迁移后先运行一次 `validate_project.py`，按报错逐条处理：
+
+1. **稳定问题 ID。** v1.0.7 的 `target_questions` 若是自由文本，先在 `structure-questions.csv` 建立唯一、稳定的 `question_id`，把区间改为引用 ID，并在实际回答它的观察里写 `question_refs`。
+2. **观察与区间的节点一致。** `deep-observations.plan_node_id` 必须等于它所在 `detail_interval_id` 的 `plan_node_id`。服务于另一个节点的观察，应放进那个节点的区间。
+3. **问题与关联区间一致。** 问题行里写了具体值（不是 `none` / `unknown` 等）的 `source_id`、`plan_node_id`、`detail_interval_id`，必须与它实际关联的区间一致；问题的 `detail_interval_id` 也必须是存在的区间。一个问题同时关联多个区间时，`detail_interval_id` 写 `none`；这些区间的节点不同时，`plan_node_id` 也写 `none`。
+4. **问题闭环表。** 已有 handoff 若有被否决 / 未解决的问题，补上 Question Closure Ledger 表（模板见 `assets/execution-handoff-template.md`）。表格放在包含 "Question Closure Ledger" 或"问题闭环"字样的标题下，可附中文说明；每个问题只列一行，`plan_node_id` 写它实际关联的全部节点（多个用分号分隔）。
+
+用 v1.0.7 习惯手工抽的帧，若标签是"起点 + 序号 × 间隔"算出来的，进入精确切点前请用脚本或已验证适配器重新取得实测标签。
+
+## 从 v1.0.8–v1.0.10 更新
+
+v1.1.0 不沿用 v1.0.8–v1.0.10 的开发线，而是回到 v1.0.7 重建。对用这些版本建立的项目：
+
+- 稳定 question ID、`question_refs` 显式回指：保留，无需改动；上面第 2、3 项一致性规则同样适用。
+- `extract_detail_evidence.py`、`detail_progress.py`、`detail-evidence-state.json`、semantic draft / `compile_detail.py`、`prepare_detail.py`：不再提供。抽帧改用 `extract_frames.py`（实测标签；v1.0.10 的抽帧标签比画面早约半个采样间隔，需重新抽取）。
+- `narrative-conflicts.jsonl`、D1 重新确认文件：由 handoff 的 Question Closure Ledger 取代。把其中的处理方式与确认人填入该表即可；旧文件不再被读取。
+- 五个 Detail `structure_policy` 常量：不再使用，保留也会被忽略。
 
 ## 从 v1.0.6 更新
 

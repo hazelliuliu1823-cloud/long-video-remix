@@ -1,6 +1,20 @@
 # Changelog
 
-Public release packaging targets v1.0.7. Earlier entries are retained as development history; their dates do not imply published GitHub Releases or tags.
+Public release packaging targets v1.1.0. Earlier entries are retained as development history; their dates do not imply published GitHub Releases or tags.
+
+## v1.1.0 — Lean Detail Rebuild on v1.0.7 · 2026-10-07
+
+Rebuilt on v1.0.7. The v1.0.8–v1.0.10 development line is not carried forward; its lessons are kept in a smaller form.
+
+- Added `scripts/extract_frames.py` for local identity-mapped sources (Broad sampling, Detail reading, edit-point strips). Every label is measured, never `start + index / fps`; other environments use validated MCP adapters and retain existing time mappings. `signals` reports local visual change, hard-cut candidates and sound / silence segments. Cleanup requires a dedicated ownership record, touches tracked outputs only and protects project/source ancestors.
+- Added `references/detail-evidence.md`, read only in stage E: full coverage with content-driven density (context 0.5 fps, static core 1 fps, change / candidate / question windows 4 fps), each moment read once, mandatory full-resolution frames at decisive moments, no thumbnail-only verdicts on fine actions, bracket-then-strip edit points, single-context dense reading.
+- Added `scripts/detail_gates.py`: Detail files are linted as soon as they exist; completed Detail requires stable target question IDs answered by observations; contradicted / unresolved questions are closed in one place, the handoff Question Closure Ledger; at ready_for_render a selected node cannot carry an unresolved question, and a contradicted one needs a human `confirmed_by`.
+- Added `assets/benchmark-template.md` (reads per density, repeated reads, edit-point rework, Detail writing time, full re-read audit).
+- Capped instruction size: `tests/test_size_budget.py` keeps SKILL.md within the v1.0.7 size (now 23,445 of 23,842 bytes) and `references/workflow.md` within its v1.0.7 size; field lists in SKILL.md now point to data-contracts, which the validator already enforces.
+- The synthetic example now carries its Q001 question row; its authorization evidence digest and render manifest were refreshed accordingly. Formal CSV headers are unchanged.
+- Review repair is limited to directory cleanup, question closure and extraction adapters: unique question/ledger IDs and source/interval/node consistency are checked against actual evidence links. Early Detail numeric lint remains unchanged; no new package files or schemas.
+- Second review round: the Question Closure Ledger is recognized under any heading that contains "Question Closure Ledger" or "问题闭环" (a Chinese note is fine), with an explicit hint when no such section exists; INSTALL / RELEASE_NOTES now list all four project migrations (stable question IDs, observation-interval node consistency, question-interval consistency, the closure ledger); MCP frame adapters must prove measured timestamps in a short probe and record `timestamp_method`, and `computed` adapters are not used for Detail facts or edit points. 4 tests added (190 total), passing under Python 3.12.3 + FFmpeg 6.1.1 + Pillow; the 3 heading tests fail on the previous build.
+- 33 new tests versus v1.0.7 (186 total, including 9 review-repair tests) passed under Python 3.12.14 + FFmpeg 6.1.1 + Pillow. Frame-timing tests decode picture content; with default fps rounding and computed labels they fail. No real long-video benchmark has been run yet.
 
 ## v1.0.7 — Prompt Examples & Bilingual Guide · 2026-10-03
 

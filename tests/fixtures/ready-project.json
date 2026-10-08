@@ -149,7 +149,7 @@
         "speaker_adjudication_refs": "none",
         "before_state": "unknown",
         "after_state": "unknown",
-        "question_refs": "none",
+        "question_refs": "Q001",
         "topic_judgment": "unknown",
         "confidence": "pending",
         "confidence_basis": "insufficient_evidence",
@@ -607,7 +607,27 @@
       "next_check",
       "review_refs"
     ],
-    "rows": []
+    "rows": [
+      {
+        "question_id": "Q001",
+        "stage": "detail",
+        "source_id": "SRC001",
+        "episode": "",
+        "scene_id": "S001",
+        "detail_interval_id": "DI001",
+        "frame_refs": "frame:F001",
+        "plan_node_id": "P01",
+        "question": "Does the selected synthetic interval support the target narrative fact?",
+        "answer": "Supported by the controlled synthetic record",
+        "answer_status": "supported",
+        "evidence_refs": "observation:DO001",
+        "confidence": "high",
+        "confidence_basis": "controlled synthetic fixture",
+        "unverified_items": "none",
+        "next_check": "none",
+        "review_refs": "R001"
+      }
+    ]
   },
   "timeline.json": {
     "schema_version": "1.4",
@@ -655,11 +675,11 @@
         },
         "dialogue_required_range": "1300-5800",
         "sync_mode": "locked",
-      "audio_source_refs": [
-        "A001"
-      ],
-      "adopted_utterance_refs": [
-        "T001"
+        "audio_source_refs": [
+          "A001"
+        ],
+        "adopted_utterance_refs": [
+          "T001"
         ]
       }
     ],
@@ -684,10 +704,10 @@
         "speed": 1,
         "fade_in_ms": 0,
         "fade_out_ms": 0,
-      "treatment": "preserve",
-      "review_refs": [
-        "R001"
-      ]
+        "treatment": "preserve",
+        "review_refs": [
+          "R001"
+        ]
       }
     ],
     "text_tracks": [

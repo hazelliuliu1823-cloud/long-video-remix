@@ -46,6 +46,10 @@ python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.js
 
 原始音画处理与实际渲染由当前环境的模型、视频 MCP、FFmpeg 或其他适配器完成。随包脚本提供授权记录准备、静态检查、时间轴编译和导出审计，渲染器按 [MCP 适配](references/mcp-adapter.md) 接入。
 
+本地原片抽帧优先用 `scripts/extract_frames.py`；MCP / 代理等按 [MCP 适配](references/mcp-adapter.md) 保留实测时间与源绑定。脚本的 `signals` 模式标出画面变化与有声区间，`strip` 模式输出逐帧条用于定切点。E 阶段的取证、切点与问题闭环见 [Detail 证据获取](references/detail-evidence.md)。
+
+**v1.1.0：** 以 v1.0.7 为底的精简版——抽帧时间标签改为实测、Detail 读图按内容定密度、切点逐帧确认、被否决 / 未解决的问题在 handoff 中用一张表闭环，并给 SKILL.md 设了大小上限。迁移见 [INSTALL.md](INSTALL.md)。
+
 ## 常用提问示例
 
 把〔……〕替换成你的素材、主线或文件，按当前任务选用。
@@ -337,6 +341,7 @@ long-video-remix/
 │   ├── editorial-plan-template.md
 │   ├── execution-authorization-template.json
 │   ├── project-template.json
+│   ├── benchmark-template.md
 │   └── timeline-template.json
 ├── docs/
 │   └── qa/
@@ -348,12 +353,15 @@ long-video-remix/
 │       ├── v1.0.5-QA.md
 │       ├── v1.0.5-QA.json
 │       ├── v1.0.6-QA.md
-│       └── v1.0.6-QA.json
+│       ├── v1.0.6-QA.json
+│       ├── v1.1.0-QA.md
+│       └── v1.1.0-QA.json
 ├── examples/
 │   ├── content-performance-analysis.md
 │   └── synthetic-ready/
 ├── references/
 │   ├── workflow.md
+│   ├── detail-evidence.md
 │   ├── data-contracts.md
 │   ├── execution-integrity.md
 │   ├── execution-package.md
@@ -369,9 +377,14 @@ long-video-remix/
 │   ├── test_execution_integrity.py
 │   ├── test_execution_package.py
 │   ├── test_independent_audio_dialogue.py
+│   ├── test_extract_frames.py
+│   ├── test_detail_gates.py
+│   ├── test_size_budget.py
 │   └── fixtures/ready-project.json
 └── scripts/
+    ├── extract_frames.py
     ├── validate_project.py
+    ├── detail_gates.py
     ├── compile_render_manifest.py
     ├── timeline_math.py
     ├── execution_integrity.py

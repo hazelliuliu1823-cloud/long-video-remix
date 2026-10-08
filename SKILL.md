@@ -5,7 +5,7 @@ description: 从三到五小时或多集影视、活动视频中建立可回查�
 
 # 长视频结构化与混剪执行
 
-公开仓库版本 v1.0.7 · 2026年10月3日
+公开仓库版本 v1.1.0 · 2026年10月7日
 
 本 Skill 的核心不是“一句话自动生成成片”，而是先把视频、图像、对白与上下文等高成本多模态信息压缩成有来源、可检索、可回查的**紧凑结构化工作层**，让后续人工、Director 或其他 Skill 尽量基于表格 / 文本继续工作；创意方案确认后，再只把命中的区域压回原素材做高密度核验，并落实成真正可执行的剪辑方案。
 
@@ -52,7 +52,7 @@ Render / QA
 - 不凭抽样帧补出未见动作，不凭转写补出未听台词，不把用户摘要或工具标签改写为亲眼观察。
 - **Broad Structure 不因已有 brief 过早缩窄覆盖。** brief 可以帮助标注重点，但第一轮仍要保留整体内容面、coverage 和 unknowns。
 - **Structure 有最低信息地板。** `frame-observations.csv`、动作节点候选、结构化问答 / 未验证项，以及进入第二轮后的 `detail-intervals.csv` / `speaker-adjudications.csv` 是基础工作层，不得用 overview、Content Map、最终文案或剪辑结论替代。某字段没有可见信息时保留原字段及允许的 `unknown` / `not_applicable` 等值，不能留空；无法满足的字段或产物另外声明 status / reason / impact / downstream_handling，继续可做部分，不补造、不豁免精确执行门槛。详见 [异常与执行包契约](references/execution-package.md)。
-- **时间标签是全流程的证据主键。** Structure 中一律以 `source_id + source_ms / source_range` 为 canonical 定位；`display_timecode` 只是人读显示，九宫格序号、ASR 自带时间、代理文件时间和成片时间都不能替代源时间。任何抽帧、硬字幕、ASR、原声核听、动作节点、Detail observation、unit 都必须保留或能无歧义映射回同一源时间；Execute 再由 source time 通过 event anchor 编译到 assembly / output frame。源版本或 time mapping 变化时，所有精确下游坐标必须失效重核。
+- **时间标签是全流程的证据主键。** Structure 中一律以 `source_id + source_ms / source_range` 为 canonical 定位；`display_timecode` 只是人读显示，九宫格序号、ASR 自带时间、代理文件时间和成片时间都不能替代源时间。任何抽帧、硬字幕、ASR、原声核听、动作节点、Detail observation、unit 都必须保留或能无歧义映射回同一源时间；Execute 再由 source time 通过 event anchor 编译到 assembly / output frame。源版本或 time mapping 变化时，所有精确下游坐标必须失效重核。本地原片优先用 `scripts/extract_frames.py`；MCP / 代理等用经短段校验的适配器，均保留实测时间与源绑定。
 - **未观察到不等于没有发生。** 4fps 是动作候选的局部加密起点，不是“没有发生”的充分证据。否定性结论必须先限定明确 source-time 范围，再按事实类型核验：视觉动作 / 物件缺席需连续视频覆盖完整机会窗口，某句话未说需连续原声覆盖声明区间，或存在能直接排除该事实的可靠反证；否则只记录 `not_observed_in_sample` / `unknown`。
 - **证据冲突按事实类型裁决，不设一条机械总排名。** 视觉动作以连续原画为主；实际台词以清晰原声核听与可靠官方硬字幕相互校验；说话人 / 对象结合口型、连续原声、人物关系与字幕信号。ASR 尤其在方言 / 强口音下默认只作 locator，未经回听或硬字幕核对不得升级为台词事实；冲突必须显式保留。
 - **先记录基础事实，再做派生判断。** 画面事实、动作、硬字幕、原声要点、与前帧变化、背景、情绪线索、主题判定、confidence / 证据依据、问题与未验证项必须保留；意象标签、情绪解释、叙事功能和剪辑价值只能建立在这些基础记录之上。
@@ -94,11 +94,11 @@ Render / QA
 目标是**扩大可见范围，并把多模态素材压成正式、文字化、可检索、可回查的结构化工作层**，不是提前替某个选题找证明。Broad 的核心出口首先是这些表单和分片段观察数据；Content Map 与情绪 / 关系大意建立在它们之上，不能替代它们。
 
 - 全时段建立基础画面与台词覆盖；
-- 对每张**已实际分析的抽样帧**建立一行基础结构化观察：帧号 / 时间 / 帧尾 ms、可见人物、画面事实、动作 / 状态、可观察情绪线索、表情 / 视线、空间关系、环境背景、关键物件、`motif_tags`、硬字幕 / 可见文字、**原声要点及其核听状态**、邻近对白、内容说明、`change_from_previous`、**topic_judgment、confidence、confidence_basis**、interpretations 与 unknowns；
+- 对每张**已实际分析的抽样帧**按数据契约建立一行完整基础观察，含**原声要点及核听状态**、`change_from_previous`、**topic_judgment、confidence、confidence_basis**、interpretations 与 unknowns；
 - `change_from_previous` 只写相邻**已分析抽样帧**之间实际可见的变化，不把中间未观察过程补成完整动作；第一张可写 `not_applicable`；
 - 出现明显动作变化、视线 / 站位变化、物件交接、进入 / 离开等候选节点时，登记 `action-node-candidates.csv`，同时保留候选起止帧、最小有效单元候选、口型 / 说话线索与关系转折信号，围绕候选点建立默认 **4fps** 的局部高密度窗口；若因源帧率、工具限制或连续播放更合适而偏离 4fps，必须记录 `sampling_exception_reason`；
 - 对理解场景或候选价值有实质影响的问题，登记 `structure-questions.csv`：保留问题、回答、回答状态、证据引用、未验证项和下一步核查；未回答的问题保持 `unresolved`，不能被 overview 或最终结论吞掉；
-- 同时保留机器可追溯的 `frames.jsonl` 与便于人工 / Director / 其他 Skill 阅读的 `frame-observations.csv`；动作候选与问题分别进入 `action-node-candidates.csv`、`structure-questions.csv`；后续创意阶段优先消费这些结构化表，而不是反复加载原始九宫格；
+- 同时保留机器可追溯的 `frames.jsonl` 与人可读的 `frame-observations.csv`；后续创意阶段优先消费这些结构化表，而不是反复加载原始九宫格；
 - 场景、人物、事件、关系变化和无声互动都保留入口；
 - 形成 source-order overview 和跨场景 Content Map；
 - Broad Structure 的正式交付包称为 **Structured Observation Layer**：`frame-observations.csv` + `action-node-candidates.csv` + `structure-questions.csv` + scene / segment 观察 + `overview.md`；`content-map.md`、情绪 / 关系线索和 usable bounds 是建立在这套文字化结构数据之上的导航层。第一次 Director 必须优先消费这套表单，而不是只读一份总结；
@@ -111,17 +111,19 @@ Render / QA
 
 目标是**只把已确认方案命中的节点重新压回原片证据**，把高成本观察集中在真正需要的区域。
 
-- 先建立 `detail-intervals.csv`：写清精查区间、为什么进入精查、前情、当前背景、后续、内容摘要、目标问题与主题关联；再根据计划节点提高抽样密度或直接连续播放；
-- 先建立 `deep-observations.csv`：完整记录人物与站位、镜头 / 构图、动作链、关键画面变化、可观察情绪线索 / 情绪解释、表情 / 视线、空间关系、场景环境、关键物件与 `motif_tags`；
+- 先建立 `detail-intervals.csv`：写清精查区间、为什么进入精查、前情、当前背景、后续、内容摘要、目标问题（稳定 question ID）与主题关联；
+- 按 [Detail 证据获取](references/detail-evidence.md) 取证：先回答会改变理解的目标问题；全覆盖、按内容定密度、每个时间点只读一次；细动作不凭缩略图下结论；密集读图不拆给子代理；
+- 建立 `deep-observations.csv`，按数据契约填写全部字段；
 - 写清这一核心区域**实际发生了什么**，并补充 setting_context、narrative_context、before_state、after_state；
 - 从台词命中扩展到完整问答、动作链和必要前后文；保留原声要点、硬字幕 / ASR 冲突和核听状态。说话人或对象不清时进入 `speaker-adjudications.csv`，按事实类型综合帧级口型、可见人物、连续原声与可靠硬字幕裁决 speaker / addressee；ASR 默认只作 locator / 辅助信号，方言或强口音未经核听不得单独定案；
 - facts、interpretations、unknowns 分开；每个核心观察保留 `topic_judgment`、`confidence` 与 `confidence_basis`，主题判定必须落到该帧 / 节点承担的具体叙事作用，不能只写抽象标签；检查反证、误读风险和时空关系；
-- 在完整理解之后，再把初步 unit 收敛为可剪 unit，并形成 context_ranges、protected_ranges 与 isolated_use_risk；同时必须建立 Edit Boundary / Continuity Layer：区分内容范围、真实音频尾部、动作 / 反应收束，输出 preferred in/out、safe in/out windows、must-keep ranges、handles 与 cut risk。字幕消失、ASR 结束或抽样帧中的动作停止都不能直接当作自然切点；
+- 在完整理解之后，再把初步 unit 收敛为可剪 unit，并形成 context_ranges、protected_ranges 与 isolated_use_risk；同时必须建立 Edit Boundary / Continuity Layer：区分内容范围、真实音频尾部、动作 / 反应收束，输出 preferred in/out、safe in/out windows、must-keep ranges、handles 与 cut risk。字幕消失、ASR 结束或抽样帧中的动作停止都不能直接当作自然切点；切点先夹住、再读逐帧条定帧，不靠反复加密抽帧逼近；
+- 被否决 / 未解决的目标问题列入 handoff 的 Question Closure Ledger；入选节点不得带 `unresolved`，带 `contradicted` 须有人工 `confirmed_by`；
 - 如果 Narrative Direction 不成立，把具体问题返回 Direct 1，而不是直接替用户重写核心创意；如果证据成立，则随 Detail 固定交付 `keyframe-references.json`、可用真实图片和 `execution-handoff.md`；handoff 直接携带完整 Execution Package 要求。Director 2 再形成计划与制作参考，经确认后进入 Execute。关键帧失败要声明异常并继续，不能由生成图片冒充素材。
 
 ## 决策时读取
 
-- 抽帧密度、批次、Content Map、第二轮定向回查和恢复：读取 [工作流程](references/workflow.md)。
+- 抽帧密度、批次、Content Map、第二轮定向回查和恢复：读取 [工作流程](references/workflow.md)；E 阶段取证、切点与问题闭环另读 [Detail 证据获取](references/detail-evidence.md)。
 - 时间码、记录字段、Structured Observation Layer / Content Map / 两次 Direct 与时间轴关系：读取 [数据契约](references/data-contracts.md)。
 - 换模型或 MCP、能力缺失、调用失败：读取 [MCP 适配](references/mcp-adapter.md)。
 - 在已确认 Narrative Direction / execution plan 下保住完整对白、连续性与正确重组关系：读取 [重组与剪辑规则](references/montage-rules.md)。
@@ -132,7 +134,7 @@ Render / QA
 - 每次改版或重新封装后：读取 [核心能力回归检查](references/regression-checklist.md) 与 [Structure 能力对照矩阵](references/structure-regression-matrix.md)，确认 Board/Broad / Detail / Direct / Execute 主线和基础信息层没有被弱化。
 - 需要演示两轮 Structure、外部 Direct 和 Execute 的衔接：读取 [执行示例](references/worked-example.md)。示例均为虚构，不是当前素材。
 
-复制 `assets/project-template.json` 建立配置。Broad Structure 可复制 `assets/frame-observation-template.csv` 建立人可读逐抽样帧观察表，同时用 `assets/action-node-candidate-template.csv` 记录动作节点的 4fps 局部窗口、用 `assets/structure-question-template.csv` 记录问题回答与未验证项；第二轮先复制 `assets/detail-interval-template.csv` 建立精查区间卡，再用 `assets/deep-observation-template.csv` 建立核心区域高密度观察表；说话人 / 对象不清时使用 `assets/speaker-adjudication-template.csv`，即使本轮没有歧义也保留带表头的文件。需要 Direct 时，可复制 `assets/brief-template.md`、`assets/narrative-direction-template.md` 和 `assets/execution-plan-template.md`；`assets/editorial-plan-template.md` 保留为兼容 / 合并式计划模板，也可以直接接入用户已有的编导文档。Detail 交接使用 `assets/keyframe-reference-template.json` 与 `assets/execution-handoff-template.md`；Direct 2 同时使用 `assets/execution-reference-template.md` 明确制作规则。异常按 `assets/structure-exception-template.json` 逐项填写后保存为 JSONL。复制 `assets/timeline-template.json` 建立时间轴。
+复制 `assets/` 中对应模板建立配置与各表：`project-template.json`、`frame-observation`、`action-node-candidate`（4fps 局部窗口）、`structure-question`、`detail-interval`、`deep-observation`、`speaker-adjudication`（本轮没有歧义也保留带表头的文件）与 `timeline-template.json`。Direct 用 `brief`、`narrative-direction`、`execution-plan` 模板（`editorial-plan` 为兼容模板，也可接入用户已有编导文档）；Detail 交接用 `keyframe-reference` 与 `execution-handoff`；Direct 2 另用 `execution-reference`；异常按 `structure-exception` 模板逐项保存为 JSONL；效率测量用 `benchmark-template.md`。
 
 具备 Python 时运行 `scripts/validate_project.py 项目目录` 检查来源、时间和引用；不具备 Python 时按数据契约逐项核查，并写明为人工或模型静态检查。脚本不判断剧情真伪或观看流畅度。
 

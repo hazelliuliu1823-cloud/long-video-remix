@@ -1,3 +1,35 @@
+# v1.1.0 — 以 v1.0.7 为底的精简版 / Lean Detail Rebuild
+
+2026-10-07
+
+回到 v1.0.7，只加有证据支撑的四件事，并给 SKILL.md 设了大小上限。v1.0.8–v1.0.10 的开发线不再沿用。
+
+## 改了什么
+
+- **抽帧时间标签实测。** 本地原片优先用 `scripts/extract_frames.py`；其他环境按 MCP 适配保留实测时间与源绑定，不按序号计算。`signals` 给出变化与声音候选，`strip` 给出逐帧条。目录清理只处理专用标识中登记的输出，并保护项目与源文件目录。
+- **Detail 取证规则。** 新增只在 E 阶段读取的 `references/detail-evidence.md`：全覆盖、按内容定密度、每个时间点只读一次；细动作不凭缩略图下结论；切点先夹住再逐帧，不靠反复加密逼近。
+- **两道门槛。** Detail 文件写到一半就做结构检查；问题闭环按实际关联的节点核对唯一 ID、来源与区间；未解决问题阻止入选节点渲染，被否定的问题须有对应节点的人工确认。
+- **SKILL.md 不再变长。** 测试把它锁在 v1.0.7 的大小以内（当前 23,445 / 23,842 字节）。
+
+## 兼容
+
+正式 CSV 表头不变。项目迁移有四项，都在 Detail 完成时检查：自由文本 `target_questions` 改为稳定 `question_id`；观察的节点与其区间一致；问题已填写的来源 / 节点 / 区间与实际关联一致；被否决 / 未解决的问题列入 handoff 的问题闭环表（标题含 Question Closure Ledger 或“问题闭环”即可）。详见 INSTALL，v1.0.8–v1.0.10 项目的处理也在其中。
+
+## 验证
+
+- Python 3.12.14 + FFmpeg 6.1.1 + Pillow：186 项回归全部通过（较 v1.0.7 新增 33 项，其中第一轮审阅修复新增 9 项）。第二轮审阅修复后共 190 项，在 Python 3.12.3 + FFmpeg 6.1.1 + Pillow 上全部通过。
+- 抽帧时间测试逐帧解码画面内容核对标签；把实现换回 ffmpeg 默认取整 + 计算标签时，3 项测试失败。
+- 合成示例的校验、编译与渲染授权检查通过。
+- **尚未在真实长视频上做 benchmark**，读图量与耗时的改善未经证实；请用 `assets/benchmark-template.md` 记录。
+
+---
+
+# v1.1.0 — Lean Detail Rebuild (English)
+
+Back to v1.0.7 plus measured frame timestamps, a Stage-E evidence guide, early Detail lint, a single closure ledger and an instruction-size cap. Review repairs harden directory cleanup and evidence-linked question closure, and clarify MCP adapters; early numeric lint is unchanged. A second review round accepts localized ledger headings with a clear hint when the section is missing, documents all four project migrations (stable question IDs, observation / interval node consistency, question-to-interval consistency, the closure ledger), and specifies how an MCP frame adapter must prove measured timestamps. Formal CSV headers remain unchanged. 190 tests pass; timing tests check decoded picture content. No real long-video benchmark has been run yet.
+
+---
+
 # v1.0.7 — 常用提问示例 / Prompt Examples
 
 2026-10-03

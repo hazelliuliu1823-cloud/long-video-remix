@@ -26,6 +26,13 @@
 
 原音轨完整核听范围、问答 / 动作的最短完整范围及切点风险：
 
+### Question Closure Ledger
+
+所有 `answer_status=contradicted` 或 `unresolved` 的 Detail 问题逐行列出；没有时保留表头。标题可附中文说明，但须包含 "Question Closure Ledger" 或“问题闭环”字样，validator 只读取这个标题下的表格。每个 question_id 只列一次，plan_node_id 与实际关联节点一致（多个节点用分号分隔）。`处理方式` 写具体下游动作（不能只写 resolved）；入选成片的节点带 `contradicted` 问题时，`confirmed_by` 必须是作出该决定的人。
+
+| question_id | status | plan_node_id | 处理方式 | confirmed_by |
+|---|---|---|---|---|
+
 ## 原片关键帧
 
 - keyframe-references.json：

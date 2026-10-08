@@ -11,7 +11,7 @@
 | project.json | 对象；任务范围、约束、参数、交付目标、版本 |
 | capability-map.json | 数组；内部能力和真实工具的映射 |
 | sources.json | 数组；源文件、版本、时长、时间映射 |
-| frames.jsonl | 每行一个抽样帧证据记录；包含图片定位和机器可追溯 facts / unknowns |
+| frames.jsonl | 每行一个抽样帧证据记录；包含图片定位和机器可追溯 facts / unknowns。`extract_frames.py` 在输出目录另写同名索引，`source_ms` 为实测时间戳 |
 | frame-observations.csv | Broad Structure 的人可读逐抽样帧基础观察表；供人工 / Director / 其他 Skill 浏览 |
 | action-node-candidates.csv | Broad / Deep Structure 的动作变化候选；记录 4fps 局部窗口、触发原因与核验状态 |
 | structure-questions.csv | Structure 阶段的问题—回答—证据—confidence—未验证项工作表 |
@@ -169,7 +169,7 @@ Direct 2 选择素材时必须引用 `boundary_id`，而不是自行从字幕时
 
 ## Detail 区间卡与说话人裁决
 
-`detail-intervals.csv` 每行对应一个进入 Directed Deep / Detail Structure 的核心区间。至少包含：`detail_interval_id`、`plan_node_id`、`source_id`、`start_ms`、`end_ms`、`entry_reason`、`preceding_context`、`current_background`、`following_context`、`content_summary`、`target_questions`、`topic_relevance`、`evidence_refs`、`unknowns`。前情 / 背景 / 后续不清时写 `unknown`，不能省略。
+`detail-intervals.csv` 每行对应一个进入 Directed Deep / Detail Structure 的核心区间。至少包含：`detail_interval_id`、`plan_node_id`、`source_id`、`start_ms`、`end_ms`、`entry_reason`、`preceding_context`、`current_background`、`following_context`、`content_summary`、`target_questions`、`topic_relevance`、`evidence_refs`、`unknowns`。前情 / 背景 / 后续不清时写 `unknown`，不能省略。`target_questions` 写分号分隔的稳定 `question_id`（无则 `none`），每个都须存在于 `structure-questions.csv` 并被本区间至少一条 `deep-observations.question_refs` 回指；`contradicted / unresolved` 的目标问题列入 handoff 的 Question Closure Ledger（见 [Detail 证据获取](detail-evidence.md)）。
 
 `speaker-adjudications.csv` 用于说话人 / 对象歧义的帧级裁决。至少包含：`adjudication_id`、`stage`、`source_id`、`utterance_id`、区间、`frame_window_refs`、`lip_movement_observation`、`visible_speaker_candidate`、`addressee_candidate`、`audio_speaker_candidate`、`hard_subtitle_signal`、`asr_signal`、`asr_role`、`evidence_resolution_rule`、`subtitle_audio_conflict`、`decision`、`decision_basis`、`confidence`、`evidence_refs`、`unknowns`。只有字幕或只有画面时不得假装完成裁决；ASR 在方言 / 强口音场景默认 `locator_only_until_verified`。
 

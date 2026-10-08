@@ -18,6 +18,10 @@
 | inspect_output | 输出文件、检查项目 | 时长、可播放性、音画与文字检查记录 | 只完成技术或静态检查，保留实看待办 |
 | export_editor_project | 时间轴、目标软件已验证格式 | 工程文件或导入文件、日志 | 交付中立时间轴，标记尚需格式适配 |
 
+本地原片且 identity 映射时优先用 `scripts/extract_frames.py`；远程 / MCP、代理 / 偏移或缺少本地工具时，使用 capability-map 中经短段校验的抽帧适配器，保留实测媒体时间、canonical source time 与源绑定。脚本限制不改变项目的既有时间映射；已有带时间码图片仍按表中降级路径处理。
+
+抽帧适配器在小范围探测时须证明返回的是**每帧实测时间**：取一段约 2 秒的素材，用 ffprobe / showinfo 读出的帧 pts（或本地 `extract_frames.py` 的输出）逐帧比对，误差不超过一帧，并核对画面确为该时刻；结果写入该能力的 `timestamp_method`（`measured_pts` 或 `computed`）与 `tested_range`。只能给出"起点 + 序号 × 间隔"推算时间的适配器记为 `computed`，只用于粗定位，不用于 Detail 事实与切点。
+
 inspect_av 可以由具备对应模态能力的模型、工具或人工完成。仅返回抽样图片的工具不能登记为连续音画观察。纯文字模型可处理记录与方案，但必须保留上游证据来源。
 
 ## capability-map.json
@@ -35,6 +39,7 @@ inspect_av 可以由具备对应模态能力的模型、工具或人工完成。
   "end_semantics": null,
   "limits": {},
   "tested_range": null,
+  "timestamp_method": null,
   "audio_observation": false,
   "video_observation": false,
   "fallback": "读取用户提供的带时间码单帧"

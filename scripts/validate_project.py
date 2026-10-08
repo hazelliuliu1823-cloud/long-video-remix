@@ -8,6 +8,7 @@ from pathlib import Path
 
 from timeline_math import canonical_assembly_ranges, output_ranges_from_overlaps
 from execution_integrity import validate_integrity
+from detail_gates import lint_detail_draft, check_question_closure
 
 
 def validate(root):
@@ -375,6 +376,11 @@ def validate(root):
             if require(isinstance(tid, str) and tid in transcript, f'{uid}: unknown utterance {tid}'):
                 require(transcript[tid].get('source_id') == unit.get('source_id'), f'{uid}: utterance source mismatch')
 
+    # v1.1.0: Detail files are linted as soon as they exist, not only at the final gate.
+    if not deep_complete and any((root / name).is_file() for name in (
+            'detail-intervals.csv', 'deep-observations.csv', 'speaker-adjudications.csv', 'edit-boundaries.csv')):
+        errors.extend(lint_detail_draft(root, sources))
+
     if deep_complete:
         require(project.get('narrative_direction_status') == 'confirmed',
                 'completed Detail Structure requires confirmed Direct 1 Narrative Direction')
@@ -608,6 +614,10 @@ def validate(root):
         events = []
     event_index = index(events, 'event_id')
     ready = timeline.get('status') == 'ready_for_render'
+    if deep_complete:
+        # v1.1.0: stable question IDs, answered target questions, and one human-visible
+        # closure record (handoff Question Closure Ledger) for contradicted/unresolved ones.
+        errors.extend(check_question_closure(root, project, detail_index, deep_index, events, ready))
     # v1.0.6 keeps the original schemas and render gates. Exception declarations
     # report unknowns; they never remove an error or certify an unobserved fact.
     exception_ref = project.get('structure_exceptions_ref')

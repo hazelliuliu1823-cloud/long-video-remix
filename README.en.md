@@ -46,6 +46,10 @@ python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.js
 
 Raw audiovisual processing and actual rendering are handled by the models, video MCP, FFmpeg, or other adapters available in the current environment. The bundled scripts prepare authorization records, run static checks, compile timelines, and audit exports. Connect a renderer through the [MCP adapter contract](references/mcp-adapter.md).
 
+Prefer `scripts/extract_frames.py` for local identity-mapped sources; for MCP / proxies, follow the [MCP adapter](references/mcp-adapter.md), retaining measured times and source bindings. The script's `signals` mode marks visual-change and sound segments; `strip` returns frame-by-frame edit-point strips. See [Detail evidence](references/detail-evidence.md) for evidence and question closure.
+
+**v1.1.0:** a lean rebuild on v1.0.7 - measured frame timestamps, content-driven Detail sampling, frame-accurate edit points, one closure table in the handoff for contradicted / unresolved questions, and a size cap on SKILL.md. See [INSTALL.md](INSTALL.md) for migration.
+
 ## Common prompt examples
 
 Replace the placeholders with your sources, narrative direction, or working files, and choose the example that fits your current task.
@@ -337,6 +341,7 @@ long-video-remix/
 │   ├── editorial-plan-template.md
 │   ├── execution-authorization-template.json
 │   ├── project-template.json
+│   ├── benchmark-template.md
 │   └── timeline-template.json
 ├── docs/
 │   └── qa/
@@ -348,12 +353,15 @@ long-video-remix/
 │       ├── v1.0.5-QA.md
 │       ├── v1.0.5-QA.json
 │       ├── v1.0.6-QA.md
-│       └── v1.0.6-QA.json
+│       ├── v1.0.6-QA.json
+│       ├── v1.1.0-QA.md
+│       └── v1.1.0-QA.json
 ├── examples/
 │   ├── content-performance-analysis.md
 │   └── synthetic-ready/
 ├── references/
 │   ├── workflow.md
+│   ├── detail-evidence.md
 │   ├── data-contracts.md
 │   ├── execution-integrity.md
 │   ├── execution-package.md
@@ -369,9 +377,14 @@ long-video-remix/
 │   ├── test_execution_integrity.py
 │   ├── test_execution_package.py
 │   ├── test_independent_audio_dialogue.py
+│   ├── test_extract_frames.py
+│   ├── test_detail_gates.py
+│   ├── test_size_budget.py
 │   └── fixtures/ready-project.json
 └── scripts/
+    ├── extract_frames.py
     ├── validate_project.py
+    ├── detail_gates.py
     ├── compile_render_manifest.py
     ├── timeline_math.py
     ├── execution_integrity.py
