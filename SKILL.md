@@ -5,7 +5,7 @@ description: 从三到五小时或多集影视、活动视频中建立可回查�
 
 # 长视频结构化与混剪执行
 
-公开仓库版本 v1.2.0 · 2026年10月8日
+公开仓库版本 v1.2.2 · 2026年10月14日
 
 本 Skill 的核心不是“一句话自动生成成片”，而是先把视频、图像、对白与上下文等高成本多模态信息压缩成有来源、可检索、可回查的**紧凑结构化工作层**，让后续人工、Director 或其他 Skill 尽量基于表格 / 文本继续工作；创意方案确认后，再只把命中的区域压回原素材做高密度核验，并落实成真正可执行的剪辑方案。
 
@@ -58,17 +58,17 @@ Render / QA
 - **先记录基础事实，再做派生判断。** 画面事实、动作、硬字幕、原声要点、与前帧变化、背景、情绪线索、主题判定、confidence / 证据依据、问题与未验证项必须保留；意象标签、情绪解释、叙事功能和剪辑价值只能建立在这些基础记录之上。
 - **第一次 Direct 的 Narrative Direction 是创意意图，不等于素材已经证明。** Directed Deep / Detail Structure 必须围绕其 narrative spine、candidate regions 和 verification questions 重新回到相关原片核对。
 - 如果第二轮证据与 narrative direction 冲突，报告冲突、替代素材和缺口；默认返回 Direct 1 调整主线，不通过剪辑技巧强行证明原方案。
-- **第二次 Direct 必须发生在 Detail Structure 之后。** 它基于已核实的 Deep observations / verified units / protected ranges 与真实关键帧形成 Execution Package（计划 + 制作参考）；Execute 默认只落实该执行包，不把素材证据层直接等同于最终剪辑方案，也不擅自重写已确认的核心表达。
+- **第二次 Direct 必须发生在 Detail Structure 之后。** 先推荐并确认音乐模式与声音形式，再展示真实关键帧 Mockup 并记录视觉确认，最后确认完整 Execution Package。视觉与整包可同轮确认；已有明确确认直接承接。Execute 只落实已确认包，不重写核心表达。节点与记录见 [执行包契约](references/execution-package.md)。
 - 同一集优先；同一事件、对白指向和关系阶段优先级高于服装相似。跨集须有明确主题联系，并让观众辨认时空变化。
 - 删段不删句，删重复不删因果。必要问答、否定、条件、迟疑、回应和动作后果共同决定最短保留范围。
 - 默认不改写原声、不拼接词语制造新对白、不借用异场反应冒充即时回应。明确要求架空或恶搞时另行约定，不沿用剧情准确混剪的事实标签。
 - 不强制每条五至八段或四十五至六十秒。未给时长时先提出由证据支持的时长，再试剪；不为达到配额拆碎互动。
-- 不设固定审批关卡。有明确授权就继续；仅在素材缺失、关键意思不确定或需扩大用户明确限定范围时，完成可做部分后提出一个具体问题。
+- 单独呈现叙事主线、声音方案、Mockup 与完整执行包的确认内容；未确认时暂停依赖动作并继续可做部分。已有明确确认不重复询问，也不增设无关审批。
 
 ## 开始工作
 
 1. 读取 [工作流程](references/workflow.md) 和 [数据契约](references/data-contracts.md)，建立任务目录与 `project.json`。
-2. 读取 [MCP 适配](references/mcp-adapter.md)，发现真实能力、记录映射并完成小范围探测。只使用获授权的素材访问与处理范围。
+2. 读取 [MCP 适配](references/mcp-adapter.md)，发现真实能力并探测；缺失 capability 按其中的“复用 → 环境允许时主动准备免费本地后端 → smoke test → fallback”处理，不要求用户预封装第三方安装文件。只使用获授权的素材访问与处理范围。
 3. 检查已有产物。按源文件版本和配置恢复进度；不因切换模型重复扫描完整视频。
 4. 如果当前任务只要求 Structure，可在 Structured Observation Layer + Content Map 完成后正式交付，不必进入 Direct 或 Execute。
 5. 如果要继续混剪，先读取已有 Narrative Direction；没有时，把 Broad Structure 的正式结构化表单、scene / segment observations、Content Map、情绪 / 关系线索和 usable bounds 交给用户或独立研究 / 编导环境，结合外部资料与人工判断形成第一次 Direct 输出。Detail Structure 完成后，固定交付真实关键帧与 `execution-handoff.md`，在 handoff 内写入下游 Execution Package 的完整要求，再交给可位于其他环境的 Director 2。
@@ -83,8 +83,8 @@ Render / QA
 | C Structured Working Layer + Content Map | 在逐抽样帧表之上形成 scene / segment 观察、source-order overview、情绪 / 关系线索和跨场景 Content Map；这些都是 Broad Structure 的正式文字化结构输出，不是用 Content Map 替代表单 | frame-observations、action-node-candidates、structure-questions、scenes / segment observations、overview、content-map、emotional / relationship cues | 形成足够完整且可下钻回 frame observation 的素材面；若 deliverable=content_map 可在此正式交付 |
 | D1 Direct — Narrative Direction | 人 / Director 读取正式结构化表单 + Content Map + 外部研究，抽选“到底讲什么”：核心命题、Narrative Spine、candidate regions、需要 Detail 验证的问题和禁改项 | brief、narrative-direction、external research refs、narrative mapping | 主线已人工确认到足以指导定向深挖；不要求已有精确切点 |
 | E Directed Deep / Detail Structure | 带着 Narrative Direction 回到相关原素材，先建立精查区间卡，再提高抽样 / 播放密度；补完整画面、内容、背景、前后状态、原声、说话人裁决、主题判定与 confidence；进一步识别完整可剪单元的音频 / 动作 / 反应边界，给出 preferred in/out、safe in/out windows、must-keep ranges 与 cut risk，再形成 verified units / protected ranges，并导出少量真实关键帧与独立 handoff | detail-intervals、deep-observations、speaker-adjudications、edit-boundaries、已核实 units、reviews、protected_ranges、evidence gaps、keyframe-references、execution-handoff | 每个核心节点有足够音画、内容与语境证据，并有可追溯 edit boundary；主线不成立时退回 D1 调整 |
-| D2 Direct — Execution Package | Director 读取 Detail handoff、证据与真实关键帧，定取舍、顺序、文字 / 声音与时长 / 转场；用一两个关键帧 mockup 和参数锁定全片风格与已采用版式，不逐镜头映射 | execution-plan、execution-reference（mockup + 复现参数）、selected verified units、final narrative mapping | 最终执行方案已确认；关键节点 evidence_status 不为 pending / contradicted |
-| F Execute | 接收素材、Detail、计划、reference 与约束组成的已确认 Execution Package：先通过阶段 / Direct / evidence / edit-boundary 机械门槛，再用累计时长统一量化事件边界并完成时长预算对账；按反馈类型确定失效范围；标明声音的叙事作用；再编译叠化后的时间轴、分层渲染并生成全接点图表 | timeline（含 duration budget 与 boundary refs）、transitions、render-manifest、edit-plan、rough-cut | 两次 Direct 均 confirmed；每个入选 source event 显式引用实际采用的 Deep observation 与 edit boundary，默认切点落在 safe windows 并覆盖 must-keep ranges；若故意越界必须显式 override 并绑定具体规则、区间、当前有效 review 与已确认创作决定；Direct 2 机器授权、当前 source/time-mapping 证据、许可取段和原声音轨连续性检查均通过；预算守恒；源时间→成片时间映射可追；实测帧数与时长；近静音窗口有记录，再继续音画实看 |
+| D2 Direct — Execution Package | 先确认音乐模式与声音形式，再基于 Detail 定取舍、文字 / 声音、时长 / 转场；需要时形成 Music Map / AV Mapping；展示少量真实关键帧 mockup 并确认风格与整包 | music-direction、visual-confirmation、execution-plan、execution-reference、必要的 music-map、selected verified units | 声音、实际 Mockup 与整包均有明确确认来源；关键节点 evidence_status 不为 pending / contradicted |
+| F Execute | 接收已确认 Execution Package，完成 Audio Preparation / Assembly、必要的 music-aware mapping、时间轴编译、分层渲染与接点检查 | timeline（含 duration budget 与 boundary refs）、transitions、render-manifest、edit-plan、rough-cut | 阶段、Direct、Music Mode、证据、边界、授权、源 / 时间映射、许可、音轨连续性与预算等机械门槛全部通过；具体条件由 validator 与执行完整性契约检查，导出后进入 G 做技术 / 实看 QA |
 | G QA & Handoff | 逐接点及全片复核，做 EVA 和 Reference Compliance，保存问题与缓存版本 | render-audit、接点图表、qa、handoff | 技术检查与人工观看分别记录，不以成功日志代替验收 |
 
 ## Structure 的两种密度
@@ -125,16 +125,16 @@ Render / QA
 
 - 抽帧密度、批次、Content Map、第二轮定向回查和恢复：读取 [工作流程](references/workflow.md)；E 阶段取证、切点与问题闭环另读 [Detail 证据获取](references/detail-evidence.md)。
 - 时间码、记录字段、Structured Observation Layer / Content Map / 两次 Direct 与时间轴关系：读取 [数据契约](references/data-contracts.md)。
-- 换模型或 MCP、能力缺失、调用失败：读取 [MCP 适配](references/mcp-adapter.md)。
+- 换模型或 MCP、能力缺失、调用失败：读取 [MCP 适配](references/mcp-adapter.md)。声音 / 音乐方向、Music Mode Gate、Music Map、分离与混音执行另读 [Sound & Music Execution](references/sound-music-execution.md)。
 - 在已确认 Narrative Direction / execution plan 下保住完整对白、连续性与正确重组关系：读取 [重组与剪辑规则](references/montage-rules.md)。
 - 首次出片或返工：读取 [渲染与工程检查](references/render-engineering.md)，按文字校准、时间轴编译、分层渲染、解码实测、全接点检查顺序执行。
 - 交付前、移交另一模型：读取 [检查与交接](references/qa-handoff.md)。
 - Structure 字段无法取得、Detail 交接、Direct 2 完整输出或视觉风格核查：读取 [异常与执行包契约](references/execution-package.md)；固定输出字段，一两个 reference 用于锁定整体风格，不要求逐项配对。
-- 准备 Direct 2 执行记录、进入正式编译或接入渲染器：读取 [执行完整性契约](references/execution-integrity.md)，将采用证据与源版本绑定，明确 adopted_utterance_refs 和源音轨 review_refs；逐源音轨核对白保护及完整取段核听，包括卡片、未关联与异源仅音频。关联视频时另核同步；独立声音按成片放置核完整对白、政策原因及 track 级例外。continuity_type 不关闭保留对白政策；指纹计算不等于实际观察或人工确认。
+- 准备 Direct 2 执行记录、正式编译或接入渲染器：读取 [执行完整性契约](references/execution-integrity.md)。证据与源版本绑定、对白 / 源音轨 review、同步、例外和授权的具体机械条件由该契约与 validator 检查；指纹不等于实际观察或人工确认。
 - 每次改版或重新封装后：读取 [核心能力回归检查](references/regression-checklist.md) 与 [Structure 能力对照矩阵](references/structure-regression-matrix.md)，确认 Board/Broad / Detail / Direct / Execute 主线和基础信息层没有被弱化。
 - 需要演示两轮 Structure、外部 Direct 和 Execute 的衔接：读取 [执行示例](references/worked-example.md)。示例均为虚构，不是当前素材。
 
-复制 `assets/` 中对应模板建立配置与各表：`project-template.json`、`frame-observation`、`action-node-candidate`（4fps 局部窗口）、`structure-question`、`detail-interval`、`deep-observation`、`speaker-adjudication`（本轮没有歧义也保留带表头的文件）与 `timeline-template.json`。Direct 用 `brief`、`narrative-direction`、`execution-plan` 模板（`editorial-plan` 为兼容模板，也可接入用户已有编导文档）；Detail 交接用 `keyframe-reference` 与 `execution-handoff`；Direct 2 另用 `execution-reference`；异常按 `structure-exception` 模板逐项保存为 JSONL；效率测量用 `benchmark-template.md`。
+按当前阶段从 `assets/` 复制对应模板；字段与完整模板清单见 README / 数据契约 / 执行包契约。沿用现有 Broad、Detail、两次 Direct、Music Direction、timeline、exception 与 benchmark 模板，不在 SKILL.md 重复列全表。
 
 具备 Python 时运行 `scripts/validate_project.py 项目目录` 检查来源、时间和引用；不具备 Python 时按数据契约逐项核查，并写明为人工或模型静态检查。脚本不判断剧情真伪或观看流畅度。
 

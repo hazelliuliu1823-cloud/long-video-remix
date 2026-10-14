@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "decision_id": null,
+  "status": "draft",
+  "proposed_mode": null,
+  "proposed_by": null,
+  "basis_refs": [],
+  "recommendation_reason": null,
+  "protected_event_ids": [],
+  "music_flexible_event_ids": [],
+  "sound_form": null,
+  "dialogue_separation": null,
+  "separation_fallback": null,
+  "music_asset_ref": null,
+  "music_asset_digest": null,
+  "music_selection": null,
+  "music_map_required": false,
+  "music_map_ref": null,
+  "confirmation_source": null,
+  "confirmed_mode": null,
+  "confirmed_by": null,
+  "confirmed_at": null
+}

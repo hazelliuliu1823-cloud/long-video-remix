@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "decision_id": "MD-SYNTHETIC",
+  "status": "confirmed",
+  "proposed_mode": "narrative_led",
+  "proposed_by": "synthetic-test-author",
+  "basis_refs": [
+    "narrative-direction.md",
+    "execution-plan.md"
+  ],
+  "recommendation_reason": "Synthetic example preserves the confirmed narrative and original source audio without adding new music.",
+  "protected_event_ids": [
+    "E001"
+  ],
+  "music_flexible_event_ids": [],
+  "music_asset_ref": null,
+  "music_map_required": false,
+  "music_map_ref": null,
+  "confirmation_source": "synthetic example configuration",
+  "confirmed_mode": "narrative_led",
+  "confirmed_by": "synthetic-test-author",
+  "confirmed_at": "2026-10-14",
+  "sound_form": "source_mix",
+  "dialogue_separation": "not_needed",
+  "separation_fallback": null,
+  "music_asset_digest": null,
+  "music_selection": null
+}

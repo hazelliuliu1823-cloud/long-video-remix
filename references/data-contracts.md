@@ -63,7 +63,7 @@
 
 原 CSV 表头与类型锁定；字段无法取得时使用原契约允许的未知表示，并在 `structure-exceptions.jsonl` 保存异常，继续可做的索引 / 草案 / 交接，不虚构、删字段或把未完成阶段标成 complete。E 固定提供 keyframe 清单和自包含 handoff；D2 提供 execution-plan + execution-reference。详见 [异常与执行包契约](execution-package.md) 及其可复制模板。
 
-project 增加可选 `structure_exceptions_ref`、`keyframe_references_ref`、`execution_handoff_ref`、`execution_reference_ref`、`execution_reference_asset_refs` 与 `execution_package_policy`。新模板使用 `plan_and_reference`；旧项目未声明时保持既有行为。新 policy 下 Detail complete 须有清单 / handoff，正式 ready 须有 reference 文档和已列出的资源；关键帧缺失有明确异常仍可继续。采用未核实证据的原门槛不变。
+project 增加可选 `structure_exceptions_ref`、`keyframe_references_ref`、`execution_handoff_ref`、`execution_reference_ref`、`execution_reference_asset_refs`、`execution_package_policy` 与 `capability_resolution_policy`。新模板的 capability policy 使用 `discover_then_prepare_if_permitted`：所需工具缺失时先复用兼容能力，当前 Agent 有安装权限时可准备免费本地首选后端并 smoke test；旧项目不声明时不强制迁移。Execution Package 新模板使用 `plan_and_reference`；旧项目未声明时保持既有行为。新 policy 下 Detail complete 须有清单 / handoff，正式 ready 须有 reference 文档和已列出的资源；关键帧缺失有明确异常仍可继续。采用未核实证据的原门槛不变。
 
 完整执行包确认追加 reference 文档 / 实际样本指纹，变更使旧确认失效。只有结构 / 文件 / 指纹经过机器检查，内容完备性与风格一致性仍按契约人工 / 模型审阅；不要据此声称视觉通过。
 
@@ -206,6 +206,14 @@ claims 每条至少含 text、evidence_refs、status。status 为 supported、in
 
 candidate.status 为 provisional、ready_for_plan 或 rejected。ready_for_plan 表示 Narrative Direction / legacy rough plan 对应的核心素材已经完成 Directed Deep Structure、语境和反证已经检查，不表示粗剪通过。补充 estimated_duration_ms、scope_changes、reorder_reason 和 selected 字段方便执行。
 
+## Music Direction 与 Music Map
+
+启用 `project.music_direction_policy=mode_confirmation_required`，或已经声明 `project.music_direction_ref` 的项目，在 Direct 2 正式确认 Execution Package 前使用 `music-direction.json`；引用存在即启用 Gate，不能通过漏写 policy 绕过确认。模板初始化可为 `draft`；进入 Gate 后 `status` 使用 `proposed / confirmed`；`proposed_mode` 与 `confirmed_mode` 只用 `narrative_led / hybrid / music_led`。记录 `basis_refs`、`recommendation_reason`、`protected_event_ids`、`music_flexible_event_ids`、`confirmation_source` 与 `confirmed_by`。已有明确用户选择可以直接成为 confirmation source；仅由 Director 推断时必须先停在 proposed 等待明确回复。
+
+若本条具体音乐需要参与画面组织，`music_map_required=true` 并给出 `music_map_ref`。Music Map 保存 music asset、分析方法 / 状态、duration、tempo、beats、accents、energy、sections 与 editorial notes；机器分析是候选，不自动成为编辑决策。`narrative_led` 可以完全不需要 Music Map；`hybrid / music_led` 是否需要由本条实际音乐使用方式决定。
+
+新策略下 `ready_for_render` 必须有 confirmed music direction；若声明 Music Map required，则对应文件必须存在且分析状态为 complete / verified。Music Direction 与采用的 Music Map 进入 Direct 2 授权指纹，确认后修改会使旧授权失效。旧项目未声明该 policy 时保持既有行为。详细交互与执行规则见 [Sound & Music Execution](sound-music-execution.md)。
+
 ## Execute 前的时长预算
 
 `timeline.duration_budget` 用帧而不是浮点秒做对账，至少含 `sum_event_frames`、`sum_transition_overlap_frames`、`computed_output_frames`、`target_max_frames`、`status`、`adjustment_note`。计算规则：`computed_output_frames = Σ event frames − Σ transition overlap frames`。黑场卡、freeze / hold 等真正增加播放时间的内容必须成为 event 后再计入；覆盖在既有画面上的 text track 不单独加时。若文字阅读时间放不进当前视觉窗口，先修改 event / card / hold 或内容长度，再重新对账。
@@ -258,3 +266,10 @@ v1.0.5 逐 source_id 音轨推导已知对白，视频关联不决定检查资�
 随附脚本检查 sources、frames、transcript、reviews、units、timeline 的核心 ID、源范围、保护区间、帧时长，以及 transitions 的相邻引用。ready_for_render 还检查核查记录的存在及音视频区间覆盖。它不会证明核查记录所写事实真实、说话人正确、剧情因果成立、实际音画流畅或字幕准确。JSON 合法也不等于数据契约所有语义要求得到满足。
 
 运行 `python3 scripts/validate_project.py 项目目录`；缺失后续阶段文件列为 skipped，不得把输出 status=pass 解释为项目已完成。进入 ready_for_render 前仍须按检查与交接规范人工或模型复核全部相关字段。
+
+
+## v1.2.2 确认节点补充
+
+正式 CSV 与 timeline schema 保持原样。project 新增 visual_confirmation_policy=mockup_confirmation_required、visual_confirmation_ref；plan_and_reference 执行包本身也要求有效视觉确认。music-direction 增加 sound_form、dialogue_separation / separation_fallback、音乐文件指纹与 music_selection；visual-confirmation 的字段、状态与图片绑定见 [执行包契约](execution-package.md)，Music Map 的有效内容及 AV Mapping 见 [声音执行](sound-music-execution.md)。确认记录引用本轮或既有明确指令，脚本不自动确认。
+
+ready_for_render 须有已确认声音形式与实际 Mockup；仅 complete 标签的 Music Map、占位图片、缺失确认来源均不能放行。草案允许 pending 及异常，--planning 的清单始终不可渲染。prepare_execution_authorization 只追加声音 / 视觉 / 音乐文件及 Map 的指纹，不改变旧证据或确认身份。

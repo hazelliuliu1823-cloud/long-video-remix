@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "music_asset_ref": null,
+  "analysis_method": null,
+  "analysis_status": "pending",
+  "duration_ms": null,
+  "tempo_bpm": null,
+  "beat_positions_ms": [],
+  "accent_positions_ms": [],
+  "energy_curve": [],
+  "sections": [],
+  "phrases": [],
+  "av_mapping": [],
+  "editorial_notes": [],
+  "qa": {
+    "analysis_verified": false,
+    "notes": null
+  }
+}

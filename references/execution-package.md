@@ -50,18 +50,32 @@ Detail 不替 Director 生成最终方案，但交付必须在没有安装本 Sk
 
 ## 4. Director 2 的 Execution Package
 
-D2 保留 Editorial Execution Plan，交付升级为 **Execution Package**。最小组成是 `execution-plan.md` + `execution-reference.md` + 采用素材 / Detail 证据与关键帧入口 + 原有 `execution-authorization.json`。允许引用项目中的既有文件，无需复制一套素材库。
+D2 保留 Editorial Execution Plan，交付升级为 **Execution Package**。最小组成是已确认的 `music-direction.json` + `visual-confirmation.json` + `execution-plan.md` + `execution-reference.md` + 真实 Mockup 图片 + 采用素材 / Detail 证据与关键帧入口 + 原有 `execution-authorization.json`；实际需要音乐结构参与剪辑时再附 `music-map.json`。允许引用项目中的既有文件，无需复制一套素材库。
+
+### 必须单独呈现的确认内容
+
+| 节点 | 交给用户查看的具体内容 | 确认后推进 |
+|---|---|---|
+| Direct 1 | 核心表达、主线、必须保留内容 | 定向 Detail |
+| Direct 2 声音 | 推荐音乐模式、原声 / 配乐形式、分离与回退决定；采用配乐时列具体版本与区间 | 完成声音与节奏设计 |
+| Direct 2 视觉 | 少量真实关键帧制作的可查看 Mockup、具体文字、目标画幅、字体 / 颜色 / 构图及应用范围 | 锁定视觉设计 |
+| 完整执行包 | 最终取舍、顺序、逐条文字、声音、时长与允许调整 | Execute |
+
+先完成可供审阅的推荐或样稿，再请求对应确认。已有明确确认直接承接并记录原指令来源；“生成完整包 / 继续”不能自动算作对尚未展示样稿的确认。视觉与完整执行包可以同轮确认，但两项必须单列且绑定同一版本。不逐镜头增加确认，不给素材关键帧另设用户审批。
 
 | 组成 | 执行前写清的内容 |
 |---|---|
-| Editorial Execution Plan | 最终取舍、顺序、逐段源 in/out、速度 / 画面处理、保护范围、总长与各段预算；实际文字全文、逐条出现 / 消失锚点与阅读停留；音轨取段 / 放置、转场及允许调整 |
+| Music Direction Gate | 推荐 `narrative_led / hybrid / music_led` 与具体声音形式，列出依据、保护 / 可调整区域；记录原声、人声分离、配乐政策。无明确确认来源则保持 proposed |
+| Editorial Execution Plan | 最终取舍、顺序、逐段源 in/out、速度 / 画面处理、保护范围、总长与各段预算；实际文字全文、逐条出现 / 消失锚点与阅读停留；Audio Treatment Plan、必要的 Music Map / AV Mapping、最终音轨 / 转场及允许调整 |
 | Visual Treatment Reference | 基于真实关键帧的实际 mockup 及全片规则；按目标输出画幅展示原片裁切 / 缩放、画面占比、文字与人物 / 原字幕关系，以及本次采用的相片页 / 录像框等版式 |
 | Text Treatment Rules | 各类文字的字体 / 可用字体文件或确定替代、尺寸及单位、字重、颜色、描边 / 背景、位置 / 对齐、行数 / 换行、动效与阅读时间；绑定输出分辨率 |
-| Audio Treatment Rules | 原声 / 环境音 / BGM / 旁白的采用政策；每条音轨取段、源与成片锚点、增益、速度、淡化及完整对白保护；不默认加 BGM |
+| Sound & Music Rules | sound thesis、confirmed music mode、原声 / 环境音 / BGM / 旁白政策；preserve / isolate / attenuate / replace / remove / designed_silence、gain / fade / duck / mix / normalize、完整对白保护、分离失败回退；不默认加 BGM |
 | Transition Rules | 具体接点使用 cut / fade / black card 等什么处理及帧数；真正增时的卡片 / hold 计入事件和预算 |
 | Reference Application Rules | 用一两个代表性风格参考锁定文字层级、位置、画面关系、情绪强调和视觉密度；按相同规则扩展到全片 |
 | Asset / Constraint Mapping | 素材、字体、关键帧、mockup、布局生成入口及必要资源的文件入口；禁改项、可调整项、缺失项及降级处理 |
 | QA Criteria | 内容 / 保护范围、实际文字与阅读时间、音轨 / 接点及 Reference Compliance 的判据；未经播放的项不得填通过 |
+
+Music Mode Gate 的完整规则见 `references/sound-music-execution.md`。这个 Gate 约束的是“是否已有明确确认来源”，不是机械重复提问：若用户在当前或既有确认指令中已明确要求音乐卡点 / 叙事优先等模式，直接记录并继续；只有 Director 自己推断时才必须先输出推荐并停住。`hybrid` / `music_led` 在具体音乐参与画面组织时，先形成 Music Map 与 AV Mapping，再进入最终执行。
 
 使用 `assets/execution-plan-template.md` 和 `assets/execution-reference-template.md`。参考文档是执行规格，不只是“简洁 / 有情绪 / 字体大一点”等意图；逐条文字与素材时间放在计划，重复使用的样式放在 reference，二者相互引用。没有某层时写 not_applicable 及原因，不为满足标题额外制作。
 
@@ -73,19 +87,23 @@ D2 保留 Editorial Execution Plan，交付升级为 **Execution Package**。最
 
 在 `execution-reference.md` 将 mockup ID / 文件、原片 frame_id、style / layout ID 与适用范围绑定。交付字体文件或确认可用的字体及明确替代（商用发布时注意字体授权：不少商用字库不允许再分发或未经授权商用，打包或烧录前确认，必要时改用开源字体）、字号 / 字重、断行 / 字距 / 行距、颜色、描边 / 阴影、坐标 / 对齐和边距；采用特殊版式时再写图片置入矩形 x/y/w/h、crop / fit、边框 / 圆角 / 间距、图层顺序与符号参数。尺寸绑定输出画幅，位置注明坐标原点与单位；时间仍在计划中绑定 event anchor + local frames。
 
-mockup 与执行复用同一套字体、布局参数和可复用生成入口（布局源文件或渲染代码 / 方法），随包携带必要资源；图与参数保持同版，不能靠 Execute 看图猜值。示意图中仅供说明的箭头 / 标签与实际进入视频的元素明确区分；后者落实到计划和时间轴，图片交付不代替成片制作。样稿或参数变化按既有 Direct 2 授权处理，不另设审批阶段。
+mockup 与执行复用同一套字体、布局参数和可复用生成入口（布局源文件或渲染代码 / 方法），随包携带必要资源；图与参数保持同版，不能靠 Execute 看图猜值。示意图中仅供说明的箭头 / 标签与实际进入视频的元素明确区分；后者落实到计划和时间轴，图片交付不代替成片制作。
 
-真实关键帧或出图能力缺失时，明确 mockup 尚待补齐及原因，先交可执行参数和可做部分；不把样式表称为已完成 mockup，也不生成替代画面冒充原片。缺口随包传递，依赖该视觉的制作前补齐可查看样稿。
+展示样稿后使用 `assets/visual-confirmation-template.json` 记录 `decision_id`、`status`、`confirmed_by / confirmed_at / confirmation_source`、`execution_reference_digest`、输出规格及 `mockups`。每张样稿记录 `mockup_id / image_ref / image_digest / source_frame_id / source_image_digest / application_scope`；源帧引用 Detail 清单中的 available 原图。明确确认前保持 proposed。只有文字参数、原片截图、文件占位或未经展示的新设计均不能作为已确认 Mockup。
+
+`execution_package_policy=plan_and_reference`、视觉策略或视觉引用任一启用时，正式渲染都要求有效视觉确认；删除视觉策略字段不能跳过执行包约束。校验实际图片可解码、Mockup 尺寸等于目标画幅、原图可达、图片与 reference 参数版本一致。读图检查按需使用 Pillow；缺能力时继续草案但不声称已经通过。样稿、原图、reference 参数或输出规格变化使该视觉确认失效；先展示受影响版本并按已有明确授权确认，再更新整包授权。重算指纹本身不构成确认。
+
+真实关键帧或出图能力缺失时，明确 mockup 尚待补齐及原因，先交参数、证据与草案；不把样式表称为已完成 mockup，也不生成替代画面冒充原片。此时保持非 ready 状态，允许 `--planning` 生成不可渲染清单；补齐可查看样稿和明确确认后，才进入依赖该视觉的正式制作。
 
 **不要求每个字幕、镜头或主要视觉动作逐项映射一个 reference；逐镜头内容与时间仍写入计划。** 样本用于提炼 Design Rules 并保持全片一致。Execute 在这些规则和已有 allowed_adjustments 内实施，不能重新决定核心表达、素材取舍或风格。
 
 ## 5. 与原工程入口的衔接
 
-新项目的 project 设置 `execution_package_policy="plan_and_reference"`，并保存 `structure_exceptions_ref`、`keyframe_references_ref`、`execution_handoff_ref`、`execution_reference_ref` 和 `execution_reference_asset_refs`（实际采用的风格样本文件，未使用图片则为 []）。沿用原 project / timeline / authorization schema 版本，不改正式 CSV。
+新项目使用 project 模板中的 package、music 与 visual 策略；保存 `structure_exceptions_ref`、`keyframe_references_ref`、`execution_handoff_ref`、`music_direction_ref`、`visual_confirmation_ref`、`execution_reference_ref` 和 `execution_reference_asset_refs`。草案缺图可为 []；正式渲染须列实际采用且已确认的 Mockup。沿用原 project / timeline / authorization schema 版本，不改正式 CSV。
 
-新项目在 Detail complete 时须有关键帧清单和独立 handoff；关键帧 unavailable 按上节声明仍可继续。ready_for_render 时还须有非空 reference 文档及已列出的实际参考资源。机器仅检查结构 / 文件 / 指纹，文档是否足够执行、参考图是否实现设计意图仍须按本契约审阅。
+新项目在 Detail complete 时须有关键帧清单和独立 handoff；关键帧 unavailable 按上节声明仍可继续。ready_for_render 时还须有非空 reference 文档及已列出的实际参考资源。机器检查结构、文件 / 指纹及必要的图片 / 音乐属性，文档是否足够执行、参考图是否实现设计意图仍须按本契约审阅。
 
-准备 draft 时追加 `execution_reference_digest` 和 `execution_reference_asset_digests`。完整执行包中的 reference 文档 / 风格样本改变，会使既有 Direct 2 确认和旧渲染入口失效；按已有授权裁决变化后更新记录。新机制不自动确认草稿，也不改对白保护、源许可、时间轴算法或缓存边界。
+准备 draft 时记录 reference / 样稿、`visual_confirmation_digest`、`music_direction_digest`，并绑定实际采用的 Music Map 与音乐文件指纹。这些决定或资产变化会使既有授权与旧渲染入口失效；按确认范围更新记录，不自动确认草稿。对白保护、源许可与时间轴算法保持原样。
 
 旧项目未声明新 package policy 时保持原机械行为；按 v1.0.6 继续制作时补齐上述交接 / reference 并设置 policy，不重写旧观察表。未得到的事实通过异常声明携带，不能靠重新计算指纹变成有效证据。
 

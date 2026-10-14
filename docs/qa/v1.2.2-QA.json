@@ -1,0 +1,82 @@
+{
+  "version": "1.2.2",
+  "date": "2026-10-14",
+  "scope": "license-aware capability preparation, isolated heavy dependencies, fail-closed music-direction gating and stale music-map authorization",
+  "regression_tests": {
+    "command": "python3 -m unittest discover -s tests -v",
+    "count": 200,
+    "status": "pass"
+  },
+  "new_checks": [
+    "music_direction_ref without policy still requires confirmed direction",
+    "direct music-map change invalidates confirmation and old manifest",
+    "valid capability_resolution_policy accepted",
+    "invalid capability_resolution_policy blocked"
+  ],
+  "compatibility": "legacy projects without music_direction_policy and without music_direction_ref remain compatible; declaring a music_direction_ref activates the gate",
+  "third_party_policy": [
+    "software and model-weight licences are evaluated separately",
+    "third-party model weights are not bundled in the Release",
+    "large Python dependencies default to a project-local venv"
+  ],
+  "not_verified": [
+    "actual WorkBuddy shell/package-install permissions",
+    "network/package-manager availability",
+    "third-party model-weight commercial rights unless explicitly documented",
+    "real dialogue separation and music analysis quality"
+  ],
+  "synthetic_example": {
+    "validate_project": "pass",
+    "compiled_frames": 125,
+    "render_allowed": true,
+    "authorization_check": "pass",
+    "playback_verified": false
+  },
+  "environment": {
+    "python": "3.13.5",
+    "ffmpeg": "7.1.5",
+    "pillow": "12.3.0"
+  },
+  "confirmation_revision": {
+    "date": "2026-10-14",
+    "retained_package_version": "1.2.2",
+    "scope": "explicit sound-form and mockup confirmation, standalone handoff, meaningful music maps and adopted assets; no migration work",
+    "regression_tests": {
+      "command": "python -m unittest discover -s tests -q",
+      "count": 227,
+      "status": "pass"
+    },
+    "checks": [
+      "missing/proposed visual confirmation and missing/undecodable/wrong-size mockups block formal render",
+      "used original-frame/reference/mockup changes invalidate visual approval even when a fresh authorization is prepared",
+      "planning continues with missing images and pending music maps; render_allowed remains false",
+      "sound form and dialogue-separation fallback are recorded with the mode",
+      "adopted music file fingerprints and inspected excerpts are checked; added/replacement music must be used in final tracks",
+      "music map complete label alone is insufficient; duration, anchors, AV mapping and declared verification are checked",
+      "source_mix without added music needs no map; section-based music without a BPM grid and partial-section excerpts remain valid"
+    ],
+    "cross_model_cases": {
+      "sound_open": "recommended narrative-led source mix and waited for sound confirmation",
+      "visual_open": "provided proposed visual/package draft; did not enter Execute"
+    },
+    "synthetic_example": {
+      "validate_project": "pass",
+      "compiled_frames": 125,
+      "render_allowed": true,
+      "authorization_check": "pass",
+      "playback_verified": false,
+      "note": "Original/mocked images and approval identities are synthetic fixtures, not actual footage/user approval."
+    },
+    "skill_validation": "pass",
+    "markdown_local_links": "pass",
+    "environment": {
+      "python": "3.12.14",
+      "pillow": "12.3.0",
+      "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers"
+    },
+    "limits": [
+      "declarations and fingerprints do not authenticate a reviewer or prove actual approval",
+      "synthetic tests do not certify real separation, music analysis, listening or aesthetic quality"
+    ]
+  }
+}

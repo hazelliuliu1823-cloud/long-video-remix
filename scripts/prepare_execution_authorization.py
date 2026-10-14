@@ -37,11 +37,27 @@ def prepare(root):
         'evidence_digest': adopted_evidence_digest(timeline, units, observations, boundaries, reviews, transitions, transcript)}
     if project.get('execution_reference_ref') or project.get('execution_package_policy') == 'plan_and_reference':
         result['execution_reference_digest'] = decision_digest(project.get('execution_reference_ref'))
+    if (project.get('visual_confirmation_ref') or project.get('execution_package_policy') == 'plan_and_reference'
+            or project.get('visual_confirmation_policy') == 'mockup_confirmation_required'):
+        result['visual_confirmation_digest'] = decision_digest(project.get('visual_confirmation_ref'))
     reference_assets = project.get('execution_reference_asset_refs', [])
     if not isinstance(reference_assets, list) or any(not isinstance(x, str) or not x.strip() for x in reference_assets):
         raise ValueError('execution_reference_asset_refs must be an array of paths')
     if reference_assets or project.get('execution_package_policy') == 'plan_and_reference':
         result['execution_reference_asset_digests'] = {ref: decision_digest(ref) for ref in reference_assets}
+    music_ref = project.get('music_direction_ref')
+    if music_ref or project.get('music_direction_policy') == 'mode_confirmation_required':
+        result['music_direction_digest'] = decision_digest(music_ref)
+        if music_ref and (root / music_ref).is_file():
+            music_direction = json.loads((root / music_ref).read_text(encoding='utf-8'))
+            map_ref = music_direction.get('music_map_ref') if isinstance(music_direction, dict) else None
+            if map_ref:
+                result['music_map_ref'] = map_ref
+                result['music_map_digest'] = decision_digest(map_ref)
+            asset_ref = music_direction.get('music_asset_ref') if isinstance(music_direction, dict) else None
+            if asset_ref:
+                result['music_asset_ref'] = asset_ref
+                result['music_asset_digest'] = decision_digest(asset_ref)
     return result
 
 

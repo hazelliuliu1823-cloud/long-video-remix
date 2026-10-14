@@ -8,8 +8,9 @@
 - execution-plan.md / Narrative Direction：
 - 输出 width × height / fps：
 - reference 状态与已有确认来源：
+- visual-confirmation.json：状态、decision_id、确认来源及本版 reference / 样稿指纹；未确认保持 proposed。
 - 原片关键帧清单 / 图片入口：
-- 实际 mockup 文件（project.execution_reference_asset_refs；缺失写 [] 并说明待补项）：
+- 实际 mockup 文件（project.execution_reference_asset_refs；草案缺失写 []；正式执行前展示并确认）：
 
 ## 少量参考锁定的规则
 
@@ -39,10 +40,19 @@ mockup 规则见本 Skill 的 `references/execution-package.md`：一两个完�
 
 实际文字全文、断行及逐条出现 / 消失事件锚点放在 execution-plan.md，并引用 style ID。不要只交“字幕大一些”或“适当停留”。字重是否可用、字号采用 px / pt / 相对高度必须明确；参数绑定本版输出规格。
 
-## 声音与转场
+## Sound & Music Treatment
 
+- confirmed music mode / music-direction ref：
+- 已确认声音形式、原声 / 配乐政策与人声分离决定：
+- sound thesis（一句话说明这一条声音怎样参与叙事）：
+- attention hierarchy（对白 / 环境 / 旁白 / 音乐的优先级）：
 - 原声 / 环境音 / BGM / 旁白政策和禁止项：
-- 每条音轨的源 / 取段 / 放置 / 增益 / 速度 / fade / review refs：见 execution-plan.md 的明确记录。
+- music brief（若需选曲：用途、质感、节奏、结构、禁用方向）：
+- 采用曲目 / 版本 / 来源、实际文件与指纹、使用区间（随完整执行包确认）：
+- Music Map / AV Mapping：见 execution-plan.md；protected narrative anchor 不为卡点让位。
+- designed silence / music entry / exit / duck 规则：
+- dialogue separation 触发条件与失败回退：
+- 每条最终音轨的源 / derived asset / 取段 / 放置 / 增益 / 速度 / fade / duck / review refs：见 execution-plan.md。
 - 每个接点的类型 / overlap 或 card 帧数：见 execution-plan.md 的接点表。
 - 重要停顿、动作 / 回应、对白尾部的保护规则：
 
@@ -63,7 +73,7 @@ mockup 规则见本 Skill 的 `references/execution-package.md`：一两个完�
 - 正常速度阅读时间、遮挡 / 裁切和手机检查：
 - 情绪强调、动效 / 转场与 reference 是否一致：
 - 成片风格对照：同一版式的成片截图与 mockup 的对照入口及结论（风格匹配即可）：
-- 原声、保护范围与音轨参数是否实现：
+- 原声、保护范围、Music Mode / AV Mapping 与音轨参数是否实现；分离轨是否核听伪影与残留：
 - 实际导出 / reference 对照尚未完成的项：
 
 在原 qa.json checks 中登记 ReferenceCompliance；没有实际观看记 not_tested。具体参数变更同步计划、机器授权与受影响时间轴 / 缓存，不在 Execute 中另行定义风格。

@@ -16,14 +16,14 @@ D1 Direct：Narrative Direction（人 / Director 确定叙事主线）
 E Directed Deep / Detail Structure：围绕主线回原片做高密度补查
   ↺ 证据不足 / 主线不成立时返回 D1
   ↓
-D2 Direct：Editorial Execution Plan（基于核实证据形成最终执行方案）
+D2 Direct：Music Mode Gate → Execution Package（基于核实证据形成最终执行方案）
   ↓
 F Execute：时间轴与渲染
   ↓
 G QA & Handoff
 ```
 
-第一次 Structure 追求**广度 + 紧凑表示**：正式产出逐抽样帧 / 分片段观察表、动作节点、Q&A、scene / overview 等文字化结构数据，并在其上形成 Content Map；第一次 Direct 只负责确定 Narrative Direction。第二次 Structure 追求**与已确认 Narrative Direction 相关的证据深度**；Detail 完成后必须再次回到 Director 形成 Editorial Execution Plan，之后才进入 Execute。不要在第一轮为某个主题过早押题，也不要把第二轮证据直接当成最终剪辑方案。
+第一次 Structure 追求**广度 + 紧凑表示**并形成 Content Map；第一次 Direct 只定 Narrative Direction。第二次 Structure 追求已确认主线的证据深度；Detail 完成后回到 Director，先确认 Music Mode，再形成 Execution Package，之后才进入 Execute。不要把第二轮证据直接当成最终剪辑方案。
 
 Structure 字段无法取得时，保留原 schema 并明确异常后继续可做部分；E 随证据交付关键帧和独立 handoff，D2 输出完整 Execution Package。具体字段与样式参考规则见 [异常与执行包契约](execution-package.md)，不增加阶段。
 
@@ -33,7 +33,7 @@ Structure 字段无法取得时，保留原 schema 并明确异常后继续可�
 
 配置必须写明：素材范围、目标人物（如有）、已知目标或开放 Structure、是否限同集、成片比例和时长、原声与配乐要求、已有底稿、交付目标、可用工具。未知项写 null；对不影响前期建档的缺项先继续工作。无指定时，以同集为优先、保留原声、只用必要解释文字；时长和比例不擅自写成用户已确认要求。
 
-`deliverable=content_map` 时，默认目标是完成 A—C，并正式交付 Structured Observation Layer + Content Map，而不是只交一份摘要。`deliverable=detailed_plan` 或更后续产物时，进入 E 前必须取得第一次 Direct 的 Narrative Direction；E 完成后，进入 F 前必须取得第二次 Direct 的 Editorial Execution Plan。两者都可以来自用户或独立研究 / 编导环境。
+`deliverable=content_map` 时完成 A—C 并正式交付 Structured Observation Layer + Content Map。`deliverable=detailed_plan` 或更后续产物时，进入 E 前须有第一次 Direct；E 完成后，进入 F 前须完成第二次 Direct 的 Music Mode Gate 与 Execution Package。
 
 已有 brief 可以在 Broad Structure 阶段作为重点标记，但不得让第一轮覆盖只剩关键词检索。Structure 的价值之一就是扩大人的可见范围，并把昂贵的多模态上下文压成可反复复用的表格 / 文本层，让后续 Direct 不被最初假设锁死，也不必在每次创意讨论时重复读取原视频。
 
@@ -206,17 +206,7 @@ Content Map 可以提示“这里可能值得继续看”，但不把这种提�
 
 E 阶段完成后，不直接进入 Execute。以独立 handoff 把 `detail-intervals.csv`、`deep-observations.csv`、speaker adjudications、verified units、context / protected ranges、counterevidence、evidence gaps、source-time refs 和真实关键帧交回 Director；直接附上后续执行包的必需组成，不能依赖同一环境的 Skill 上下文。
 
-第二次 Direct 基于**已经核实的材料能力**形成完整 Execution Package，其中 Editorial Execution Plan 至少明确：
-
-- 最终选择 / 排除的 verified units；
-- 段落顺序与每段 narrative function；
-- 必须完整保留的对白、动作、反应与 protected ranges；
-- 原声 / BGM / ambience / 文字的处理策略；
-- 总时长与各段分配；
-- 转场 / 时空提示等执行意图；
-- 可替换范围、允许执行层调整的边界、不得改变的核心表达。
-
-按 [执行包契约](execution-package.md) 用真实关键帧做一两个锁定风格的 mockup，填写 `assets/execution-reference-template.md`；逐条文字及出现 / 消失锚点写入计划（`assets/execution-plan-template.md`）。如果 Detailed Structure 暴露出主线级冲突，先退回 D1；如果只是素材取舍 / 排序 / 执行策略问题，在 D2 内解决。只有计划及 reference 组成的执行包被确认，且关键 evidence_status 不为 pending / contradicted，并且每个入选 source segment 已引用可用 edit boundary，才进入 F Execute。`ready_for_render` 是机械状态，不是文字口径：项目必须同时满足 Broad / Content Map / Detail 完成、两次 Direct 状态均为 `confirmed`、对应文档真实存在，以及 `render_authorized=true`。每个入选 source event 还必须显式列出本次真正采用的 `deep_observation_refs` 与 `edit_boundary_ref`；这些 observation 的 source 必须与 event 一致，source-time 覆盖本次采用区间，状态为 `supported / partial`。默认 source_in/out 必须落在 boundary 的 safe windows 并覆盖 must-keep ranges；有意越界只能通过显式 override + 创作理由 + review refs。同一 unit 中未采用的 pending / contradicted observation 不阻断本次执行。静态校验或编译器任一项不通过都不得进入渲染。
+第二次 Direct 先按 [Sound & Music Execution](sound-music-execution.md) 完成 Music Mode Gate：从已确认 Narrative Direction + Detail 主动推荐 `narrative_led / hybrid / music_led` 及声音形式，已有用户明确选择就承接；否则保持 proposed、给出推荐与保护 / 可调整区域并结束当前回合。确认后再形成完整 Execution Package，明确 verified units、顺序、protected ranges、文字 / Sound & Music Treatment、必要的 Music Map / AV Mapping、时长、转场和允许调整，并按 [执行包契约](execution-package.md) 展示一两个真实关键帧 Mockup，记录 visual-confirmation 的具体样稿 / 参数版本和确认来源（可与整包同轮）。缺图或未确认只交草案。主线级冲突退回 D1；素材取舍 / 排序 / 执行策略留在 D2。只有声音形式、实际 Mockup 和执行包均确认、关键 evidence_status 可用且每个入选 source segment 有 edit boundary，才进入 F。`ready_for_render` 仍要求 Broad / Content Map / Detail 完成、两次 Direct confirmed、真实文档、render_authorized=true，以及 adopted observations / safe windows / must-keep / override 等原有机械门槛；静态校验或编译器任一项不通过都不得渲染。
 
 ## F Execute：执行与粗剪
 
@@ -224,7 +214,7 @@ E 阶段完成后，不直接进入 Execute。以独立 handoff 把 `detail-inte
 
 随后按反馈类型先判断失效范围，再动文件：纯文字层反馈只重烧文字层；声音策略改变失效音频 + final；切点 / 段长 / 转场改变重新编译 timeline 并使所有依赖坐标的下游失效；核心主线 / 段落功能变化退回 Direct，并只重做受影响的 Directed Deep Structure。
 
-音频处理前先标记它在该段的 **narrative_role**（例如 dialogue_information / ambience_continuity / emotional_music / rhythm_cue / intentional_silence），再决定 preserve / isolate / attenuate / replace / remove；不能把“信息”只理解成对白。
+音频处理按已确认 Music Mode 与 [Sound & Music Execution](sound-music-execution.md)：先标 `narrative_role`，再做 Audio Preparation / Assembly；preserve / isolate / attenuate / replace / remove / designed silence、gain / fade / duck / mix / normalize 均不得破坏完整对白与 protected ranges。
 
 再用锚点和对照帧校准文字，按实际叠化帧数编译 render-manifest；所有成片文字、音轨放置、封面定位和接点核查使用此版本成片坐标。分开保存视频单元、无字底片、混音和文字烧录产物，便于局部返工。
 
@@ -252,4 +242,4 @@ E 阶段完成后，不直接进入 Execute。以独立 handoff 把 `detail-inte
 
 沿用 A—G 与两次 Direct。Detail 的实际观察记录与 edit boundary 追加源版本、时间映射指纹；单位 verification 与采用 reviews / utterances 保留同样绑定。完成 Direct 2 时，将已经确认的取舍保存为 execution-authorization.json：采用事件、顺序、unit / boundary、音轨、文字、转场与允许调整。Execute 读取这些记录并检查实际采用范围、原声对白和例外依据，再编译。
 
-授权不增加固定审批关卡：当前用户已经确认且包含执行时，据该授权继续工作；缺证据时补实际观察，机器记录不能代替观察。按 [执行完整性契约](execution-integrity.md) 创建字段，并在外部渲染前运行 check_render_authorization.py。
+叙事主线、声音方案、实际 Mockup 和完整执行包的确认内容分别呈现；视觉与整包可同轮确认，已有明确确认直接承接。不新增无关审批，机器记录不能代替观察或用户确认。按 [执行完整性契约](execution-integrity.md) 创建字段，外部渲染前运行 check_render_authorization.py。

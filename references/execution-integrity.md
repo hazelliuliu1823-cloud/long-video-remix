@@ -52,12 +52,18 @@
 | output、audio_policy | 已确认输出规格、声音要求 |
 | source_bindings | 采用源的 source_signature、time_mapping_digest、source_constraint_digest |
 | evidence_digest | 采用 observation / boundary / unit / utterance / review 的 canonical 快照指纹，含每条源音轨独有的 utterance 及其 review |
+| music_direction_digest / music_map_digest | 启用 Music Mode Gate 时绑定已确认的 music-direction；采用 Music Map 时一并绑定，任一改变使旧 Direct 2 授权失效 |
+| music_asset_ref / music_asset_digest、visual_confirmation_digest | 绑定实际采用音乐文件及视觉确认记录；文件或确认范围变化使旧授权失效 |
 
 使用 `prepare_execution_authorization.py PROJECT` 从当前方案准备 draft。脚本不会确认，也不会刷新 evidence；已有同名 draft 不会被覆盖。人工 / Director 对照已确认方案核对取舍、顺序、处理和例外，在授权范围内补 authorization_id、confirmed_by、status 并保存正式文件；不要把 draft 自动升为 confirmed。随后计算授权指纹并写入 project。
 
+启用 `music_direction_policy=mode_confirmation_required` **或 project 已填写 `music_direction_ref`** 时，`music-direction.json` 都是 Direct 2 决策文件；后者采用 fail-closed，避免漏写 policy 绕过确认。进入 ready_for_render 前必须 `status=confirmed` 且有 `confirmed_mode / confirmed_by / confirmation_source`；只有 Director 推断而无用户明确确认时保持 proposed。若该文件声明 `music_map_ref`，prepare authorization 同时绑定其指纹。确认后改变 mode、protected / flexible 区域或 Music Map 都必须重新裁决并更新授权，不能只重算 digest。
+
 `allowed_adjustments` 不允许变更 source、unit、boundary、采用证据、速度、叙事功能或其他字段。safe trim 只能缩短既定范围，add_transition_handle 可在已核实 safe windows 内扩展；两者均不能越过源许可或保护区间。原声 locked 轨可以随已允许的安全裁剪调整源端点和 local frame，其余处理仍须一致。文字 / 接续变化按既有授权重新裁决并更新对应确认记录。改变取段后须按累计量化更新 locked 音轨、文字显示范围和 duration_budget；编译器不会自动替方案改写这些依赖字段。
 
-机器记录将用户已有授权具体化，不增加固定确认关卡。名字、状态和指纹可以检查一致性，不能证明填表者身份或自然语言意图真实；实际决定来自本轮用户 / Director 指令。
+声音确认同时包含音乐模式、sound_form 与分离决定；视觉确认绑定可打开的 Mockup、原片关键帧、reference 参数及目标画幅。它们和整包确认的明确来源分别记录，视觉与整包可以同轮确认。准备授权只生成 draft，不替用户确认，也不能靠重新准备授权掩盖已失效的视觉记录。具体字段与范围见 [执行包契约](execution-package.md) 和 [声音执行](sound-music-execution.md)。
+
+机器记录将已有授权具体化。名字、状态和指纹只检查声明的一致性，不能证明填表者身份、真实展示行为或自然语言意图；实际决定来自本轮或既有明确用户 / Director 指令。
 
 ## 3. 声音连续性
 

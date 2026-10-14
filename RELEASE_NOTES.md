@@ -1,3 +1,59 @@
+# v1.2.2 确认节点修订 / Confirmation Review Revision
+
+2026-10-14。本次保留版本号，在现有安装包上定向修正确认流程。
+
+- 主线、声音形式 / 音乐模式、真实关键帧 Mockup、完整执行包分别呈现确认内容；视觉与整包可同轮确认，已有明确确认直接沿用。
+- 新增 visual-confirmation 及强制检查：实图可打开、目标画幅一致、原图可达、图片与参数同版；缺图或未确认只交草案，正式渲染阻断。
+- 采用配乐时核对曲目 / 版本 / 区间与实际音乐文件；必要的 Music Map 须有有效时长、锚点、AV Mapping 与核对记录，不能只填 complete。
+- 同步独立 handoff、模板、双语提问示例、合成示例与测试；本次不处理项目迁移。
+
+227 项回归测试、Skill 基础校验和合成示例编译 / 授权检查通过。
+
+This revision retains v1.2.2 and adds explicit sound-form and visual approval records. Readable source-frame mockups, their production parameters and output size must match the approved version before formal rendering. Existing explicit choices are reused; missing decisions/assets permit planning only. Adopted music bytes/excerpts and meaningful Music Maps are validated and fingerprinted. Standalone handoff instructions, bilingual prompts and synthetic fixtures are updated; project migration is outside this revision.
+
+---
+
+# v1.2.2 — Capability Auto-Preparation / 能力自准备
+
+2026-10-14
+
+在 v1.2.1 声音与音乐执行上补齐运行时能力准备、许可边界与 Music Direction fail-closed 校验；不新增创作阶段，不把第三方模型权重塞进 Skill 包。
+
+- **Discover → license check → prepare → verify：** capability 缺失时先复用已有 MCP / 本地工具；只有来源明确、许可证允许当前用途且当前 Agent 具备相应权限时，才准备本地后端并以最小样本 smoke test 验证。
+- **代码与模型权重分开判断：** Demucs 代码可作为 MIT 许可的可选 `separate_dialogue` 实现；预训练权重、模型卡资源和其他第三方资产分别核对许可。v1.2.2 Release 不打包第三方模型权重，商业使用许可不明确的权重不静默使用。
+- **隔离重依赖：** Demucs / PyTorch 等可能带来大体积下载或环境依赖时，先说明影响；Python 类后端默认进入项目独立 venv，不自动修改用户已有全局环境。
+- **Music Direction fail-closed：** `music_direction_ref` 一旦存在即启用 Music Mode Gate；即使漏写 `music_direction_policy`，未确认的方案也不能进入 `ready_for_render`。确认后直接修改采用的 Music Map 会使旧授权失效。
+- **完整使用示例：** 中英 README 补上 Direct 2 / Execution 两个提问示例；用户可提前声明“音乐模式：narrative_led，不新增配乐”以避免重复确认。
+- **示例迁移：** `examples/synthetic-ready` 补入已确认的 `narrative_led` Music Direction，并刷新授权与 render manifest。
+
+200 项工程回归通过；合成示例校验、编译与授权检查通过。真实 WorkBuddy 权限、网络、第三方安装、模型权重许可与真实媒体听感仍须在实际运行环境中确认。
+
+## English
+
+v1.2.2 adds license-aware capability preparation, isolated heavy dependencies, and fail-closed Music Direction validation. Software licences and model-weight licences are checked separately; Demucs code remains an optional MIT-licensed separation backend, but third-party pretrained weights are not bundled in the Release and are not silently treated as commercially usable when their licence is unclear. Heavy Python backends default to a project-local venv. A declared `music_direction_ref` activates the confirmation gate even if the policy field is omitted, and changing an adopted Music Map invalidates the old authorization. The bilingual README now includes Direct 2 and Execute prompt examples. All 200 regression tests pass.
+
+---
+
+# v1.2.1 — 声音与音乐执行 / Sound & Music Execution
+
+2026-10-14
+
+在 v1.2.0 的视觉交付基础上，把声音从“音轨参数”升级为可确认、可执行、可回查的导演与工程链路，同时加入音乐参与组织画面的能力。
+
+- **Music Mode Gate：** Direct 2 必须先主动推荐 `narrative_led / hybrid / music_led`。已有明确用户选择时直接承接；否则只输出推荐、保护节点、可随音乐调整区域和 A/B/C，停在 `proposed` 等待明确确认。
+- **Music-Aware Editing：** `hybrid / music_led` 可使用 Music Map，把 beat / accent / phrase / section / energy 与 narrative anchors 映射；保护对白、动作链、主动方和关系变化优先于卡点。
+- **Audio Treatment：** Execution Plan 增加 preserve / isolate / attenuate / replace / remove / designed silence，基础执行覆盖 gain / fade / duck / mix / normalize；人声分离按需触发，结果作为 derived asset 保存并核听。
+- **MCP 抽象能力：** 新增 `extract_audio / separate_dialogue / analyze_music / mix_audio / inspect_audio`。Skill 不把 Demucs、具体音乐分析库或具体 FFmpeg MCP 写成硬依赖，运行时按 capability-map 发现并验证。
+- **机械门槛：** 新项目默认启用 `music_direction_policy=mode_confirmation_required`。未确认 mode 阻断 ready_for_render；music-direction 与采用 Music Map 进入 Direct 2 授权指纹，确认后改动会使旧授权失效。旧 v1.2.0 项目未声明该 policy 时保持兼容。
+
+新增 `assets/music-direction-template.json`、`assets/music-map-template.json` 与 `references/sound-music-execution.md`；正式 timeline schema 与既有 Structure CSV 表头不变。196 项工程回归通过；新增检查覆盖 proposed / missing gate、确认后改动失效和 required Music Map。真实音乐审美、分离听感与最终混音仍需实际试听，不由静态测试替代。
+
+## English
+
+v1.2.1 adds a mandatory Music Mode decision for new projects, music-aware editing, executable Audio Treatment, and backend-agnostic audio MCP capabilities. Direct 2 recommends `narrative_led / hybrid / music_led` first; a prior explicit user choice is reused, otherwise the workflow stops at `proposed` until confirmation. Confirmed music-direction and any adopted Music Map are bound into Direct 2 authorization. Existing v1.2.0 projects remain compatible unless they opt into the new policy. All 196 regression tests pass; real listening and mix quality still require playback review.
+
+---
+
 # v1.2.0 — 关键帧与视觉样稿交付 / Keyframe Mockup Handoff
 
 2026-10-08
@@ -8,7 +64,7 @@
 - **Direct 2 视觉样稿：** 用真实关键帧、实际文字和目标输出画幅制作可打开的 mockup；一两个代表样稿锁定整体风格，实际采用的相片页 / 录像框等版式纳入样稿。
 - **执行可复现：** Execution Package 同时交付字体、布局参数、必要资源和布局源文件或渲染方法；Execute 复用这些内容；mockup 的核心是锁定风格，QA 核对成片与 mockup 风格是否匹配，不要求逐帧或逐像素对应。缺失样稿明确待补。商用发布时注意字体授权。
 
-更新现有规范与模板，新增两份 v1.2.0 QA 记录，不新增创作阶段或脚本，不改正式 CSV 表头及 schema。SKILL.md 为 23,447 / 23,842 字节；192 项工程回归通过。**本版新增的视觉交付内容几乎没有自动化检查**：唯一的机器检查是进入 ready_for_render 时若未登记任何 mockup / 参考图，给出提醒（不阻断）；样稿质量与风格是否匹配仍须人工审阅，工程回归不代替真实视频的视觉验收。
+更新现有规范与模板，不增加文件、创作阶段或脚本，不改正式 CSV 表头及 schema。SKILL.md 为 23,447 / 23,842 字节；192 项工程回归通过。**本版新增的视觉交付内容几乎没有自动化检查**：唯一的机器检查是进入 ready_for_render 时若未登记任何 mockup / 参考图，给出提醒（不阻断）；样稿质量与风格是否匹配仍须人工审阅，工程回归不代替真实视频的视觉验收。
 
 审阅修复（同为 v1.2.0）：验收标准由“像素级复现”改为“风格匹配”；mockup 规则集中写在 `references/execution-package.md`，其他文档与模板只保留字段或摘要（handoff 模板为可独立阅读保留简短完整说明）；增加字体授权风险提示；补齐本版 QA 记录。迁移见 [INSTALL.md](INSTALL.md)。
 
@@ -16,7 +72,7 @@
 
 Built on v1.1.0. Detail hands over individual original keyframes. Direct 2 produces actual full-canvas mockups from those frames and the intended text, with typography, layout parameters, required resources and a reusable layout source or rendering method. One or two representative samples normally establish the film's style; show special layouts when used.
 
-Execute reuses the same design and resources. Mockups exist to lock the style: QA checks that the output matches the mockup's style, with no frame-exact or pixel-exact requirement. Missing mockups remain explicitly pending. Check font licences before commercial release. Two v1.2.0 QA records are added; existing instructions and templates are updated without adding creative stages or scripts or changing formal CSV headers or schema versions. All 192 engineering tests pass. The new visual handoff has almost no automated checks: the only one is a non-blocking reminder at ready_for_render when no mockup or reference image is declared; mockup quality and style match still need human review. A review round in v1.2.0 replaced pixel-level wording with style matching, consolidated the mockup rules in `references/execution-package.md`, added the font-licence note and the v1.2.0 QA record. See [INSTALL.md](INSTALL.md).
+Execute reuses the same design and resources. Mockups exist to lock the style: QA checks that the output matches the mockup's style, with no frame-exact or pixel-exact requirement. Missing mockups remain explicitly pending. Check font licences before commercial release. Existing instructions and templates are updated without adding package files, creative stages or scripts, or changing formal CSV headers or schema versions. All 192 engineering tests pass. The new visual handoff has almost no automated checks: the only one is a non-blocking reminder at ready_for_render when no mockup or reference image is declared; mockup quality and style match still need human review. A review round in v1.2.0 replaced pixel-level wording with style matching, consolidated the mockup rules in `references/execution-package.md`, added the font-licence note and the v1.2.0 QA record. See [INSTALL.md](INSTALL.md).
 
 ---
 

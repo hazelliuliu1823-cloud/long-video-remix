@@ -32,11 +32,12 @@
 | 时间标签稳定性 | source_id + source ms/range → assembly/output frame | 同 frame/source time 必须一致；代理和输出坐标不得覆盖 source time |
 | 长任务恢复 | incremental artifacts + `coverage.json` | 中断后按缺口续跑，不能重扫已完成且版本一致区间 |
 | 时长预算 | `timeline.duration_budget` | ready 前按整数帧守恒；覆盖文字不重复加时 |
-| 声音叙事作用 | `audio_tracks.narrative_role/treatment_reason` | 先判断功能再做 preserve/remove 等处理 |
+| Music Mode Gate | `music-direction.json` | D2 先推荐 `narrative_led / hybrid / music_led`；已有明确用户选择直接承接，否则 proposed 等待确认；新 policy 或已声明 music_direction_ref 时，未确认不得 ready_for_render；漏写 policy 不绕过 Gate |
+| 声音叙事作用与处理 | Audio Treatment Plan + `audio_tracks.narrative_role/treatment_reason` | 先决定 preserve / isolate / attenuate / replace / remove / designed_silence，再落最终音轨；保护对白优先 |
 | 反馈失效范围 | feedback → invalidation matrix | 文字 / 声音 / 结构 / 创意分别局部重算或回退 |
 | Broad 正式文字化交付 | `frame-observations.csv` + action-node + Q&A + scene/segment observations + overview | Content Map / 情绪大意只能建立在这些结构表单之上，不能替代 |
 | 第一次 Director | `narrative-direction.md` | 明确 thesis / narrative spine / candidate regions / verification questions；不提前冒充最终 execution plan |
-| 第二次 Director | `execution-plan.md` | Detail evidence 完成后再确认最终取舍、顺序、声音 / 文字 / 时长 / 执行边界；Execute 不跳过 |
+| 第二次 Director | `music-direction.json` + `execution-plan.md` + `execution-reference.md` | Detail evidence 完成后先确认 Music Mode，再确认最终取舍、必要 Music Map / AV Mapping、声音 / 文字 / 时长 / 执行边界；Execute 不跳过 |
 | 最终执行与 QA | timeline / render-manifest / render audit / junction checks / EVA / handoff | 原 Execute 主线不变 |
 
 ## 发布判定

@@ -121,5 +121,10 @@
   "execution_handoff_ref": "execution-handoff.md",
   "execution_reference_ref": "execution-reference.md",
   "execution_reference_asset_refs": [],
-  "execution_package_policy": "plan_and_reference"
+  "execution_package_policy": "plan_and_reference",
+  "visual_confirmation_policy": "mockup_confirmation_required",
+  "visual_confirmation_ref": "visual-confirmation.json",
+  "music_direction_policy": "mode_confirmation_required",
+  "capability_resolution_policy": "discover_then_prepare_if_permitted",
+  "music_direction_ref": "music-direction.json"
 }

@@ -203,10 +203,16 @@ def project_inputs_digest(root):
              'detail-intervals.csv', 'deep-observations.csv', 'speaker-adjudications.csv',
              'edit-boundaries.csv'}
     for key in ('narrative_direction_ref', 'execution_plan_ref', 'execution_authorization_ref', 'content_map_ref',
-                'execution_reference_ref', 'execution_handoff_ref', 'keyframe_references_ref', 'structure_exceptions_ref'):
+                'execution_reference_ref', 'execution_handoff_ref', 'keyframe_references_ref', 'structure_exceptions_ref',
+                'music_direction_ref', 'visual_confirmation_ref'):
         if explicit(project.get(key)):
             names.add(project[key])
     names.update(ref for ref in project.get('execution_reference_asset_refs', []) if explicit(ref))
+    music_ref = project.get('music_direction_ref')
+    if explicit(music_ref) and (root / music_ref).is_file():
+        music = json.loads((root / music_ref).read_text(encoding='utf-8'))
+        if isinstance(music, dict):
+            names.update(music[key] for key in ('music_asset_ref', 'music_map_ref') if explicit(music.get(key)))
     keyframe_ref = project.get('keyframe_references_ref')
     if explicit(keyframe_ref) and (root / keyframe_ref).is_file():
         keyframes = json.loads((root / keyframe_ref).read_text(encoding='utf-8'))
@@ -317,11 +323,36 @@ def validate_integrity(root, project, sources, units, observations, boundaries,
                       ('narrative_direction_digest', 'narrative_direction_ref')]
     if explicit(project.get('execution_reference_ref')) or project.get('execution_package_policy') == 'plan_and_reference':
         decision_files.append(('execution_reference_digest', 'execution_reference_ref'))
+    if explicit(project.get('music_direction_ref')) or project.get('music_direction_policy') == 'mode_confirmation_required':
+        decision_files.append(('music_direction_digest', 'music_direction_ref'))
+    if (explicit(project.get('visual_confirmation_ref')) or project.get('execution_package_policy') == 'plan_and_reference'
+            or project.get('visual_confirmation_policy') == 'mockup_confirmation_required'):
+        decision_files.append(('visual_confirmation_digest', 'visual_confirmation_ref'))
     for key, target in decision_files:
         try:
             need(auth.get(key) == file_digest(root / project[target]), f'execution authorization: {target} changed since confirmation')
         except (OSError, KeyError, TypeError):
             need(False, f'execution authorization: missing {target}')
+    music_ref = project.get('music_direction_ref')
+    if explicit(music_ref) and (root / music_ref).is_file():
+        try:
+            music_direction = json.loads((root / music_ref).read_text(encoding='utf-8'))
+            map_ref = music_direction.get('music_map_ref') if isinstance(music_direction, dict) else None
+            if map_ref or 'music_map_digest' in auth:
+                need(auth.get('music_map_ref') == map_ref, 'execution authorization: music map reference changed since confirmation')
+                need(explicit(map_ref), 'execution authorization: missing music map reference')
+                if explicit(map_ref):
+                    need(auth.get('music_map_digest') == file_digest(root / map_ref),
+                         'execution authorization: music map changed since confirmation')
+            asset_ref = music_direction.get('music_asset_ref') if isinstance(music_direction, dict) else None
+            if asset_ref or 'music_asset_digest' in auth:
+                need(auth.get('music_asset_ref') == asset_ref, 'execution authorization: music asset reference changed since confirmation')
+                need(explicit(asset_ref), 'execution authorization: missing music asset reference')
+                if explicit(asset_ref):
+                    need(auth.get('music_asset_digest') == file_digest(root / asset_ref),
+                         'execution authorization: music asset changed since confirmation')
+        except (OSError, ValueError, TypeError):
+            need(False, 'execution authorization: invalid music direction / music map')
     reference_assets = project.get('execution_reference_asset_refs', [])
     if need(isinstance(reference_assets, list) and all(explicit(x) for x in reference_assets),
             'execution reference assets must be an array of paths'):

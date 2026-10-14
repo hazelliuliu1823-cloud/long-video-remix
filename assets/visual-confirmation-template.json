@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "decision_id": null,
+  "status": "draft",
+  "confirmation_source": null,
+  "confirmed_by": null,
+  "confirmed_at": null,
+  "execution_reference_digest": null,
+  "output": {
+    "width": null,
+    "height": null,
+    "fps_num": null,
+    "fps_den": null
+  },
+  "mockups": [
+    {
+      "mockup_id": null,
+      "image_ref": null,
+      "image_digest": null,
+      "source_frame_id": null,
+      "source_image_digest": null,
+      "application_scope": null
+    }
+  ]
+}

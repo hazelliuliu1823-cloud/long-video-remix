@@ -35,7 +35,7 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 
 1. 安装完整文件夹，复制 `assets/project-template.json` 建立独立项目，登记源与可用模型 / 视频工具。
 2. 完成 Broad 的正式观察层和 Content Map；只做结构化时可在此交付，后续剪辑可复用。
-3. 人 / Director 定主线，Detail 核实命中区域并交付真实关键帧与独立 handoff，再由 Direct 2 确认 Execution Package（计划 + 制作 reference）和机器授权。
+3. 人 / Director 定主线，Detail 核实命中区域并交付真实关键帧与独立 handoff；Direct 2 先推荐并确认音乐模式与声音形式，再展示真实关键帧 Mockup，分别记录视觉与完整执行包确认（可同轮），最后生成机器授权。
 4. 执行静态校验与编译，渲染适配器在消费清单前检查授权：
 
 ```sh
@@ -48,7 +48,11 @@ python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.js
 
 本地原片抽帧优先用 `scripts/extract_frames.py`；MCP / 代理等按 [MCP 适配](references/mcp-adapter.md) 保留实测时间与源绑定。脚本的 `signals` 模式标出画面变化与有声区间，`strip` 模式输出逐帧条用于定切点。E 阶段的取证、切点与问题闭环见 [Detail 证据获取](references/detail-evidence.md)。
 
-**v1.2.0：** 在 v1.1.0 基础上补齐视觉交付：Detail 单独交付关键帧原图，Direct 2 制作真实画面的 mockup，并交付设计参数、资源与可复用布局入口，Execute 按同一套设计制作，并核对成片风格与 mockup 是否匹配。保留实测时间标签、问题闭环与指令大小上限。迁移见 [INSTALL.md](INSTALL.md)。
+**v1.2.2：** 延续 v1.2.1 的 Sound & Music Execution，并补齐 capability 自准备与发布闭环：缺工具时先复用，许可证允许当前用途且环境允许时再准备本地后端并 smoke test。Demucs 代码可作为 MIT 的可选分离实现，但第三方模型权重单独核对许可且不随 Release 打包；重依赖默认进入项目独立 venv。Music Direction 只要被项目引用就按 fail-closed 校验，不能因漏写 policy 绕过确认。
+
+**v1.2.2 确认节点修订：** 单独呈现主线、声音方案、Mockup 与完整执行包的确认内容；视觉可与整包同轮确认，已有明确选择直接沿用。新增 `visual-confirmation.json` 绑定实际样稿、原图、参数与目标画幅；缺图或未确认只交草案，正式渲染阻断。音乐模式同时确认声音形式，采用配乐时核对文件、版本、区间及有效 Music Map；仅 complete 标签不能放行。详见 [执行包契约](references/execution-package.md)。
+
+**v1.2.1：** 在 v1.2.0 上增加 Sound & Music Execution。Direct 2 先主动推荐 `narrative_led / hybrid / music_led`；已有明确用户选择直接承接，否则必须停在 proposed 等待确认。`hybrid / music_led` 可用 Music Map 把 beat / phrase / section 与可调整画面映射；Audio Treatment 支持 preserve / isolate / attenuate / replace / remove / designed silence，以及 gain / fade / duck / mix / normalize。新增抽象 MCP capabilities 与可选 dialogue separation；不把 Demucs 等具体后端写死。迁移见 [INSTALL.md](INSTALL.md)。
 
 ## 常用提问示例
 
@@ -86,6 +90,22 @@ python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.js
 
 **会拿到什么：** Detail 证据包，包括精查区间与深度观察、说话人核验、剪辑边界、真实关键帧和交接文件。交接文件写清下一轮 Direct 所需的执行包要求，未完成项明确标注。
 
+### 5. Detail 已完成，请确定最终执行方案
+
+**可以怎么问：**
+
+> 请基于〔已确认主线〕和〔Detail handoff〕进入 Direct 2。音乐模式：`narrative_led`，保留节目混音，不新增配乐，不需要人声分离。沿用已确认的叙事与证据，完成 Music Direction、Execution Plan 和 Execution Reference；明确最终取舍、文字、声音处理、转场、视觉样稿 / 风格规则与 QA 要求，先展示 Mockup 与参数供我确认；确认后形成完整 Execution Package，不重新改写主线。
+
+**会拿到什么：** 已确定的声音方向和待确认视觉样稿；视觉与完整执行包确认后再交执行。上例提前明确的声音选择直接承接，不重复询问。
+
+### 6. 执行方案已确认，请按包出片
+
+**可以怎么问：**
+
+> 请严格按〔已确认 Execution Package〕进入 Execute。不要重新决定叙事、音乐模式或视觉方向；按包内时间轴、声音处理、文字、转场与 reference 执行，输出 render manifest 和当前环境能生成的粗剪 / 成片，并完成导出审计与未验证项记录。
+
+**会拿到什么：** 与已确认方案一致的执行结果、render manifest、技术 QA / 审计和需要人工最终观看的项目；若当前缺少渲染能力，会按 capability 规则处理而不是伪称已出片。
+
 ## 工作路径
 
 | 环节 | 产出与决定 |
@@ -93,7 +113,7 @@ python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.js
 | Broad Structure → Structured Observation Layer → Content Map | 全局观察表、场景 / 动作 / 问题索引，保留覆盖与缺口 |
 | Direct 1 · Narrative Direction | 人 / Director 确定主线、候选区域和待核问题 |
 | Directed Deep / Detail Structure + Edit Boundary | 核实连续音画、前后语境、反证和可剪范围；随证据交付真实关键帧与独立 handoff；证据不足返回 Direct 1 |
-| Direct 2 · Execution Package | 确认计划 + 制作 reference：事件、顺序、具体声音 / 文字 / 转场、一两个风格样本的全片应用规则与允许调整 |
+| Direct 2 · Music Mode Gate → Execution Package | 先推荐并确认叙事优先 / 混合 / 音乐优先；再确认事件、Music Map / AV Mapping（如需）、声音 / 文字 / 转场和风格规则 |
 | Execute → Render / QA | 按完整执行包与机器授权制作，再完成技术检查、动态听看与 Reference Compliance |
 
 ## 丰富结构如何可靠进入执行
@@ -336,6 +356,8 @@ long-video-remix/
 │   ├── execution-plan-template.md
 │   ├── execution-reference-template.md
 │   ├── execution-handoff-template.md
+│   ├── music-direction-template.json
+│   ├── music-map-template.json
 │   ├── keyframe-reference-template.json
 │   ├── structure-exception-template.json
 │   ├── editorial-plan-template.md
@@ -357,7 +379,11 @@ long-video-remix/
 │       ├── v1.1.0-QA.md
 │       ├── v1.1.0-QA.json
 │       ├── v1.2.0-QA.md
-│       └── v1.2.0-QA.json
+│       ├── v1.2.0-QA.json
+│       ├── v1.2.1-QA.md
+│       ├── v1.2.1-QA.json
+│       ├── v1.2.2-QA.md
+│       └── v1.2.2-QA.json
 ├── examples/
 │   ├── content-performance-analysis.md
 │   └── synthetic-ready/
@@ -373,6 +399,7 @@ long-video-remix/
 │   ├── regression-checklist.md
 │   ├── structure-regression-matrix.md
 │   ├── mcp-adapter.md
+│   ├── sound-music-execution.md
 │   └── worked-example.md
 ├── tests/
 │   ├── test_dialogue_continuity.py
@@ -410,8 +437,8 @@ long-video-remix/
 1. 先完成 Broad Structure，交付正式的 Structured Observation Layer + Content Map；
 2. 由人 / Director 基于这些文字化结构数据和必要外部研究形成 Narrative Direction（Narrative Spine + candidate regions + verification questions）；
 3. 把 Narrative Direction 接回项目，对命中区域进行 Directed Deep / Detail Structure，并生成 `deep-observations.csv`，把核心区域的画面、内容、背景、前后状态、原声证据、反证和保护范围补全；
-4. 交付真实关键帧、证据与独立 handoff（含下游完整输出要求），交回 Director 形成 Execution Package；
-5. Execute 只依据已确认计划 + 制作 reference，把 verified units / protected ranges 编译为 edit plan 和 timeline，按冻结样式制作；
+4. 交付真实关键帧、证据与独立 handoff；Direct 2 先基于这些材料推荐 Music Mode，若用户此前未明确选择则等待一次明确确认；
+5. mode 确认后形成 Execution Package；需要音乐参与组织画面时加入 Music Map / AV Mapping，Execute 再按已确认计划 + reference 完成声音准备、混音与画面时间轴；
 6. 先按 [执行完整性契约](references/execution-integrity.md) 保存当前证据绑定和 Direct 2 的机器授权，再运行：
 
 ```text
@@ -433,7 +460,7 @@ python3 scripts/audit_render.py 成片.mp4 项目目录/render-manifest.json --o
 - Broad Structure 的正式表单是文字化结构数据，Content Map 建立在其上，不能反向替代表单；
 - Direct 1 的 Narrative Direction 是编导意图，不等于已经得到素材证明；
 - Directed Deep Structure 负责把 Narrative Direction 重新压回原片证据；
-- Direct 2 基于核实后的证据与关键帧形成完整 Execution Package；Execute 不默认跨过这一步自行决定最终讲法或风格；
+- Direct 2 基于核实后的证据与关键帧先完成 Music Mode Gate，再形成完整 Execution Package；只有 Director 推断时才要求用户确认，已有明确选择不重复问；Execute 不跨过这一步自行决定最终讲法、音乐结构或风格；
 - 工具可以建议某个节点的素材不足或替代片段，但默认不擅自改写已经确认的核心表达；
 - 渲染成功日志不等于成片通过验收。
 

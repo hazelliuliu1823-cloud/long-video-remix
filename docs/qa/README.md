@@ -12,7 +12,10 @@ These are the original validation records for the development versions. Baseline
 | v1.0.6 | [Markdown](v1.0.6-QA.md) | [JSON](v1.0.6-QA.json) |
 | v1.1.0 | [Markdown](v1.1.0-QA.md) | [JSON](v1.1.0-QA.json) |
 | v1.2.0 | [Markdown](v1.2.0-QA.md) | [JSON](v1.2.0-QA.json) |
+| v1.2.1 | [Markdown](v1.2.1-QA.md) | [JSON](v1.2.1-QA.json) |
+| v1.2.2 | [Markdown](v1.2.2-QA.md) | [JSON](v1.2.2-QA.json) |
 
 安装与更新见 [INSTALL.md](../../INSTALL.md)，版本记录见 [CHANGELOG.md](../../CHANGELOG.md)。
 
 For installation and updates, see [INSTALL.md](../../INSTALL.md). For version history, see [CHANGELOG.md](../../CHANGELOG.md).
+

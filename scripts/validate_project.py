@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate core references and timing only; never certifies editorial truth."""
+"""Validate references, timing and declared confirmations; never certifies editorial truth."""
 import csv
 import json
 import math
@@ -9,6 +9,7 @@ from pathlib import Path
 from timeline_math import canonical_assembly_ranges, output_ranges_from_overlaps
 from execution_integrity import validate_integrity
 from detail_gates import lint_detail_draft, check_question_closure
+from confirmation_gates import validate_confirmations
 
 
 def validate(root):
@@ -642,6 +643,13 @@ def validate(root):
                 require(nonblank(row.get(key)), f'{label}: {key} must be explicit')
             warnings.append(f'{label}: {row.get("status")}; {row.get("reason")}; '
                             f'downstream: {row.get("downstream_handling")}')
+    capability_resolution_policy = project.get('capability_resolution_policy')
+    if capability_resolution_policy is not None:
+        require(capability_resolution_policy == 'discover_then_prepare_if_permitted',
+                'invalid capability_resolution_policy')
+    confirmation_errors, confirmation_warnings = validate_confirmations(root, project, timeline)
+    errors.extend(confirmation_errors)
+    warnings.extend(confirmation_warnings)
     package_policy = project.get('execution_package_policy')
     if package_policy is not None:
         require(package_policy == 'plan_and_reference', 'invalid execution_package_policy')
@@ -731,10 +739,7 @@ def validate(root):
                     require(nonblank(asset) and (root / asset).is_file(),
                             'declared execution reference asset is missing')
                 if not assets:
-                    # v1.2.0: a missing mockup may travel with the package as a declared gap,
-                    # so this is a reminder, not a block.
-                    warnings.append('ready_for_render: no mockup / reference image in execution_reference_asset_refs; '
-                                    'execution-reference must state the pending mockup and why')
+                    require(False, 'ready_for_render requires actual confirmed mockup images')
     if ready:
         require(bool(events), 'ready_for_render has no events')
         require(positive(timeline.get('width')) and positive(timeline.get('height')), 'ready_for_render requires output dimensions')
@@ -1014,7 +1019,7 @@ def validate(root):
             warnings.extend(integrity['warnings'])
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
             errors.append(f'execution integrity: malformed input: {exc}')
-    return {'status': 'fail' if errors else 'pass', 'scope': 'core static references and timing only', 'checked': checked, 'skipped': skipped, 'errors': errors, 'warnings': warnings}
+    return {'status': 'fail' if errors else 'pass', 'scope': 'core references, timing, declared confirmations and required asset checks', 'checked': checked, 'skipped': skipped, 'errors': errors, 'warnings': warnings}
 
 
 if __name__ == '__main__':

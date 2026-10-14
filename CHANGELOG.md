@@ -1,12 +1,39 @@
 # Changelog
 
-Public release packaging targets v1.2.0. Earlier entries are retained as development history; their dates do not imply published GitHub Releases or tags.
+Release history below follows repository tags. v1.2.2 is packaged for a tagged GitHub Release; attach the complete github-ready package as the release asset when publishing.
+
+
+## v1.2.2 — Confirmation Review Revision · 2026-10-14
+
+- Retained the version number and current package baseline; separately present narrative, sound, actual mockup and complete-package decisions, with visual/package approval allowed in the same turn.
+- Added visual-confirmation records binding readable target-size mockups, their original keyframes, reference parameters and explicit approval provenance. Missing/unapproved visual work remains a draft and blocks formal rendering; preparation never confirms a record.
+- Sound confirmation now includes sound form and separation/fallback decisions. Adopted music files and excerpts are checked and fingerprinted; required Music Maps contain real anchors, AV mappings and declared verification instead of only a completion label.
+- Updated standalone handoff requirements, templates, bilingual prompts and synthetic fixtures. Original Structure CSV headers, time mapping, dialogue/boundary protection and timeline algorithms remain unchanged.
+- No project-migration work is included in this revision. Test evidence is recorded in docs/qa/v1.2.2-QA.
+
+## v1.2.2 — Capability Auto-Preparation · 2026-10-14
+
+- Changed missing-capability handling from immediate unavailable/fallback to discover → reuse → prepare-if-permitted → smoke-test → register, while keeping fallbacks for blocked or failed setup.
+- Agents may prepare a compatible local backend when shell/package installation is available, but only after checking that the software licence permits the actual use. Demucs remains an optional dialogue-separation implementation; its code is MIT-licensed, while model-weight licensing is checked separately and weights are not bundled in this Release.
+- Heavy installs that may download large dependencies or alter Python environments are disclosed first and default to a project-local virtual environment rather than the user's global Python. Code, model-weight and other downloadable-resource licences are evaluated independently; unclear commercial-use rights are not treated as permission.
+- Added safety boundaries: no silent paid API use, credentials, third-party media upload, privilege escalation, security-setting changes, unknown-source installers, or redistribution of third-party model weights without a clear licence.
+- Music Direction is now fail-closed whenever `music_direction_ref` is present, even if `music_direction_policy` was accidentally omitted. Added regressions for stale Music Map authorization and the missing-policy bypass; synthetic-ready now carries a confirmed `narrative_led` music direction.
+- Added optional capability resolution provenance to capability-map and `capability_resolution_policy=discover_then_prepare_if_permitted` to new project templates. Backends remain replaceable rather than hard dependencies. README now includes Direct 2 / Execution Package and execution prompt examples, including how to predeclare `narrative_led` with no new music.
+- 200 regression tests pass; timeline schema, Structure CSV headers and existing Direct 2 authorization semantics remain unchanged apart from the fail-closed Music Direction gate above.
+
+## v1.2.1 — Sound & Music Execution · 2026-10-14
+
+- Added a Direct 2 Music Mode Confirmation Gate with `narrative_led / hybrid / music_led`. The Director must recommend a mode from confirmed Narrative Direction + Detail evidence; explicit prior user choices are reused, while inferred modes stop at `proposed` until the user confirms.
+- Added `music-direction.json` and optional `music-map.json`. New projects mechanically block ready_for_render until music mode is confirmed; adopted music-direction / Music Map bytes are bound into Direct 2 authorization so post-confirmation changes invalidate the old render entry. Legacy projects without the new policy remain compatible.
+- Added Music-Aware Editing and Audio Treatment: narrative anchors vs flexible regions, beat / phrase / section mapping, preserve / isolate / attenuate / replace / remove / designed silence, gain / fade / duck / mix / normalize, derived-audio provenance, QA and fallback.
+- Added backend-agnostic MCP capabilities `extract_audio`, `separate_dialogue`, `analyze_music`, `mix_audio`, and `inspect_audio`; Demucs or specific analysis libraries are optional implementations, not hard dependencies.
+- Added two templates and one reference document; formal timeline schema and Structure CSV headers remain unchanged. 196 regression tests pass, including 4 new Music Mode / Music Map authorization cases.
 
 ## v1.2.0 — Keyframe Mockup Handoff · 2026-10-08
 
 - Detail delivers individual original keyframes with its existing index and handoff. Direct 2 uses real keyframes to produce full-canvas mockups and binds them to typography, layout parameters, required resources and a reusable layout source or rendering method.
 - Execute reuses the same design and resources; mockups lock the style, and QA checks style match between output and mockup without frame-exact or pixel-exact requirements. One or two representative samples normally establish the film's style; include special layouts only when used. Missing images or rendering capability are recorded as pending, without substituting generated evidence or treating parameters as a completed mockup.
-- Updated existing instructions, templates and bilingual release documentation; added two v1.2.0 QA records, with no new creative stages or scripts and no changes to formal CSV headers or schema versions. SKILL.md remains 23,447 of 23,842 bytes.
+- Updated existing instructions, templates and bilingual release documentation; no new package files, creative stages, scripts, formal CSV headers or schema versions. SKILL.md remains 23,447 of 23,842 bytes.
 - Review round (still v1.2.0): acceptance wording changed from pixel-level reproduction to style match; mockup rules consolidated in `references/execution-package.md` (templates keep fields; the handoff template keeps a short self-contained summary); font-licence risk noted for commercial use; `validate_project.py` warns, without blocking, when a ready_for_render package declares no mockup / reference image; added `docs/qa/v1.2.0-QA.*`. 2 tests added (192 total) under Python 3.12.3 + FFmpeg 6.1.1 + Pillow; the new visual handoff otherwise has no automated checks.
 
 ## v1.1.0 — Lean Detail Rebuild on v1.0.7 · 2026-10-07

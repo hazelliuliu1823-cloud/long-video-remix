@@ -35,7 +35,7 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 
 1. Install the complete folder, copy `assets/project-template.json` to create a separate project, and register sources and available models / video tools.
 2. Complete Broad's formal observation layer and Content Map. If you only need structured analysis, deliver at this point; later editing can reuse the results.
-3. A human / Director defines the narrative spine. Detail verifies the selected regions and delivers real keyframes and a standalone handoff. Direct 2 then confirms the Execution Package (plan + production reference) and machine-readable authorization.
+3. A human / Director defines the narrative spine. Detail verifies selected regions and delivers real keyframes plus a standalone handoff. Direct 2 first recommends and confirms a Music Mode, then finalizes the Execution Package (plan + production reference) and machine-readable authorization.
 4. Run static validation and compilation. The rendering adapter checks authorization before consuming the manifest:
 
 ```sh
@@ -48,7 +48,11 @@ Raw audiovisual processing and actual rendering are handled by the models, video
 
 Prefer `scripts/extract_frames.py` for local identity-mapped sources; for MCP / proxies, follow the [MCP adapter](references/mcp-adapter.md), retaining measured times and source bindings. The script's `signals` mode marks visual-change and sound segments; `strip` returns frame-by-frame edit-point strips. See [Detail evidence](references/detail-evidence.md) for evidence and question closure.
 
-**v1.2.0:** builds on v1.1.0 with visual handoff: Detail delivers individual source keyframes; Direct 2 supplies actual mockups, design parameters, required assets and a reusable layout entry point; Execute uses the same design and checks that the output matches the mockup's style. Measured timestamps, question closure and instruction-size caps remain. See [INSTALL.md](INSTALL.md) for migration.
+**v1.2.2:** keeps the v1.2.1 Sound & Music Execution model and closes the capability/release loop. Missing tools are reused first; a local backend is prepared only when its licence permits the actual use and the environment allows installation, then smoke-tested before it is marked available. Demucs code can be an optional MIT-licensed separation implementation, while third-party model weights are licensed separately and are not bundled in the Release; heavy Python dependencies default to a project-local venv. A referenced Music Direction is validated fail-closed even if its policy field was accidentally omitted.
+
+**v1.2.2 confirmation revision:** separately present narrative, sound, mockup and complete-package decisions. Visual approval may share the package-approval turn; explicit existing decisions are reused. `visual-confirmation.json` binds readable mockups, original frames, production parameters and output dimensions. Missing/unapproved mockups permit drafts, never formal rendering. Sound approval includes its form; adopted music files, versions, excerpts and meaningful Music Maps are checked. A `complete` label alone is insufficient. See the [execution-package contract](references/execution-package.md).
+
+**v1.2.1:** adds Sound & Music Execution on top of v1.2.0. Direct 2 first recommends `narrative_led / hybrid / music_led`; an already explicit user choice is reused, otherwise the workflow stops at `proposed` until the user confirms. `hybrid / music_led` can use a Music Map to align beat / phrase / section structure with flexible visual regions. Audio Treatment covers preserve / isolate / attenuate / replace / remove / designed silence plus gain / fade / duck / mix / normalize. New MCP capabilities stay backend-agnostic rather than hard-coding Demucs or another model. See [INSTALL.md](INSTALL.md).
 
 ## Common prompt examples
 
@@ -86,6 +90,22 @@ Replace the placeholders with your sources, narrative direction, or working file
 
 **What you get:** A Detail evidence package with interval and deep-observation records, speaker verification, edit boundaries, real source keyframes, and a handoff file. The handoff states the execution-package requirements for the next Direct stage and explicitly marks incomplete items.
 
+### 5. Detail is complete: lock the final execution plan
+
+**What to ask:**
+
+> Use 〔confirmed narrative direction〕 and 〔Detail handoff〕 for Direct 2. Music mode: `narrative_led`; preserve the programme mix, add no new music, and do not separate dialogue. Preserve the confirmed narrative and evidence, complete Music Direction, the Execution Plan, and the Execution Reference, and specify final selections, text, audio treatment, transitions, visual mockups / style rules, and QA requirements. Present the mockups and parameters for my review first; after approval, deliver the complete Execution Package without rewriting the narrative direction.
+
+**What you get:** The specified sound direction and visual mockups awaiting review, followed by the approved complete package. Explicit sound choices are reused without asking again; they do not implicitly approve a new visual design.
+
+### 6. The package is confirmed: execute the edit
+
+**What to ask:**
+
+> Enter Execute and follow 〔confirmed Execution Package〕 exactly. Do not re-decide the narrative, music mode, or visual direction. Apply the package timeline, audio treatment, text, transitions, and references; output the render manifest and any rough cut / final output the current environment can actually render, then run export audit and record anything still unverified.
+
+**What you get:** An execution result aligned with the confirmed package, its render manifest, technical QA / audit, and explicit items that still require final human playback. If rendering is unavailable, capability fallback is recorded instead of claiming a finished video.
+
 ## Workflow
 
 | Stage | Outputs and decisions |
@@ -93,7 +113,7 @@ Replace the placeholders with your sources, narrative direction, or working file
 | Broad Structure → Structured Observation Layer → Content Map | Global observation tables and scene / action / question indexes, preserving coverage and gaps |
 | Direct 1 · Narrative Direction | A human / Director determines the narrative spine, candidate regions, and questions to verify |
 | Directed Deep / Detail Structure + Edit Boundary | Verifies continuous audiovisual material, surrounding context, counterevidence, and editable ranges; delivers real keyframes and a standalone handoff with the evidence; returns to Direct 1 if evidence is insufficient |
-| Direct 2 · Execution Package | Confirms the plan + production reference: events, order, specific audio / text / transitions, rules for applying one or two style samples across the video, and allowed adjustments |
+| Direct 2 · Music Mode Gate → Execution Package | Recommends and confirms narrative-led / hybrid / music-led first, then locks events, optional Music Map / AV Mapping, audio / text / transitions, style rules, and allowed adjustments |
 | Execute → Render / QA | Produces the video from the complete execution package and machine-readable authorization, then performs technical checks, playback review, and Reference Compliance |
 
 ## How rich structure reliably reaches execution
@@ -336,6 +356,8 @@ long-video-remix/
 │   ├── execution-plan-template.md
 │   ├── execution-reference-template.md
 │   ├── execution-handoff-template.md
+│   ├── music-direction-template.json
+│   ├── music-map-template.json
 │   ├── keyframe-reference-template.json
 │   ├── structure-exception-template.json
 │   ├── editorial-plan-template.md
@@ -357,7 +379,11 @@ long-video-remix/
 │       ├── v1.1.0-QA.md
 │       ├── v1.1.0-QA.json
 │       ├── v1.2.0-QA.md
-│       └── v1.2.0-QA.json
+│       ├── v1.2.0-QA.json
+│       ├── v1.2.1-QA.md
+│       ├── v1.2.1-QA.json
+│       ├── v1.2.2-QA.md
+│       └── v1.2.2-QA.json
 ├── examples/
 │   ├── content-performance-analysis.md
 │   └── synthetic-ready/
@@ -373,6 +399,7 @@ long-video-remix/
 │   ├── regression-checklist.md
 │   ├── structure-regression-matrix.md
 │   ├── mcp-adapter.md
+│   ├── sound-music-execution.md
 │   └── worked-example.md
 ├── tests/
 │   ├── test_dialogue_continuity.py
@@ -410,8 +437,8 @@ long-video-remix/
 1. Complete Broad Structure first, delivering the formal Structured Observation Layer + Content Map;
 2. A human / Director uses this textual structured data and any necessary external research to form Narrative Direction (Narrative Spine + candidate regions + verification questions);
 3. Bring Narrative Direction back into the project, perform Directed Deep / Detail Structure on selected regions, and create `deep-observations.csv` to complete visuals, content, background, before/after states, original-audio evidence, counterevidence, and protected ranges for core regions;
-4. Deliver real keyframes, evidence, and a standalone handoff (including complete downstream output requirements), then return them to the Director to form the Execution Package;
-5. Execute uses only the confirmed plan + production reference to compile verified units / protected ranges into an edit plan and timeline, producing the video with the frozen styles;
+4. Deliver real keyframes, evidence, and a standalone handoff; Direct 2 first recommends a Music Mode and waits for one explicit confirmation only when the user has not already chosen it;
+5. After the mode is confirmed, form the Execution Package. When music structures the visuals, include a Music Map / AV Mapping; Execute then performs audio preparation / assembly and compiles the visual timeline from the confirmed package;
 6. Save current evidence bindings and Direct 2's machine-readable authorization according to the [Execution integrity contract](references/execution-integrity.md), then run:
 
 ```text
@@ -433,7 +460,7 @@ python3 scripts/audit_render.py 成片.mp4 项目目录/render-manifest.json --o
 - Broad Structure's formal forms are textual structured data. The Content Map builds on them and cannot replace them;
 - Direct 1's Narrative Direction expresses directing intent; it is not proof from the source material;
 - Directed Deep Structure grounds Narrative Direction in original source evidence;
-- Direct 2 forms a complete Execution Package from verified evidence and keyframes; Execute does not skip this step by default and decide the final narrative or style on its own;
+- Direct 2 first completes the Music Mode Gate from verified evidence and keyframes, then forms the complete Execution Package; only inferred modes require a confirmation turn, while an explicit prior user choice is reused. Execute does not decide the final narrative, music structure, or style on its own;
 - Tools may suggest that a node lacks sufficient material or propose alternative segments, but do not rewrite confirmed core expression on their own by default;
 - A successful rendering log does not mean the finished video has passed acceptance.
 

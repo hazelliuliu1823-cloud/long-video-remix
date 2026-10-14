@@ -1,0 +1,36 @@
+{
+  "version": "1.2.1",
+  "date": "2026-10-14",
+  "scope": "Music Mode Confirmation Gate, music-aware editing contracts, audio treatment, backend-agnostic audio MCP capabilities",
+  "environment": {
+    "python": "3.13.5",
+    "ffmpeg": "7.1.5",
+    "pillow": "12.3.0"
+  },
+  "regression_tests": {
+    "command": "python3 -m unittest discover -s tests -v",
+    "count": 196,
+    "status": "pass"
+  },
+  "new_checks": [
+    "proposed music mode blocks ready_for_render",
+    "missing music-direction file blocks new policy",
+    "post-confirmation music-direction change invalidates authorization",
+    "required Music Map must exist and be complete or verified"
+  ],
+  "compatibility": "projects without music_direction_policy keep legacy behavior",
+  "synthetic_example": {
+    "validate_project": "pass",
+    "compiled_frames": 125,
+    "render_allowed": true,
+    "authorization_check": "pass",
+    "playback_verified": false
+  },
+  "not_verified": [
+    "real WorkBuddy MCP configuration",
+    "real dialogue separation quality",
+    "real music analysis accuracy",
+    "real mix and loudness quality",
+    "real audiovisual playback and mobile listening"
+  ]
+}

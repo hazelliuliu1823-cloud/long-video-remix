@@ -104,3 +104,25 @@ tests/test_independent_audio_dialogue.py 覆盖卡片对白、同源额外音轨
 - 问题闭环表的标题含 "Question Closure Ledger" 或“问题闭环”即被识别（可附中文说明）；找不到这样的标题时给出明确提示，其他表格中的同名问题行不能代替确认。
 - 观察与区间节点、问题与关联区间的一致性规则在 INSTALL 中列为迁移项，并有对应回归。
 - MCP 抽帧适配器探测须记录 `timestamp_method`；`computed` 的适配器不用于 Detail 事实与切点。
+
+
+## v1.2.1 Music Mode Gate 与声音执行回归
+
+- 新项目启用 `music_direction_policy=mode_confirmation_required` 时，ready_for_render 必须有 `music-direction.json` 且状态 confirmed；**只要填写 `music_direction_ref` 也视为启用 Gate**，漏写 policy 不得放行 proposed。没有 policy 且没有 ref 的旧项目保持兼容。
+- `music-direction.json` 进入 Direct 2 授权指纹；确认后改变 mode 或文件内容必须使旧授权 / 旧 manifest 失效。声明 `music_map_required=true` 时，Music Map 必须存在且 analysis_status 为 complete / verified；采用的 map 同样进入授权指纹，确认后直接改 map 而不重新授权必须阻断。
+- Direct 2 第一轮先基于已确认叙事与 Detail 主动推荐 mode；只有缺少明确用户确认时才停住请求 A/B/C，已有明确选择不得重复询问。
+- Audio Treatment Plan 与最终 `audio_tracks` 分工保持：前者决定 preserve / isolate / attenuate / replace / remove / designed_silence 和 fallback，后者描述最终可听音轨与成片坐标；不得通过新增声音规则削弱完整对白、Edit Boundary、源许可或 audio review。
+- MCP 能力使用抽象名 `extract_audio / separate_dialogue / analyze_music / mix_audio / inspect_audio`；后端不写死。
+
+## v1.2.2 Capability Auto-Preparation 回归
+
+- 工具缺失时先复用兼容实现；主动准备前分别核对软件与模型权重许可证。重依赖 / 大下载先说明影响，Python 默认用项目独立 venv；失败、不允许或许可不清楚时保留 unavailable / not_tested，不将“已安装”写成“已执行完成”。
+- `capability_resolution_policy` 若声明，只允许 `discover_then_prepare_if_permitted`；主动准备不得静默跨越付费、凭证、第三方素材上传、提权、安全设置、不明来源安装或许可边界，也不把许可不明的第三方权重打进 Release。
+
+
+## v1.2.2 确认节点修订回归
+
+- 主线、声音形式 / 模式、实际 Mockup 与完整执行包分别呈现确认内容；已有明确确认不重复询问，视觉可与整包同轮确认。外部 handoff 携带记录字段与状态，不依赖安装环境。
+- 缺 Mockup、图片不可解码、画幅不符、原图不可达、缺确认来源或 proposed 视觉状态均阻断正式渲染；草案及异常交接继续可做部分。重算整包授权不能掩盖视觉样稿 / 参数确认失效。
+- 声音模式不能代替 sound_form；分离须有回退。采用音乐文件和区间、Map 的时长 / 锚点 / 映射及核对记录检查有效性；标签 complete 不能替代内容。
+- 同路径音乐文件、实际采用原图、Mockup、reference 参数或确认记录变化时，旧授权 / 渲染入口失效。仅保留原声、没有音乐结构需求时，不强制 Music Map；有段落结构但没有固定 BPM 的音乐保持可用。
