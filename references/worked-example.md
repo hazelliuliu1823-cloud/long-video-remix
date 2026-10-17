@@ -39,7 +39,7 @@
 
 这份 plan 已经确定了创意方向，但还没有证明三个节点真的属于同一件事。
 
-## 第二轮 Directed Deep Structure
+## 第二轮 Detail Structure
 
 此时才带着 Narrative Direction 回原片提高信息密度，并建立 `deep-observations.csv`。第二轮不能只写“这段可用”，而要把入选核心区域重新描述完整：画面里谁在哪里、做什么、如何看向谁、场景环境是什么，这一小段实际发生了什么，以及前一事件和后一事件怎样连接。
 
@@ -63,7 +63,7 @@
 
 如果发现最后的“你来了”是另一天的另一件事，就不能把它当作前面约定的兑现。
 
-Directed Deep Structure 应把具体冲突返回 Direct：
+Detail Structure 应把具体冲突返回 Direct：
 
 - S017 与 S004 不是同一事件；
 - 中间拿包也没有证据指向赴约；
@@ -73,7 +73,7 @@ Director 可以改成有明确时空提示的行为比较，也可以放弃这�
 
 ## Direct 2：形成 Editorial Execution Plan
 
-当 Directed Deep Structure 已经把主线节点的完整画面、原声、前后文、反证和保护范围核实清楚后，证据包先回到 Director，而不是直接进入时间轴。Director 在这里确认最终选择哪些 verified units、怎样排序、哪些原声 / 动作必须完整、声音和文字如何承担叙事、各段时长和允许调整范围。只有这份 execution plan 确认后，Execute 才把它编译成 timeline。
+当 Detail Structure 已经把主线节点的完整画面、原声、前后文、反证和保护范围核实清楚后，证据包先回到 Director，而不是直接进入时间轴。Director 在这里确认最终选择哪些 verified units、怎样排序、哪些原声 / 动作必须完整、声音和文字如何承担叙事、各段时长和允许调整范围。只有这份 execution plan 确认后，Execute 才把它编译成 timeline。
 
 ## 时间轴如何记录
 
@@ -92,5 +92,5 @@ Director 可以改成有明确时空提示的行为比较，也可以放弃这�
 
 - Broad Structure 可以交付 Content Map，但必须保留 audio / av review 的 coverage 差异；
 - Narrative Direction 可以作为第一次外部 Direct 输入；
-- Directed Deep Structure 无法完成的原声和连续动作核查继续标 pending；
+- Detail Structure 无法完成的原声和连续动作核查继续标 pending；
 - 不输出 ready_for_render，也不宣布粗剪通过。

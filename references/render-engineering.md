@@ -31,7 +31,7 @@
 ## 分层渲染与局部返工
 
 1. 视频单元层：按已验证源切点生成规范化片段，统一画布、帧率、像素格式和时间基准。再按 render-manifest 生成无新增文字的 clean_video。用 xfade 时尤其要确认输入参数一致。
-2. 音频层：从源坐标提取原声，按成片坐标混音，生成 mix_audio。单独记录对白、环境音、音乐及人声分离的来源和处理参数；每条重要音轨同时写 `narrative_role` / `treatment_reason`，先判断它承担对白信息、环境连续性、情绪音乐、节奏提示还是有意静默，再决定保留、分离、衰减、替换或删除。 对启用 Music Mode Gate 的项目，先读取 confirmed `music-direction.json`；需要音乐结构参与剪辑时再读取 Music Map / AV Mapping。Execute 内按 Audio Preparation → Audio Assembly 顺序处理：先 extract / 按需 isolate / 准备 music asset，再做 place / trim / gain / fade / duck / mix / designed silence / normalize。分离结果作为 derived asset 保留来源与核听状态，不冒充 untouched original audio。
+2. 音频层：从源坐标提取原声，按成片坐标混音，生成 mix_audio。单独记录对白、环境音、音乐及人声分离的来源和处理参数；每条重要音轨同时写 `narrative_role` / `treatment_reason`，先判断它承担对白信息、环境连续性、情绪音乐、节奏提示还是有意静默，再决定保留、分离、衰减、替换或删除。
 3. 文字与交付层：在 clean_video 上烧录文字，合入 mix_audio，导出成片。黑场卡尽量保留无字底片，文字也在这一层添加。
 
 只改字号、措辞或既有画面内的文字停留时，复用前两层；烧录文字改变像素，最终视频流仍需重新编码。音轨无改动且封装允许时可复制音频流。若使用独立字幕轨，才可能仅更新字幕并重新封装。不要笼统宣称“改字完全无需视频重编码”。
@@ -88,7 +88,7 @@
 | 纯文字层 | 措辞、字号、既有画面内文字停留 | text layer + final；clean video / 未改音轨可复用 |
 | 声音层 | 去音乐、换音轨、混音策略 | audio layer + final |
 | 结构层 | 切点、段长、章节卡长度、叠化 | 重新编译 timeline；所有依赖成片坐标的音频 / 文字 / final 失效 |
-| 创意层 | 主线、段落功能、素材关系改变 | 回 D Direct；随后只重做受影响的 E Directed Deep Structure 与下游 |
+| 创意层 | 主线、段落功能、素材关系改变 | 回 D Direct；随后只重做受影响的 E Detail Structure 与下游 |
 
 分类不改变用户已确认的核心表达。若一条反馈同时跨层，以影响范围最大的那一层为准，并记录为什么。
 

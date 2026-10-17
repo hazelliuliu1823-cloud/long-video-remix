@@ -1,10 +1,6 @@
-# 安装与更新 · v1.2.2
+# 安装与更新 · v1.2.4
 
 解压后得到 `long-video-remix/` 完整目录。SKILL.md、references、assets、scripts 和 agents 必须一起保留；只复制 SKILL.md 会丢失契约和检查能力。
-
-## 本次确认节点修订
-
-本包保留 v1.2.2 版本号，补齐声音形式、实际 Mockup 与整包的确认要求。模板新增 visual-confirmation；校验器要求样稿可解码、尺寸匹配、原图可达、参数同版并有明确确认来源。缺图 / 未确认时可继续证据与 --planning 草案，正式渲染阻断。采用配乐时另核对实际文件、区间与有效 Music Map。图片解码按需使用 Pillow，非 PCM WAV 音乐时长检查使用 ffprobe；能力缺失先保留草案。下文历史版本说明保留当时行为，本包正式执行以 [执行包契约](references/execution-package.md) 为准。
 
 ## 安装
 
@@ -20,7 +16,7 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 
 解压安装包时，也可将完整 `long-video-remix` 文件夹放入 `~/.claude/skills/`（Claude Code）或 `~/.agents/skills/`（Codex）。项目素材和工作数据放在独立项目目录，不放进安装目录。
 
-`v1.2.2` tag / GitHub Release 发布后，推荐从 Releases 下载并解压完整的 github-ready 安装包；用 Git 安装的副本可在安装目录执行 `git pull --ff-only` 更新，开发者可执行 `git checkout v1.2.2` 固定到本版。安装或更新后检查工具的技能列表。
+用 Git 安装的副本可在安装目录执行 `git pull --ff-only` 更新。仓库安装获取当前分支版本；需要固定 v1.2.4 时，可使用对应安装包，或在 Release/tag 发布后执行 `git clone --branch v1.2.4 --depth 1 <repo> <目标目录>`。安装或更新后检查工具的技能列表。
 
 目录依据：[Claude Code 本地 skills](https://code.claude.com/docs/en/skills) · [Codex 本地 skills](https://learn.chatgpt.com/docs/build-skills)，核对日期：2026年10月2日。
 
@@ -30,9 +26,9 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 
 - 静态校验、授权记录、编译与回归：Python 3.9+，只用标准库。
 - 抽帧与时间信号（`extract_frames.py`）、导出审计：FFmpeg / ffprobe；生成拼图时额外需要 Pillow。
-- 模型、视频 MCP、渲染器的依赖按实际适配器配置；Release 不捆绑第三方模型权重或大模型。代码、权重与其他可下载资源的许可证分别核对。
+- 模型、视频 MCP、渲染器的依赖按实际适配器配置，不在包内下载大模型或素材。
 
-Python 3.9 继续保持语法兼容目标；本轮 200 项回归在当前 Python 环境通过，FFmpeg / Pillow 相关能力按实际安装条件运行或跳过。缺少 FFmpeg 或 Pillow 时，抽帧相关测试会跳过。
+Python 3.9 已做语法兼容检查，尚未在 3.9 解释器上实际运行回归；v1.2.4 发布前回归环境为 Python 3.13.5 + FFmpeg 7.1.5 + Pillow 12.3.0；216 项测试全部通过。缺少 FFmpeg 或 Pillow 时，抽帧相关测试会跳过。
 
 ## 验证安装包
 
@@ -47,31 +43,33 @@ python3 scripts/check_render_authorization.py examples/synthetic-ready examples/
 
 示例全部是合成记录，只验证数据链与工程入口；没有真实视频，不用它证明长视频理解或观看效果。
 
+## 从 v1.2.3 更新
 
-## 从 v1.2.1 更新
+- 不新增阶段、正式 CSV header 或授权 schema。schema 1.8 项目的 Direct 2 现在把 planned in/out、selected boundary、当时 safe windows 和允许调整写进 timeline source event 的 `d2_selection_snapshot`；Execute Step 0 只能在该快照内校准。越界、扩大 safe windows 或换 boundary 时停止并返回确认。
+- schema 1.7 恢复 v1.2.2 的旧边界严格度：即使 boundary 标为 `partial`，dialogue / action / reaction / mixed 等适用连续性仍按旧规则要求精确值；只有 schema 1.8+ 才允许未入选候选把最终精校延后。
+- Visual Proof 的 capability 不再是任意 available tool：`output_mapping` 必须实际指向当前 `visual_proof_ref`，并同时具备 `actual_tool + entrypoint`。
+- `project.schema_version` 只接受 `1.8` 这类纯数字点号格式；`v1.8`、`1.8-rc1` 等直接报错，不再退回旧规则。
+- `SHA256SUMS` 测试只核对 manifest 中声明的文件，因此 Git clone 产生的 `.git/` 或本机 `.DS_Store` 不再导致安装验证失败；仓库新增 `.gitattributes` 固定文本 LF，减少 Windows clone 后的 checksum 漂移。
 
-更新完整安装目录即可；不需要另行打包 Demucs、额外音乐分析库、FFmpeg 等第三方程序。v1.2.2 只补齐 capability 缺失时的运行时解析规则，现有 Music Mode、Execution Package、timeline 与授权机制不变。
+## 从 v1.2.2 更新
 
-- 新项目模板增加 `capability_resolution_policy="discover_then_prepare_if_permitted"`。旧项目不填该字段仍可继续运行。
-- 任务需要某项 capability 时，先发现并复用当前 MCP / 本地工具；没有时，当前 Agent 若具备终端 / 包管理权限，只能在软件许可证允许当前用途、来源明确且可本地运行时主动准备首选后端并做 smoke test；“免费”本身不等于可商用。
-- `separate_dialogue` 可优先解析到 Demucs 兼容本地实现，基础音频抽取 / 混音 / 检查优先复用 FFmpeg / Media；`analyze_music` 继续按抽象 capability 发现许可证兼容的本地或 MCP 实现，不指定额外音乐分析后端。
-- Demucs 代码按其官方 MIT License 使用；预训练模型权重与代码许可证分开判断。本 Release 不打包 Demucs 或其他第三方模型权重；商业使用权不明确的权重不得被静默当作可商用资源。
-- Demucs / PyTorch 等可能产生较大下载量或改变 Python 依赖图；这类准备先说明下载 / 环境影响，并默认安装到项目独立 venv，不修改用户已有全局 Python，除非用户明确要求。
-- 首次获取任何模型权重前，分别记录来源、版本 / 哈希与许可状态；只有许可允许当前用途时才可自动获取并缓存，后续复用。
-- 需要付费 API、账号 / token、向第三方上传素材、管理员 / root 提权、修改安全设置、来源不明的软件，或许可证不允许 / 无法确认当前用途时，不能静默准备，按 capability fallback 处理或由用户决定。
-- 安装成功不等于能力可用；必须经过最小样本 smoke test 后才能在 capability-map 标记 `available`。
+- 新项目模板使用 project schema 1.8；不新增正式 CSV header。
+- Detail 的 dialogue / mixed / action 候选可先以 `boundary_status=partial` 交付 selection-ready 保守边界；没有必要提前完成最终尾音 / settle 精校。
+- Direct 2 输出 planned range + boundary ref；回到实际执行环境后先做 Execute Step 0，只精校 D2 已选 range + handles。schema 1.8+ 到 `ready_for_render` 时，入选 boundary 必须为 `supported`。
+- 完整 ASR 不再是 Detail 完成条件；使用可靠字幕 + signals / waveform 定位，ASR 按需跑小窗口。
+- Step 0 后再按最终 source in/out 准备 / 确认 execution authorization。schema 1.7 项目可继续按 v1.2.2 行为运行，无需强制迁移。
 
-## 从 v1.2.0 更新
+## 从 v1.2.1 / v1.2.0 更新
 
-更新完整安装目录即可；已有项目如果既不声明 `music_direction_policy`、也不填写 `music_direction_ref`，继续按 v1.2.0 的机械行为运行；一旦填写 ref，即按 fail-closed 进入 Music Mode Gate。新项目模板默认启用 `music_direction_policy="mode_confirmation_required"`，Direct 2 在最终 Execution Package 前增加一次 Music Mode Gate。
+更新完整安装目录即可；A–G、两次 Direct 和正式 CSV 表头不变。本版把 `project.json` schema 从 1.6 升到 1.7，仅用于区分“新项目必须经过 Visual Gate”和旧项目兼容行为；不新增 `current-state.json`、`visual-style.json` 或 Music Gate。
 
-- 新增 `music-direction.json`：Director 2 先基于 Narrative Direction + Detail 推荐 `narrative_led / hybrid / music_led`。已有明确用户选择直接承接；否则保持 `proposed`，给出推荐与 A/B/C 并结束当前回合，直到用户明确确认。
-- 需要音乐参与组织画面时，可增加 `music-map.json`，保存 BPM / beat / accent / energy / section candidates 与编辑意义上的 Music Map / AV Mapping。
-- `execution-plan.md` 增加 Audio Treatment Plan；本轮执行覆盖 preserve / isolate / attenuate / replace / remove / designed silence，以及 gain / fade / duck / mix / normalize。人声分离只按需触发，输出作为 derived asset 保存并核听。
-- `mcp-adapter.md` 增加 `extract_audio / separate_dialogue / analyze_music / mix_audio / inspect_audio` 抽象 capability；底层可以是本地程序、MCP 或远程服务，不绑定 Demucs 等具体后端。
-- 新 policy 下，未确认的 music mode 会阻断 ready_for_render；music-direction 和已采用 Music Map 进入 Direct 2 授权指纹，确认后修改会使旧授权失效。
+- **Scope Lock**：在 Narrative Direction、Detail handoff、Execution Plan 的现有模板中只写四行：当前阶段、可修改、不可修改、已否决。
+- **Detail STOP**：目标问题、最小完整互动 / 动作单元、Edit Boundary、相关反证四项闭合后停止继续加密读取。
+- **Visual Gate**：schema 1.7 新项目必须使用 `execution_package_policy=plan_and_reference`，且 `project.json` 必须包含 `visual_gate_status`、`visual_mockup_ref`、`visual_proof_ref`。先确认 Aesthetic Mockup；随后可在另一模型 / 会话中，用最终 Execute 可访问的同一实际工具链生成 Executable Proof。`capability-map.json` 继续是唯一工具映射来源，可从 `assets/capability-map-template.json` 建立；可执行 capability 记录 `actual_tool + entrypoint`。
+- `visual_gate_status` 可为 `not_started`、`mockup_confirmed`、`awaiting_proof`、`proof_confirmed`、`not_applicable`。ready_for_render 只接受 `proof_confirmed` / `not_applicable`；proof_confirmed 时 mockup 与 proof 必须是路径和内容都不同的两个实际文件；二者与 `capability-map.json` 一起进入 `execution_reference_asset_refs`，且 capability-map 至少有一个 available capability 记录真实 `actual_tool + entrypoint`。
+- 如果现有执行工具链无法复现已选 mockup，不要用下游不可用的工具临时生成 proof；保持 Gate open，调整 mockup，或正式更新 capability-map / execution-reference / 最终 Execute 路径后重做 proof。
 
-旧项目想启用本机制时，在 `project.json` 增加 `music_direction_policy` 与 `music_direction_ref`，按 `assets/music-direction-template.json` 建立决策文件；若声明 `music_map_required=true`，同时提供 complete / verified 的 Music Map。详见 [Sound & Music Execution](references/sound-music-execution.md)。
+schema 1.6 旧项目没有这三个 Visual Gate 字段时继续保持兼容行为；迁移到 1.7 时补齐字段、capability-map 与 proof 即可，不要求重扫 Broad / Detail。随包 `examples/synthetic-ready` 已演示完整 1.7 流程。
 
 ## 从 v1.1.0 更新
 

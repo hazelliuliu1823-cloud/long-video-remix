@@ -1,0 +1,35 @@
+{
+  "version": "v1.2.3",
+  "date": "2026-10-17",
+  "scope": "selected range verification / progressive audio precision",
+  "changes": [
+    "Detail uses subtitle + waveform/signals first and does not require full-interval ASR",
+    "selection-ready edit boundaries may remain partial until selected",
+    "Direct 2 hands off planned ranges / boundary refs / allowed calibration",
+    "Execute Step 0 verifies only selected ranges + handles and promotes selected boundaries to supported",
+    "schema 1.8 requires selected supported boundaries before ready_for_render; schema 1.7 remains compatible",
+    "final execution authorization is prepared/confirmed after Step 0 against adopted ranges"
+  ],
+  "environment": {
+    "python": "3.13.5",
+    "ffmpeg": "7.1.5",
+    "pillow": "12.3.0"
+  },
+  "tests": {
+    "total": 207,
+    "new_selected_range_tests": 4,
+    "status": "pass",
+    "execution_note": "test_extract_frames 11 FFmpeg cases run individually due tool-session timeout; all passed"
+  },
+  "synthetic_example": {
+    "validate": "pass",
+    "compile": "pass",
+    "authorization_check": "pass",
+    "schema": "1.8"
+  },
+  "limits": {
+    "real_long_video_performance_benchmark": "not_tested",
+    "audio_quality": "requires real listening",
+    "workflow_speedup": "not quantified"
+  }
+}

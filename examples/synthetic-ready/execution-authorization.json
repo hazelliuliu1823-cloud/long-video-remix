@@ -3,10 +3,10 @@
   "authorization_id": "AUTH-SYNTHETIC",
   "version": 1,
   "status": "confirmed",
-  "confirmed_by": "synthetic-test-author",
+  "confirmed_by": "synthetic-fixture-author",
   "project_id": "synthetic-review",
   "project_version": 2,
-  "execution_plan_digest": "308c68687707ed1b2bce7d4836b4775d0f20efb309aa943f3bfa6ef9e2c6a4d9",
+  "execution_plan_digest": "ae42a8500f6a179840415c26e9b19a6bd62d994a0680eda4d3e7b172ac5111b0",
   "narrative_direction_digest": "7c0eaeb6190c4ea4d249b5dbf75285e3f29f6e03283571225932dbb0a7930013",
   "selected_events": [
     "E001"
@@ -56,7 +56,17 @@
       ],
       "adopted_utterance_refs": [
         "T001"
-      ]
+      ],
+      "d2_selection_snapshot": {
+        "edit_boundary_ref": "EB001",
+        "planned_source_in_ms": 1000,
+        "planned_source_out_ms": 6000,
+        "safe_in_start_ms": 900,
+        "safe_in_end_ms": 1200,
+        "safe_out_start_ms": 5900,
+        "safe_out_end_ms": 6200,
+        "allowed_adjustments": []
+      }
     }
   },
   "audio_specs": {
@@ -96,8 +106,7 @@
       "local_out_frame": 125,
       "fade_in_frames": 0,
       "stable_hold_frames": 125,
-      "fade_out_frames": 0,
-      "style_id": "SYNTHETIC-EXPLANATION"
+      "fade_out_frames": 0
     }
   ],
   "transitions": [],
@@ -120,10 +129,10 @@
     }
   },
   "evidence_digest": "99723f7616c8dfc85556559767478fbe27a8be3bdfa101631f7aa012117efac8",
-  "execution_reference_digest": "50e3891391037430084f87893bcef0ae9a711e1769ddedc9fec9cd11366344f6",
-  "visual_confirmation_digest": "730d7cd626cad530d518b9520c08966b26e2af4146ed41f655957b4ec9c1ca9c",
+  "execution_reference_digest": "410fe3172d354c392e54c0ce924789956e8884a6834aac9cf07b197f5d7e6f90",
   "execution_reference_asset_digests": {
-    "mockup-synthetic.png": "4fc5fa42ae45f64a57d70569bc51db9b1d4c1ddea6408ca5d8c04573fba30c23"
-  },
-  "music_direction_digest": "ec839a22c561c700a9c75142a6f654122b4e1c3201c7a7b109fe0959175b44ef"
+    "mockup.svg": "16288333cedb6f31ccb7323f479cbdc36801b617cdaa72d06fad0fb1148bc08d",
+    "proof.svg": "1b18437ed72e2d69d367ea0b78d66e4d57e586eda23d469be4f744129ac44709",
+    "capability-map.json": "8798a490b1d362e00c198f68665b70489bb26b5ff6a9c83a3049a31fe2475830"
+  }
 }

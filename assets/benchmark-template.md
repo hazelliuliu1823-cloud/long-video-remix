@@ -41,3 +41,10 @@
 - 已证实：
 - 未证实：
 - 下一步：
+
+## Audio efficiency
+
+- Candidate audio span reviewed: ___ s
+- Targeted ASR seconds: ___ s
+- Final selected audio verified in Execute Step 0: ___ s
+- Full-interval ASR avoided: yes / no / not_applicable

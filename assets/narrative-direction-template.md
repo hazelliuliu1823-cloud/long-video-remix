@@ -2,6 +2,14 @@
 
 > 第一次 Direct 的输出。输入是 Broad Structure 的正式文字化结构表单 + Content Map + 必要外部研究；目标是确定“到底讲什么”，不是提前写死切点。
 
+
+## 本轮 Scope Lock
+
+- 当前阶段 / current stage：Direct 1
+- 可修改 / editable：
+- 不可修改 / locked：
+- 已否决 / rejected：
+
 ## 核心命题
 
 - 一句话 thesis：
@@ -39,6 +47,6 @@
 - 不得改变：
 - Detail 阶段允许替换 / 扩查：
 
-## 进入 Detailed Structure 的目标问题
+## 进入 Detail Structure 的目标问题
 
 - 

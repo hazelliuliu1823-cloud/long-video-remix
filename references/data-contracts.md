@@ -9,30 +9,30 @@
 | 文件 | 格式与用途 |
 |---|---|
 | project.json | 对象；任务范围、约束、参数、交付目标、版本 |
-| capability-map.json | 数组；内部能力和真实工具的映射 |
+| capability-map.json | 对象；顶层 `schema_version` + `capabilities` 数组，映射内部能力和真实工具 |
 | sources.json | 数组；源文件、版本、时长、时间映射 |
 | frames.jsonl | 每行一个抽样帧证据记录；包含图片定位和机器可追溯 facts / unknowns。`extract_frames.py` 在输出目录另写同名索引，`source_ms` 为实测时间戳 |
 | frame-observations.csv | Broad Structure 的人可读逐抽样帧基础观察表；供人工 / Director / 其他 Skill 浏览 |
-| action-node-candidates.csv | Broad / Deep Structure 的动作变化候选；记录 4fps 局部窗口、触发原因与核验状态 |
+| action-node-candidates.csv | Broad / Detail Structure 的动作变化候选；记录 4fps 局部窗口、触发原因与核验状态 |
 | structure-questions.csv | Structure 阶段的问题—回答—证据—confidence—未验证项工作表 |
-| detail-intervals.csv | Directed Deep / Detail Structure 的精查区间卡；保留进入原因、前情、当前背景、后续、目标问题 |
+| detail-intervals.csv | Detail Structure 的精查区间卡；保留进入原因、前情、当前背景、后续、目标问题 |
 | speaker-adjudications.csv | 说话人 / 对象的帧级裁决记录；口型、画面、硬字幕、ASR、原声与 confidence 分列 |
 | transcript.jsonl | 每行一条字幕或转写；保留核听状态 |
 | scenes.jsonl | 每行一个事件或场景；链接多个源区间 |
 | units.jsonl | 每行一个可用的连续片段及其保护范围 |
 | reviews.jsonl | 每行一次实际观察的区间、模态、结果与审阅者 |
-| deep-observations.csv | Directed Deep Structure 的核心区域高密度观察表；包含完整画面、内容、背景、前后状态、原声、反证及 plan 关系 |
+| deep-observations.csv | Detail Structure 的核心区域高密度观察表；包含完整画面、内容、背景、前后状态、原声、反证及 plan 关系 |
 | edit-boundaries.csv | Detail Structure 的可剪边界 / 连续性表；把内容范围、真实音频尾部、动作 / 反应收束与 safe in/out windows 分开记录，并为 Direct 2 / Execute 提供强约束切点 |
 | structure-exceptions.jsonl | 无法满足的 Structure 字段 / 产物声明；status、reason、impact、downstream_handling 与原字段分开保存 |
 | keyframe-references.json | Detail 的真实关键帧清单与可读图片入口；source time、素材节点、用途和异常 |
-| execution-handoff.md | E 阶段独立交接；主题、证据、保护范围、关键帧及下游完整 Execution Package 要求 |
-| execution-reference.md | D2 的制作参考；具体样式、声音 / 转场规则、少量 reference 的应用规则、资源与 QA |
+| execution-handoff.md | E 阶段独立交接；主题、Scope Lock、证据、保护范围、关键帧、capability-map 中相关工具链及下游完整 Execution Package 要求 |
+| execution-reference.md | D2 的制作参考；Visual Gate、Toolchain Continuity、具体样式、声音 / 转场规则、少量 reference 的应用规则、资源与 QA |
 | coverage.json | 数组；按素材、区间、模态记录覆盖状态 |
 | overview.md | 带 scene_id 的 source-order 全片导航，不替代证据 |
 | content-map.md | 第一轮 Structure 的横向内容地图；链接 scene / evidence / coverage，供人或 Director 做创意判断 |
 | brief.md | 可选输入；主题、核心表达、范围、重点和禁改项，可来自用户或外部 Direct |
 | narrative-direction.md | 第一次 Direct 的 Narrative Direction；记录核心命题、Narrative Spine、candidate regions、verification questions 与禁改项 |
-| execution-authorization.json | Direct 2 的机器授权、采用范围、顺序、处理、证据与决策指纹；draft 不能授权渲染 |
+| execution-authorization.json | D2 已确认决策的机器授权记录；schema 1.8+ 在 Execute Step 0 精校最终采用范围后准备 / 确认，保存顺序、处理、证据与决策指纹；draft 不能授权渲染 |
 | execution-plan.md | 第二次 Direct 的 Editorial Execution Plan；基于 Detail 证据确认最终取舍、顺序、声音 / 文字策略、时长与执行边界 |
 | editorial-plan.md | 兼容旧项目的合并式 / legacy Direct 计划；新项目优先拆分为 narrative-direction + execution-plan |
 | candidates.json | 兼容性结构；记录 editorial plan 的映射分支、证据、片段顺序、反例和状态，不要求由本 Skill 自动生成 |
@@ -47,14 +47,14 @@
 
 ## 共同约定
 
-- 各类文件的 schema 分开管理：`project.json` 当前使用 `schema_version=1.6`；`timeline.json` 使用 `schema_version=1.4`；`render-manifest.json` 使用 `schema_version=1.4`；`execution-authorization.json` 使用 `schema_version=1.0`。证据 JSONL / CSV 按本文件字段契约管理，不把 project / timeline / manifest 的版本号混用。原有 1.0 / 1.1 证据记录保留，不为升级重写内容。UTF-8；JSONL 每行独立合法 JSON；未知值用 null，不用猜测值占位。
+- 各类文件的 schema 分开管理：`project.json` 当前使用 `schema_version=1.8`；`timeline.json` 使用 `schema_version=1.4`；`render-manifest.json` 使用 `schema_version=1.4`；`execution-authorization.json` 使用 `schema_version=1.0`。证据 JSONL / CSV 按本文件字段契约管理，不把 project / timeline / manifest 的版本号混用。原有 1.0 / 1.1 证据记录保留，不为升级重写内容。UTF-8；JSONL 每行独立合法 JSON；未知值用 null，不用猜测值占位。
 - source_id、frame_id、utterance_id、scene_id、unit_id、candidate_id、event_id、review_id 各自全项目唯一；一旦被引用不重新编号。
 - 所有源区间使用整数 start_ms、end_ms，左闭右开，即包含开始、不包含结束。必须满足 0 ≤ start_ms < end_ms ≤ source.duration_ms。单帧用 timestamp_ms，必须小于 duration_ms。
 - **`source_id + source ms/range` 是全流程证据层的 canonical time tag。** `display_timecode`、九宫格位置、抽样序号、字幕 / ASR 文件时间和代理时间只是派生信息；若使用代理、分轨或外部字幕，必须通过 `source.time_mapping` 映射回 canonical source time。进入 Execute 后新增 assembly / output frame，但不得覆盖源时间。任何引用如果只有“第几秒”却没有 source_id 或坐标空间，不视为稳定定位。
 - 原始文件发生内容变化时建立新 source_id；原版本 ID 保留。只移动位置可更新 locator，保持 source_id 不变。
 - evidence_refs 使用带类型的引用，例如 frame:F001、utterance:T001、review:R001。外部前情使用 context_refs，记录来源与核实状态，不伪造本项目证据 ID。
 - facts、interpretations、unknowns 分开。facts 中也保留证据来源，区分模型实际观察、用户提供和上游工具输出。
-- 第一轮 Broad Structure 与第二轮 Directed Deep Structure 使用同一套稳定 source / scene / unit / evidence ID；第二轮补密时优先更新 verification、context_ranges、protected_ranges 和 review_refs，不复制一个看似全新的平行素材库。
+- 第一轮 Broad Structure 与第二轮 Detail Structure 使用同一套稳定 source / scene / unit / evidence ID；第二轮补密时优先更新 verification、context_ranges、protected_ranges 和 review_refs，不复制一个看似全新的平行素材库。
 - `frame-observations.csv`、`action-node-candidates.csv`、`structure-questions.csv`、`deep-observations.csv`、`content-map.md`、`brief.md`、`editorial-plan.md` 都是人可读工作层，不替代 JSON / JSONL 原始证据。任何创意判断进入 Execute 前仍须链接回 frame / utterance / scene / unit / review / source range。
 - 不把取样帧序号当成源视频帧号。display_timecode 只用于阅读，机器使用毫秒或输出帧号。
 
@@ -63,15 +63,15 @@
 
 原 CSV 表头与类型锁定；字段无法取得时使用原契约允许的未知表示，并在 `structure-exceptions.jsonl` 保存异常，继续可做的索引 / 草案 / 交接，不虚构、删字段或把未完成阶段标成 complete。E 固定提供 keyframe 清单和自包含 handoff；D2 提供 execution-plan + execution-reference。详见 [异常与执行包契约](execution-package.md) 及其可复制模板。
 
-project 增加可选 `structure_exceptions_ref`、`keyframe_references_ref`、`execution_handoff_ref`、`execution_reference_ref`、`execution_reference_asset_refs`、`execution_package_policy` 与 `capability_resolution_policy`。新模板的 capability policy 使用 `discover_then_prepare_if_permitted`：所需工具缺失时先复用兼容能力，当前 Agent 有安装权限时可准备免费本地首选后端并 smoke test；旧项目不声明时不强制迁移。Execution Package 新模板使用 `plan_and_reference`；旧项目未声明时保持既有行为。新 policy 下 Detail complete 须有清单 / handoff，正式 ready 须有 reference 文档和已列出的资源；关键帧缺失有明确异常仍可继续。采用未核实证据的原门槛不变。
+project 增加可选 `structure_exceptions_ref`、`keyframe_references_ref`、`execution_handoff_ref`、`execution_reference_ref`、`execution_reference_asset_refs` 与 `execution_package_policy`。v1.2.2 的 project schema 1.7 继续只使用 `visual_gate_status`、`visual_mockup_ref`、`visual_proof_ref` 三个轻量 Visual Gate 字段，不新增状态文件或 visual-style schema。schema 1.7 时必须使用 `execution_package_policy=plan_and_reference`，且三个字段必须存在；ready 时状态必须为 `proof_confirmed` 或 `not_applicable`。`proof_confirmed` 还要求 mockup / proof 为两个不同且内容不相同的文件，并与 `capability-map.json` 一起进入 `execution_reference_asset_refs`，其中至少一个 available capability 记录真实 `actual_tool` 与 `entrypoint`，且其 `output_mapping` 实际指向当前 `visual_proof_ref`。schema 1.6 旧项目保留 v1.2.0/1.2.1 兼容行为。Detail complete 须有清单 / handoff；正式 ready 须有 reference 文档和已列出的资源。关键帧缺失有明确异常仍可继续。采用未核实证据的原门槛不变。
 
-完整执行包确认追加 reference 文档 / 实际样本指纹，变更使旧确认失效。只有结构 / 文件 / 指纹经过机器检查，内容完备性与风格一致性仍按契约人工 / 模型审阅；不要据此声称视觉通过。
+完整执行包确认继续使用 reference 文档 / 实际样本指纹；selected mockup、proof 与执行入口写入 reference / asset refs 后，变更会使旧确认失效。只有状态、结构、文件与指纹经过机器检查；proof 是否真的由声明的同一执行工具链产生、视觉是否符合审美，仍按契约人工 / 模型审阅。
 
 ## 结构化工作层与上下文成本
 
 Structure 的目标之一，是把视频 / 图像 / 原声等高成本多模态输入转换成 **compact structured representation**。`frames.jsonl`、`frame-observations.csv`、`action-node-candidates.csv`、`structure-questions.csv`、scene / segment observations 与 overview 共同构成第一轮正式的 **Structured Observation Layer**；`content-map.md` 与情绪 / 关系线索建立在这层文字化结构数据之上。第一次 Direct 优先消费这些表单和文本，而不是反复重新加载原始视频或九宫格。
 
-这是一种有损压缩式的工作表示，但不是证据替代：所有关键记录必须保留时间码和 evidence refs，确保需要时可以重新下钻到原素材。第二轮 Directed Deep Structure 只对 editorial / script plan 命中的区域恢复更高密度多模态上下文。这样可以减少重复上下文和不必要的高密度观察，但不承诺固定比例的 token 或算力节省。
+这是一种有损压缩式的工作表示，但不是证据替代：所有关键记录必须保留时间码和 evidence refs，确保需要时可以重新下钻到原素材。第二轮 Detail Structure 只对 editorial / script plan 命中的区域恢复更高密度多模态上下文。这样可以减少重复上下文和不必要的高密度观察，但不承诺固定比例的 token 或算力节省。
 
 ## 素材和证据记录
 
@@ -128,15 +128,15 @@ verification 的 audio、visual、context 使用 pending、reviewed、not_applic
 
 ## Edit Boundary / Continuity Layer
 
-Detail Structure 在“理解完整”之后还必须回答一个独立问题：**如果这段最终被采用，从哪里进、到哪里出才不会无意截断声音、动作、反应或情绪收束？** `edit-boundaries.csv` 是正式基础产物，不得由 execution plan 里的自由文字代替。字幕结束、ASR end、某个抽样帧不再见到动作，都不等于自然切点。
+Detail Structure 在“理解完整”之后还必须回答一个独立问题：**如果这段进入 D2，怎样的范围足以保住声音、动作、反应与语义？** `edit-boundaries.csv` 是正式基础产物，不得由 execution plan 自由文字代替。Detail 可以先交 selection-ready 的保守边界；字幕结束、ASR end、某个抽样帧不再见到动作，都不等于最终切点。
 
 每行至少包含：`boundary_id`、`detail_interval_id`、`plan_node_id`、`source_id`、`unit_id`、`observation_refs`、`continuity_type`、`content_start_ms/end_ms`、`audio_start_ms/end_ms/tail_end_ms`、`action_start_ms/end_ms/reaction_or_settle_end_ms`、`preferred_in_ms/out_ms`、`safe_in_start_ms/end_ms`、`safe_out_start_ms/end_ms`、`must_keep_ranges`、`left_handle_ms/right_handle_ms`、`boundary_reason`、`cut_risk`、`evidence_refs`、`confidence`、`boundary_status`。没有某类连续性时显式写 `not_applicable`，不能留空。
 
-`continuity_type` 使用 `dialogue`、`action`、`reaction`、`music`、`scene`、`mixed`。对于 dialogue / music / mixed，safe-in 窗口必须结束在需完整保留的音频表达开始之前，safe-out 窗口必须开始在真实音频尾部 / 衰减结束之后；对于 action / reaction / mixed，safe-in 必须在动作链开始之前，safe-out 必须在动作或反应 settle 完成之后。`must_keep_ranges` 使用 `start-end;start-end` 的 source-ms 表达，必须位于任一安全切法都会完整覆盖的位置。
+`continuity_type` 使用 `dialogue`、`action`、`reaction`、`music`、`scene`、`mixed`。`boundary_status=partial` 表示已具备供 D2 选择的保守 envelope：content、preferred / safe windows、must-keep 与 handles 仍要明确，但尚无必要精校的 audio / action 精确起止可写 `unknown`。只有 `supported` 才表示这些适用的连续性边界已经通过实际连续音画补齐。对于 supported 的 dialogue / music / mixed，safe-in 必须结束在需保留音频表达开始前，safe-out 必须开始在真实尾音 / 衰减结束后；action / reaction / mixed 同理保护动作与 settle。`must_keep_ranges` 使用 `start-end;start-end` source-ms 表达。
 
-Direct 2 选择素材时必须引用 `boundary_id`，而不是自行从字幕时间或内容摘要猜切点。`timeline.json` 中每个 ready source event 必须有 `edit_boundary_ref`。默认要求 `source_in_ms` 落在 safe-in window、`source_out_ms` 落在 safe-out window，并覆盖 boundary 的全部 must-keep ranges。若创作上故意做戛然而止、抢断对白或动作等非自然切法，可以设置 `boundary_override=true`，但必须保留 `boundary_override_reason` 与 `boundary_override_review_refs`，并按 v1.0.3 [执行完整性契约](execution-integrity.md) 提供与具体违规范围、规则、成功审阅和 Direct 2 授权绑定的 `overrides`；这是一项显式创作决定，不能用来掩盖未核准的切点。unit 的 `protected_ranges` 仍是更高层的不可随意丢失约束，override 不自动绕过它。
+Direct 2 选择素材时必须引用 `boundary_id`，把 source in/out 视为 planned range，并声明 Execute 可否在该 boundary 的 safe windows / handles 内校准。schema 1.8+ 的 source event 还保存轻量 `d2_selection_snapshot`：`edit_boundary_ref`、planned in/out、当时四个 safe-window 端点和 `allowed_adjustments`。Step 0 只能在这份快照内校准；safe windows 被扩大、boundary 被替换，或最终取段超出允许的 trim / handle 范围时，停止并返回确认。到 `ready_for_render` 时，所有入选 boundary 必须已升为 `supported`；未入选的 partial boundary 不要求补全。最终 `source_in_ms/out_ms` 仍须覆盖 must-keep ranges。若故意做非自然切法，沿用 `boundary_override + review refs + overrides`；unit 的 `protected_ranges` 仍不可被自动绕过。
 
-## Directed Deep Structure 的结构化观察
+## Detail Structure 的结构化观察
 
 `deep-observations.csv` 用于第二轮定向高密度 Structure。它不是剪辑表的替代品，也不能只记录“可用 / 不可用”。当某个区域已经被 Narrative Direction（或 legacy rough plan）选为核心回查对象时，应先把它做成更完整的内容档案，再收敛为 unit 和切点。
 
@@ -169,7 +169,7 @@ Direct 2 选择素材时必须引用 `boundary_id`，而不是自行从字幕时
 
 ## Detail 区间卡与说话人裁决
 
-`detail-intervals.csv` 每行对应一个进入 Directed Deep / Detail Structure 的核心区间。至少包含：`detail_interval_id`、`plan_node_id`、`source_id`、`start_ms`、`end_ms`、`entry_reason`、`preceding_context`、`current_background`、`following_context`、`content_summary`、`target_questions`、`topic_relevance`、`evidence_refs`、`unknowns`。前情 / 背景 / 后续不清时写 `unknown`，不能省略。`target_questions` 写分号分隔的稳定 `question_id`（无则 `none`），每个都须存在于 `structure-questions.csv` 并被本区间至少一条 `deep-observations.question_refs` 回指；`contradicted / unresolved` 的目标问题列入 handoff 的 Question Closure Ledger（见 [Detail 证据获取](detail-evidence.md)）。
+`detail-intervals.csv` 每行对应一个进入 Detail Structure 的核心区间。至少包含：`detail_interval_id`、`plan_node_id`、`source_id`、`start_ms`、`end_ms`、`entry_reason`、`preceding_context`、`current_background`、`following_context`、`content_summary`、`target_questions`、`topic_relevance`、`evidence_refs`、`unknowns`。前情 / 背景 / 后续不清时写 `unknown`，不能省略。`target_questions` 写分号分隔的稳定 `question_id`（无则 `none`），每个都须存在于 `structure-questions.csv` 并被本区间至少一条 `deep-observations.question_refs` 回指；`contradicted / unresolved` 的目标问题列入 handoff 的 Question Closure Ledger（见 [Detail 证据获取](detail-evidence.md)）。
 
 `speaker-adjudications.csv` 用于说话人 / 对象歧义的帧级裁决。至少包含：`adjudication_id`、`stage`、`source_id`、`utterance_id`、区间、`frame_window_refs`、`lip_movement_observation`、`visible_speaker_candidate`、`addressee_candidate`、`audio_speaker_candidate`、`hard_subtitle_signal`、`asr_signal`、`asr_role`、`evidence_resolution_rule`、`subtitle_audio_conflict`、`decision`、`decision_basis`、`confidence`、`evidence_refs`、`unknowns`。只有字幕或只有画面时不得假装完成裁决；ASR 在方言 / 强口音场景默认 `locator_only_until_verified`。
 
@@ -186,11 +186,11 @@ Direct 2 选择素材时必须引用 `boundary_id`，而不是自行从字幕时
 
 `narrative-direction.md` 是第一次 Director 的输出，说明“到底讲什么”，至少覆盖：`thesis` / 核心命题、`narrative_spine`、candidate regions / scene refs、各节点功能、verification questions、human decisions、external research refs、constraints / do-not-change。它不要求精确到帧，也不因写得详细就自动升级为素材事实。
 
-Directed Deep Structure 把 Narrative Direction 的每个核心节点映射回已有 Content Map 与原片。建议维护 narrative mapping，至少包含：`plan_node_id`、`function`、`scene_refs`、`unit_refs`、`evidence_refs`、`evidence_status`、`gaps`、`counterevidence`、`allowed_adjustment`。
+Detail Structure 把 Narrative Direction 的每个核心节点映射回已有 Content Map 与原片。建议维护 narrative mapping，至少包含：`plan_node_id`、`function`、`scene_refs`、`unit_refs`、`evidence_refs`、`evidence_status`、`gaps`、`counterevidence`、`allowed_adjustment`。
 
 ### Direct 2：Execution Package（含 Editorial Execution Plan）
 
-`execution-plan.md` 在 Detailed Structure 完成后生成，说明“这些已核实材料最终怎么讲”。至少引用 selected verified units / protected ranges，并明确 final order、narrative function、required context、audio treatment、text intent、duration allocation、transition intent、allowed substitutions、execution boundaries 和 do-not-change。
+`execution-plan.md` 在 Detail Structure 完成后生成，说明“这些已核实材料最终怎么讲”。至少引用 selected verified units / protected ranges，并明确 final order、narrative function、required context、audio treatment、text intent、duration allocation、transition intent、allowed substitutions、execution boundaries 和 do-not-change。
 
 若 evidence_status 仍为 pending / contradicted，不得把对应节点当成可确认执行事实；主线级冲突退回 Direct 1，执行取舍问题留在 Direct 2。Execute 接收 Source Clips、Detail、execution-plan、execution-reference 和 Constraints；只把确认后的包落实为 timeline / render manifest，不在技术层自行补定叙事或风格。reference 用一两个样本锁定全片规则，不逐项映射所有视觉动作。
 
@@ -204,15 +204,7 @@ candidate 建议包含 candidate_id、origin、thesis、experience、mode、unit
 
 claims 每条至少含 text、evidence_refs、status。status 为 supported、interpretation 或 pending；有证据并不自动等于某种心理动机得到证明。counterevidence 记录可能改变主线的上下文；尚未查找时写 pending，不留空后声称不存在。
 
-candidate.status 为 provisional、ready_for_plan 或 rejected。ready_for_plan 表示 Narrative Direction / legacy rough plan 对应的核心素材已经完成 Directed Deep Structure、语境和反证已经检查，不表示粗剪通过。补充 estimated_duration_ms、scope_changes、reorder_reason 和 selected 字段方便执行。
-
-## Music Direction 与 Music Map
-
-启用 `project.music_direction_policy=mode_confirmation_required`，或已经声明 `project.music_direction_ref` 的项目，在 Direct 2 正式确认 Execution Package 前使用 `music-direction.json`；引用存在即启用 Gate，不能通过漏写 policy 绕过确认。模板初始化可为 `draft`；进入 Gate 后 `status` 使用 `proposed / confirmed`；`proposed_mode` 与 `confirmed_mode` 只用 `narrative_led / hybrid / music_led`。记录 `basis_refs`、`recommendation_reason`、`protected_event_ids`、`music_flexible_event_ids`、`confirmation_source` 与 `confirmed_by`。已有明确用户选择可以直接成为 confirmation source；仅由 Director 推断时必须先停在 proposed 等待明确回复。
-
-若本条具体音乐需要参与画面组织，`music_map_required=true` 并给出 `music_map_ref`。Music Map 保存 music asset、分析方法 / 状态、duration、tempo、beats、accents、energy、sections 与 editorial notes；机器分析是候选，不自动成为编辑决策。`narrative_led` 可以完全不需要 Music Map；`hybrid / music_led` 是否需要由本条实际音乐使用方式决定。
-
-新策略下 `ready_for_render` 必须有 confirmed music direction；若声明 Music Map required，则对应文件必须存在且分析状态为 complete / verified。Music Direction 与采用的 Music Map 进入 Direct 2 授权指纹，确认后修改会使旧授权失效。旧项目未声明该 policy 时保持既有行为。详细交互与执行规则见 [Sound & Music Execution](sound-music-execution.md)。
+candidate.status 为 provisional、ready_for_plan 或 rejected。ready_for_plan 表示 Narrative Direction / legacy rough plan 对应的核心素材已经完成 Detail Structure、语境和反证已经检查，不表示粗剪通过。补充 estimated_duration_ms、scope_changes、reorder_reason 和 selected 字段方便执行。
 
 ## Execute 前的时长预算
 
@@ -226,7 +218,7 @@ candidate.status 为 provisional、ready_for_plan 或 rejected。ready_for_plan 
 
 `timeline.json` 的输入坐标空间是 `assembly`，但 source event 的 assembly 边界不得由每一段独立四舍五入得到。先按 source duration / speed 计算精确帧时长，再对**累计边界**统一量化；card 使用明确整数帧时长。相邻 transition overlap 再从这套累计量化结果映射到 output 坐标。静态校验与编译器必须调用同一套计算规则，因此 text / audio 轨也按最终 output 总帧数检查，不能只拿未扣 overlap 的 assembly 末帧做上界。
 
-当 `timeline.status=ready_for_render` 时，除了时间轴本身合法，还必须满足：Broad Structure + Content Map 完成、Directed Deep / Detail Structure 完成、`narrative_direction_status=confirmed`、`execution_plan_status=confirmed`、两份 Direct 文档存在且非空、`render_authorized=true`。每个被选中的 source event 必须显式给出 `deep_observation_refs`，引用本次实际采用的 `observation_id`；这些 observation 必须与 event 的 `source_id` 一致、其 source-time 区间合并后完整覆盖本次实际采用的 source range，且 `evidence_status` 只能是 `supported / partial`。同一 unit 中未被本次 event 引用的 pending / contradicted observation 继续保留为证据记录，但不阻断本次执行。这些检查不替代原片真伪核验，只阻止“阶段没完成或采用证据映射不清却进入 Execute”。
+当 `timeline.status=ready_for_render` 时，除了时间轴本身合法，还必须满足：Broad Structure + Content Map 完成、Detail Structure 完成、`narrative_direction_status=confirmed`、`execution_plan_status=confirmed`、两份 Direct 文档存在且非空、`render_authorized=true`；schema 1.8+ 还要求每个入选 source event 的 edit boundary 已在 Execute Step 0 精校为 `supported`。每个被选中的 source event 必须显式给出 `deep_observation_refs`，引用本次实际采用的 `observation_id`；这些 observation 必须与 event 的 `source_id` 一致、其 source-time 区间合并后完整覆盖本次实际采用的 source range，且 `evidence_status` 只能是 `supported / partial`。同一 unit 中未被本次 event 引用的 pending / contradicted observation 继续保留为证据记录，但不阻断本次执行。这些检查不替代原片真伪核验，只阻止“阶段没完成或采用证据映射不清却进入 Execute”。
 
 `source.time_mapping` 是精确时间定位的一部分，不只是输入摘要。任何 source 的 `version` 或 `time_mapping` 改变，所有依赖该 source 的 unit / clean-video / audio / final cache key 都必须变化；旧精确切点缓存不得继续标记为可复用。
 
@@ -266,10 +258,3 @@ v1.0.5 逐 source_id 音轨推导已知对白，视频关联不决定检查资�
 随附脚本检查 sources、frames、transcript、reviews、units、timeline 的核心 ID、源范围、保护区间、帧时长，以及 transitions 的相邻引用。ready_for_render 还检查核查记录的存在及音视频区间覆盖。它不会证明核查记录所写事实真实、说话人正确、剧情因果成立、实际音画流畅或字幕准确。JSON 合法也不等于数据契约所有语义要求得到满足。
 
 运行 `python3 scripts/validate_project.py 项目目录`；缺失后续阶段文件列为 skipped，不得把输出 status=pass 解释为项目已完成。进入 ready_for_render 前仍须按检查与交接规范人工或模型复核全部相关字段。
-
-
-## v1.2.2 确认节点补充
-
-正式 CSV 与 timeline schema 保持原样。project 新增 visual_confirmation_policy=mockup_confirmation_required、visual_confirmation_ref；plan_and_reference 执行包本身也要求有效视觉确认。music-direction 增加 sound_form、dialogue_separation / separation_fallback、音乐文件指纹与 music_selection；visual-confirmation 的字段、状态与图片绑定见 [执行包契约](execution-package.md)，Music Map 的有效内容及 AV Mapping 见 [声音执行](sound-music-execution.md)。确认记录引用本轮或既有明确指令，脚本不自动确认。
-
-ready_for_render 须有已确认声音形式与实际 Mockup；仅 complete 标签的 Music Map、占位图片、缺失确认来源均不能放行。草案允许 pending 及异常，--planning 的清单始终不可渲染。prepare_execution_authorization 只追加声音 / 视觉 / 音乐文件及 Map 的指纹，不改变旧证据或确认身份。

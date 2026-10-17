@@ -49,7 +49,17 @@
       ],
       "adopted_utterance_refs": [
         "T001"
-      ]
+      ],
+      "d2_selection_snapshot": {
+        "edit_boundary_ref": "EB001",
+        "planned_source_in_ms": 1000,
+        "planned_source_out_ms": 6000,
+        "safe_in_start_ms": 900,
+        "safe_in_end_ms": 1200,
+        "safe_out_start_ms": 5900,
+        "safe_out_end_ms": 6200,
+        "allowed_adjustments": []
+      }
     }
   ],
   "audio_tracks": [

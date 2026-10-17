@@ -58,9 +58,9 @@
 
 - 哪些区域内容丰富、适合 brainstorming：
 - 哪些关联目前只有抽样证据：
-- 哪些区域如果被选入 rough plan，需要第二轮 Directed Deep Structure：
+- 哪些区域如果被选入 rough plan，需要第二轮 Detail Structure：
 
-## 进入 Detail / Directed Deep Structure 时继续生成
+## 进入 Detail / Detail Structure 时继续生成
 
 - `detail-intervals.csv`：核心精查区间卡；进入原因、前情、当前背景、后续、目标问题、主题关联；
 - `deep-observations.csv`：核心区间完整高密度内容档案；

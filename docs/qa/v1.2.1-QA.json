@@ -1,36 +1,62 @@
 {
   "version": "1.2.1",
-  "date": "2026-10-14",
-  "scope": "Music Mode Confirmation Gate, music-aware editing contracts, audio treatment, backend-agnostic audio MCP capabilities",
-  "environment": {
-    "python": "3.13.5",
-    "ffmpeg": "7.1.5",
-    "pillow": "12.3.0"
-  },
-  "regression_tests": {
-    "command": "python3 -m unittest discover -s tests -v",
-    "count": 196,
-    "status": "pass"
-  },
-  "new_checks": [
-    "proposed music mode blocks ready_for_render",
-    "missing music-direction file blocks new policy",
-    "post-confirmation music-direction change invalidates authorization",
-    "required Music Map must exist and be complete or verified"
+  "date": "2026-10-17",
+  "base": "user-provided v1.2.0 package",
+  "base_archive": "long-video-remix-v1_2_0-github-ready-bilingual(1).zip",
+  "base_archive_sha256": "6636115fb8692f11152a18230c38326b7b8241e92a113dcc58ecdca7c6defe7c",
+  "scope": [
+    "four-line Scope Lock in existing Direct/handoff documents; no state file",
+    "minimum-sufficient Detail STOP rule",
+    "Aesthetic Mockup -> Executable Proof Visual Gate using the final execution toolchain from capability-map",
+    "three lightweight project fields only: visual_gate_status, visual_mockup_ref, visual_proof_ref"
   ],
-  "compatibility": "projects without music_direction_policy keep legacy behavior",
-  "synthetic_example": {
-    "validate_project": "pass",
-    "compiled_frames": 125,
-    "render_allowed": true,
-    "authorization_check": "pass",
-    "playback_verified": false
+  "changed_files_vs_v1_2_0": [
+    "CHANGELOG.md",
+    "INSTALL.md",
+    "README.en.md",
+    "README.md",
+    "RELEASE_NOTES.md",
+    "SKILL.md",
+    "assets/execution-handoff-template.md",
+    "assets/execution-plan-template.md",
+    "assets/execution-reference-template.md",
+    "assets/narrative-direction-template.md",
+    "assets/project-template.json",
+    "docs/qa/README.md",
+    "references/data-contracts.md",
+    "references/detail-evidence.md",
+    "references/execution-integrity.md",
+    "references/execution-package.md",
+    "references/mcp-adapter.md",
+    "references/qa-handoff.md",
+    "references/regression-checklist.md",
+    "references/workflow.md",
+    "scripts/validate_project.py",
+    "tests/test_execution_package.py"
+  ],
+  "added_files_vs_v1_2_0": [
+    "docs/qa/v1.2.1-QA.md",
+    "docs/qa/v1.2.1-QA.json"
+  ],
+  "validation": {
+    "tests_run": 197,
+    "tests_passed": 197,
+    "tests_added_this_version": 5,
+    "environment": "Python 3.13.5, FFmpeg 7.1.5, Pillow 12.3.0",
+    "compileall": "pass",
+    "synthetic_ready": "validate pass; manifest compiled with render_allowed=true; authorization check pass",
+    "sizes_bytes": {
+      "SKILL.md": 23092,
+      "SKILL.md_cap": 23842,
+      "references/workflow.md": 31699,
+      "workflow_cap": 31845,
+      "references/execution-package.md": 14520,
+      "references/detail-evidence.md": 6267
+    }
   },
-  "not_verified": [
-    "real WorkBuddy MCP configuration",
-    "real dialogue separation quality",
-    "real music analysis accuracy",
-    "real mix and loudness quality",
-    "real audiovisual playback and mobile listening"
+  "limits": [
+    "automated tests do not certify visual taste or actual renderer provenance of a proof image",
+    "toolchain continuity remains a documented/human-confirmed contract across capability-map, handoff and execution-reference",
+    "no real long-video aesthetic-mockup-to-proof-to-final-render end-to-end comparison was run"
   ]
 }

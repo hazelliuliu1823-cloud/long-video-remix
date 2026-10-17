@@ -19,7 +19,7 @@
 - 每行基础观察显式保留帧号 / 时间 / 帧尾 ms、画面事实、动作 / 状态、`motif_tags`、硬字幕 / 可见文字、**原声要点及核听状态**、`change_from_previous`、`content_description`、**topic_judgment、confidence / confidence_basis**、unknowns；没有内容时使用 `none` / `unknown` / `not_applicable`，不留空；
 - 动作 / 视线 / 站位 / 物件变化候选进入 `action-node-candidates.csv`；默认 4fps 局部窗口，偏离时有例外原因；
 - 会改变场景理解、plan 或剪辑意义的问题进入 `structure-questions.csv`，其 unresolved / unverified 状态持续可见；
-- Directed Deep Structure 先保留 `detail-intervals.csv` 的进入原因 / 前情 / 当前背景 / 后续 / 目标问题，再对核心区域保留完整画面、背景、动作链、关键变化、情绪线索、硬字幕、原声及核听状态、before / after、主题判定、confidence、说话人裁决引用、问题引用、反证和未验证项；
+- Detail Structure 先保留 `detail-intervals.csv` 的进入原因 / 前情 / 当前背景 / 后续 / 目标问题，再对核心区域保留完整画面、背景、动作链、关键变化、情绪线索、硬字幕、原声及核听状态、before / after、主题判定、confidence、说话人裁决引用、问题引用、反证和未验证项；
 - `speaker-adjudications.csv` 在有说话人 / 对象歧义时保留帧级口型 / 原声 / 字幕 / ASR 裁决；无歧义时也保留带表头文件。
 - Broad Structure 的正式出口首先是这些文字化结构表单；overview、Content Map、情绪大意、Narrative Direction、Execution Plan、最终文案或 edit plan 都不能反向替代上述基础记录。
 - 抽样中未出现的动作 / 台词 / 物件不得直接写成“没有发生”；4fps 只用于加密观察和缩小窗口。negative fact 必须限定 source-time scope，并按事实类型使用覆盖完整机会窗口的连续视频、覆盖声明区间的连续原声，或能直接排除该事实的可靠反证。
@@ -32,9 +32,7 @@
 ## Execute 前的规定动作
 
 - Detail 的真实关键帧清单、可用图片、独立 `execution-handoff.md` 及异常随包交付；handoff 已直接写明下游完整输出要求。
-- 已确认 Execution Package 包含计划、reference、声音确认与 visual-confirmation：文字 / 时间锚点、样式、音轨 / 接点、资源 / 约束与 QA 判据齐全。实际 Mockup 及参数同版且有明确确认来源；未完成样稿只交草案，不能标 ready。交接单独列出主线、声音、视觉、整包各项确认及当前版本，不因换模型丢失待确认项。
-- 启用 Music Mode Gate 时，`music-direction.json` 已明确 confirmed mode、确认来源、protected events 与 music-flexible regions；仅由 Director 推断的 proposed 状态不能进入最终 Execution Package。需要音乐结构参与剪辑时，Music Map / AV Mapping 已随包交付并进入授权指纹。
-- Audio Treatment Plan 已区分 preserve / isolate / attenuate / replace / remove / designed_silence；分离轨作为 derived asset 保存来源并实际核听，gain / fade / duck / mix / normalize 与失败回退明确。
+- 已确认 Execution Package 同时包含计划与 `execution-reference.md`：必要文字全文 / 时间锚点、具体样式、音轨 / 接点、资产 / 约束和 QA 判据齐全，Execute 无需另定核心风格。锁定风格的 mockup 与参数随包交付（要求见 [执行包契约](execution-package.md)）；未完成样稿明确待补项。
 
 - `timeline.duration_budget` 已按整数帧对平；普通覆盖式文字未被重复加到总长，真正延时的 card / hold 已成为 event；有时长上限时不得超预算进入 ready_for_render。
 - 每个进入执行的 source event 已显式列出 `deep_observation_refs`；只校验本次实际采用的 observation，确认 source 一致、source-time 覆盖采用区间、evidence_status 为 supported / partial；同 unit 其他未采用的 pending / contradicted 记录不作为阻断项。
@@ -58,7 +56,7 @@
 | Narrative | 陌生观众能否理解人物、事件和重组关系 | 补回必要前情或减少论点 |
 | Meaning | 是否截掉否定、条件、回应或制造虚假因果 | 恢复完整单元，调整主线 |
 | Context | 重排是否把不同日期、关系阶段当成同一事件 | 明确时空变化或换素材 |
-| Audio | 句首句尾、语气、原片音乐、分离伪影 / 残留、BGM duck、设计留白、音画同步 | 先保护原声与叙事节点，再调整分离 / 混音 / 音乐策略 |
+| Audio | 句首句尾、语气、底噪、原片音乐、音画同步 | 移切点、延长原段，再调整声音 |
 | Rhythm | 是否人为碎切、动作未完成、重要反应看不清 | 合并段落、删除重复例子 |
 | Visual | 站位、道具、服装、光线变化是否造成误读 | 改接点或接受明确场景切换 |
 | Text | 能否正常速度读完；是否与原字幕争抢 | 减字、固定区域、延长停留 |
@@ -73,7 +71,7 @@ qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_q
 
 ## 何时退回哪一步
 
-- 指代、条件、动作因果或原声核听有误：退回 E Directed Deep Structure；必要时补 C Content Map 的场景理解。
+- 指代、条件、动作因果或原声核听有误：退回 E Detail Structure；必要时补 C Content Map 的场景理解。
 - Narrative Direction 的核心节点没有证据、反差来自截断原话、或新前后文会改变核心表达：把 evidence gap / 冲突证据退回 D1 Direct 调整主线；执行层不擅自重写主题。
 - Detail 证据已经成立但最终素材取舍、排序、声音 / 文字 / 时长策略尚未确认：停在 D2 Direct，不直接进入 Execute。
 - Direct 1 只调整局部节点：优先复用 Broad Structure 与已验证证据，只补受影响的 E 区域。
@@ -92,10 +90,9 @@ qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_q
 未处理或低可信区间：
 关键决定及对应证据 ID：
 当前 brief / Narrative Direction / Editorial Execution Plan 及来源：
-第二轮 Directed Deep Structure 已补查节点与证据缺口（并确认 `deep-observations.csv` 是否已覆盖核心区域的画面 / 内容 / 背景 / 前后状态）：
+第二轮 Detail Structure 已补查节点与证据缺口（并确认 `deep-observations.csv` 是否已覆盖核心区域的画面 / 内容 / 背景 / 前后状态）：
 关键帧清单 / 实际图片 / 提取异常：
 Detail 的独立 execution-handoff 及其内嵌下游输出要求：
-Music Direction（推荐 / confirmed mode / 确认来源 / protected & flexible events）及 Music Map（如需）：
 Execution Package（计划 / reference / 风格样本 / 资产 / 约束 / QA）及确认来源：
 已有文件与路径：
 实际使用的工具和能力缺口：
@@ -119,9 +116,9 @@ Execution Package（计划 / reference / 风格样本 / 资产 / 约束 / QA）�
 ```text
 请把随附《长视频混剪跨模型与MCP执行规范》作为本任务的工作说明。
 先盘点我提供的素材、已有记录和实际可用的视频工具，输出能力映射。
-第一轮先做 Broad / Board Structure，建立可回查的 `frames.jsonl`、逐抽样帧 `frame-observations.csv`（含帧尾、原声要点、主题判定、confidence）、`action-node-candidates.csv`（动作节点默认 4fps 局部窗口并记录最小有效单元候选）、`structure-questions.csv`、场景、overview 和 Content Map；如果当前只要求内容地图，到这里正式交付。
+第一轮先做 Broad Structure，建立可回查的 `frames.jsonl`、逐抽样帧 `frame-observations.csv`（含帧尾、原声要点、主题判定、confidence）、`action-node-candidates.csv`（动作节点默认 4fps 局部窗口并记录最小有效单元候选）、`structure-questions.csv`、场景、overview 和 Content Map；如果当前只要求内容地图，到这里正式交付。
 如果要继续混剪，先把 Broad Structure 的正式文字化表单 + Content Map 交给我或独立 Director，形成 Narrative Direction；不要默认替代第一次创意决策。
-拿到 Narrative Direction 后，先建 `detail-intervals.csv` 明确精查区间的前情 / 当前背景 / 后续 / 目标问题，再回原素材做 Directed Deep / Detail Structure；补足完整音画、原声核听、说话人裁决、confidence、上下文、反证和保护范围。然后固定交付真实关键帧与独立 execution-handoff，并在其中直接写明 execution-plan、制作 reference、文字 / 声音 / 转场、Reference Application Rules、资源 / 约束和 QA 要求；再交回 Director 形成完整 Execution Package。一两个风格样本锁定全片规则，不逐镜头对应；只有第二次 Direct 确认后才进入 Execute。
+拿到 Narrative Direction 后，先建 `detail-intervals.csv` 明确精查区间的前情 / 当前背景 / 后续 / 目标问题，再回原素材做 Detail Structure；目标问题、最小完整互动 / 动作单元、Edit Boundary、相关反证四项闭合后 STOP DETAIL。然后固定交付真实关键帧与独立 execution-handoff，并在其中直接写明 Scope Lock、`capability-map.json` 中相关分析 / 执行工具、execution-plan、制作 reference、文字 / 声音 / 转场、资源 / 约束和 QA 要求；再交回 Director 形成完整 Execution Package。视觉上先用一两个 Aesthetic Mockup 选审美，再由最终 Execute 可访问的同一实际工具链生成 Executable Proof；两步可跨模型 / 会话，proof_confirmed 前不得正式 Execute。
 优先同集，保留完整对白与动作，不根据抽样帧或摘要补造未验证内容。
 已有确认信息直接沿用。遇到缺口先完成可做部分，并指出具体缺少哪段素材或哪种能力。
 素材位置：
@@ -137,7 +134,7 @@ Execution Package（计划 / reference / 风格样本 / 资产 / 约束 / QA）�
 
 ```text
 请按随附执行规范续接这个项目。先读 handoff、project、sources、coverage、Structured Observation Layer、content-map、brief、`narrative-direction`、`execution-handoff`、`keyframe-references`、`execution-plan`、`execution-reference`、异常说明和 capability-map；兼容旧项目时再读 legacy `editorial-plan`。随后读取当前 narrative / execution mapping 引用的 scene / unit / Deep observation / review / 原始证据。
-先核对当前能力与源版本；复用已有成果，只补齐缺口，不重新概括替代原记录。另读 music-direction、visual-confirmation 和实际 Mockup，核对声音形式、样稿 / 参数版本及整包的明确确认来源；未确认只暂停依赖动作，不自动升为 confirmed。
+先核对当前能力与源版本；复用已有成果，只补齐缺口，不重新概括替代原记录。
 继续完成 handoff 中的下一步。报告实际核验范围，不把前一模型的摘要写成自己的直接观察。
 ```
 

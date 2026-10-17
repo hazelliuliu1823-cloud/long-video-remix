@@ -4,7 +4,7 @@
 
 ## 主线不可变
 
-`Broad Structure → Structured Observation Layer → Content Map / emotional cues → Direct 1 Narrative Direction → Directed Deep / Detail Structure → Direct 2 Editorial Execution Plan → Execute → Timeline / Render / QA`
+`Broad Structure → Structured Observation Layer → Content Map / emotional cues → Direct 1 Narrative Direction → Detail Structure → Direct 2 Editorial Execution Plan → Execute → Timeline / Render / QA`
 
 除非版本明确声明 breaking change，否则不得删除、跳过或把任一步默认为由另一层替代。
 
@@ -30,22 +30,22 @@
 - 每个 source 有 usable ranges / downstream constraints；影响后续时长设计的物理边界已传给 Direct。
 - 长任务支持增量落盘、coverage accounting 与断点续跑，不因静默中断重扫已完成区间。
 
-## Directed Deep Structure
+## Detail Structure
 
 - 核心区间重新回原素材，不只复用第一轮摘要。
 - `detail-intervals.csv` 先保留进入精查原因、前情、当前背景、后续、目标问题和主题关联。
 - `deep-observations.csv` 保留完整画面、构图、动作链、关键变化、情绪线索 / 谨慎解释、空间、场景背景、叙事背景、意象、内容描述、硬字幕、原声及核听状态、字幕 / ASR 冲突、before / after、topic_judgment、confidence / confidence_basis、说话人裁决引用、问题引用、反证和未验证项。
 - `speaker-adjudications.csv` 保留说话人 / 对象的帧级裁决；无歧义时也保留表头。
-- 先理解完整，再形成 unit / context_ranges / protected_ranges。
+- 先理解必要完整语境，再形成 unit / context_ranges / protected_ranges；目标问题 + 最小完整单元 + boundary + 反证四项闭合后 STOP DETAIL，不做保险性重复读取。
 - Detail 必须继续形成正式 `edit-boundaries.csv`：真实音频尾部、动作 / 反应收束、preferred in/out、safe windows、must-keep ranges、handles、cut risk；字幕 / ASR 结束不能替代可剪边界。
 - 证据冲突时先判断层级：主线级冲突返回 Direct 1；Detail 证据成立后必须交回 Direct 2 形成最终 execution plan，不由 Execute 偷改已确认主线。
 
 ## 两次 Direct
 
-- Direct 1 明确输出 Narrative Direction：核心命题 / Narrative Spine / candidate regions / verification questions / constraints；不要求精确切点。
-- Directed Deep / Detail Structure 只围绕 Direct 1 已确认主线补证据；计划目标不能倒推 facts。
-- Direct 2 在 Detail evidence package 完成后输出 Editorial Execution Plan：selected verified units、顺序、段落功能、保护范围、声音 / 文字 / 时长 / 转场意图、执行边界。
-- Execute 不得从 Detailed Structure 直接跳过 Direct 2 自行生成最终讲法。
+- Direct 1 明确输出 Narrative Direction：核心命题 / Narrative Spine / candidate regions / verification questions / constraints；不要求精确切点。用四行 Scope Lock 承接当前阶段、可修改、不可修改、已否决，不另建历史状态文件。
+- Detail Structure 只围绕 Direct 1 已确认主线补证据；计划目标不能倒推 facts。
+- Direct 2 在 Detail evidence package 完成后输出 Editorial Execution Plan：selected verified units、顺序、段落功能、保护范围、声音 / 文字 / 时长 / 转场意图、执行边界；采用视觉设计时完成 Aesthetic Mockup → 同一最终执行工具链的 Executable Proof。两步可跨模型 / 会话，但 proof_confirmed 前不得 Execute。
+- Execute 不得从 Detail Structure 直接跳过 Direct 2 自行生成最终讲法；Visual Gate 已关闭时沿用 proof 对应的 capability-map / renderer 入口，不重新看 mockup 自由设计。
 
 ## Execute
 
@@ -69,7 +69,7 @@
 
 - 4fps 只作为动作候选加密起点；不能单独证明某动作 / 台词 / 物件在整个区间“没有发生”。负面事实必须有明确 scope，并按视觉 / 原声事实类型使用连续 review 或直接反证。
 - Broad 标记 complete 时，`frames.jsonl`、`frame-observations.csv`、`scenes.jsonl`、`coverage.json`、`overview.md`、Content Map 必须真实存在且基础表非空；动作候选 / Q&A 可以是带表头空表。
-- `ready_for_render` 必须要求两次 Direct 均 `confirmed`、文档存在、Detail 完成、render_authorized=true；每个选中的 source event 必须显式列出本次实际采用的 `deep_observation_refs` 与 `edit_boundary_ref`，引用 observation 的 source / source-time 覆盖正确，且 evidence_status 为 supported / partial；默认切点落在 safe windows 并覆盖 must-keep ranges；同 unit 未采用的 pending / contradicted observation 不得误伤本次执行。
+- `ready_for_render` 必须要求两次 Direct 均 `confirmed`、文档存在、Detail 完成、render_authorized=true；每个选中的 source event 必须显式列出本次实际采用的 `deep_observation_refs` 与 `edit_boundary_ref`，引用 observation 的 source / source-time 覆盖正确，且 evidence_status 为 supported / partial；schema 1.8+ 的入选 edit boundary 必须在 Execute Step 0 后为 `supported`，且最终 in/out 不得超出 `d2_selection_snapshot` 中 D2 固定的 safe windows / allowed adjustments；默认切点落在 safe windows 并覆盖 must-keep ranges；同 unit 未采用的 pending / contradicted observation 不得误伤本次执行。
 - validator / compiler 共用累计量化与 overlap 后 output 坐标；文字 / 音频轨不得以 assembly 总长冒充 output 上界。
 - 改变 `source.time_mapping` 必须改变相关 unit / clean / audio / final cache key；缓存可复用性按实际依赖分层判断，未知音频版本只关闭 mix_audio / final，不应误关已知版本的 clean-video。
 
@@ -105,24 +105,10 @@ tests/test_independent_audio_dialogue.py 覆盖卡片对白、同源额外音轨
 - 观察与区间节点、问题与关联区间的一致性规则在 INSTALL 中列为迁移项，并有对应回归。
 - MCP 抽帧适配器探测须记录 `timestamp_method`；`computed` 的适配器不用于 Detail 事实与切点。
 
+## v1.2.2 轻量 Visual Gate 回归
 
-## v1.2.1 Music Mode Gate 与声音执行回归
-
-- 新项目启用 `music_direction_policy=mode_confirmation_required` 时，ready_for_render 必须有 `music-direction.json` 且状态 confirmed；**只要填写 `music_direction_ref` 也视为启用 Gate**，漏写 policy 不得放行 proposed。没有 policy 且没有 ref 的旧项目保持兼容。
-- `music-direction.json` 进入 Direct 2 授权指纹；确认后改变 mode 或文件内容必须使旧授权 / 旧 manifest 失效。声明 `music_map_required=true` 时，Music Map 必须存在且 analysis_status 为 complete / verified；采用的 map 同样进入授权指纹，确认后直接改 map 而不重新授权必须阻断。
-- Direct 2 第一轮先基于已确认叙事与 Detail 主动推荐 mode；只有缺少明确用户确认时才停住请求 A/B/C，已有明确选择不得重复询问。
-- Audio Treatment Plan 与最终 `audio_tracks` 分工保持：前者决定 preserve / isolate / attenuate / replace / remove / designed_silence 和 fallback，后者描述最终可听音轨与成片坐标；不得通过新增声音规则削弱完整对白、Edit Boundary、源许可或 audio review。
-- MCP 能力使用抽象名 `extract_audio / separate_dialogue / analyze_music / mix_audio / inspect_audio`；后端不写死。
-
-## v1.2.2 Capability Auto-Preparation 回归
-
-- 工具缺失时先复用兼容实现；主动准备前分别核对软件与模型权重许可证。重依赖 / 大下载先说明影响，Python 默认用项目独立 venv；失败、不允许或许可不清楚时保留 unavailable / not_tested，不将“已安装”写成“已执行完成”。
-- `capability_resolution_policy` 若声明，只允许 `discover_then_prepare_if_permitted`；主动准备不得静默跨越付费、凭证、第三方素材上传、提权、安全设置、不明来源安装或许可边界，也不把许可不明的第三方权重打进 Release。
-
-
-## v1.2.2 确认节点修订回归
-
-- 主线、声音形式 / 模式、实际 Mockup 与完整执行包分别呈现确认内容；已有明确确认不重复询问，视觉可与整包同轮确认。外部 handoff 携带记录字段与状态，不依赖安装环境。
-- 缺 Mockup、图片不可解码、画幅不符、原图不可达、缺确认来源或 proposed 视觉状态均阻断正式渲染；草案及异常交接继续可做部分。重算整包授权不能掩盖视觉样稿 / 参数确认失效。
-- 声音模式不能代替 sound_form；分离须有回退。采用音乐文件和区间、Map 的时长 / 锚点 / 映射及核对记录检查有效性；标签 complete 不能替代内容。
-- 同路径音乐文件、实际采用原图、Mockup、reference 参数或确认记录变化时，旧授权 / 渲染入口失效。仅保留原声、没有音乐结构需求时，不强制 Music Map；有段落结构但没有固定 BPM 的音乐保持可用。
+- 不新增 current-state / visual-style / music gate 文件；Scope Lock 只存在于现有 Direct / handoff 文档。
+- `capability-map.json` 继续是工具能力来源；Detail handoff 摘录分析工具与最终 Execute 可访问的执行能力。
+- schema 1.7 新项目必须显式包含三个 Visual Gate 字段；`visual_gate_status` 允许 not_started / mockup_confirmed / awaiting_proof / proof_confirmed / not_applicable；ready_for_render 只接受 proof_confirmed / not_applicable。
+- proof_confirmed 时 selected mockup 与 executable proof 必须是路径和内容均不同的两个真实文件；二者与 `capability-map.json` 一起进入 `execution_reference_asset_refs`，capability-map 至少一个 available capability 具备 actual_tool + entrypoint，且 output_mapping 指向当前 visual_proof_ref。任一 reference / toolchain 文件变化继续触发既有 asset 指纹失效。
+- schema 1.6 旧项目没有 Visual Gate 字段时保持兼容行为；升级到 1.7 不要求重跑 Broad / Detail。

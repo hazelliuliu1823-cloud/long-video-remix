@@ -1,36 +1,30 @@
-# Long Video Remix
+# Long Video Remix — AI Video Editing Skill for Claude Code & Codex
 
 **中文** | [English](README.en.md)
 
-**长视频转短视频 · 直播访谈切片 · 影视综艺混剪**
+**面向长视频二创、混剪和短视频剪辑的 AI video editing / Agent Skill。** 先把长视频变成**可检索、可回查的结构化素材层**，再通过两轮人机编导确定“讲什么 / 怎么讲”，最后把选段、视觉 Proof、音画边界和授权落实成可检查的执行包。
 
-把长视频里的精彩片段，剪成有主线的短视频。
+`Claude Code · Codex · FFmpeg / FFprobe · MCP-ready · Human-in-the-loop · Bilingual`
 
-面向 Claude Code 与 Codex 的 AI 视频剪辑 Skill：建立带原片时间码的素材索引，提取高光片段，讨论叙事、字幕与声音，用真实关键帧确认视觉样稿，再执行已确认的剪辑方案。
+**你可以用它做：** long video → short-form remix、剧情 / 综艺二创、访谈高光、课程 / 活动素材复用、跨视频检索与内容效果分析。
 
-| 你想做什么 | 可以得到什么 |
-|---|---|
-| 一场直播，哪些片段值得单独发？ | 高光片段清单、原片时间码与切片方案 |
-| 影视综艺混剪，怎样把互动剪成故事？ | 关键对白与动作、情绪变化、素材顺序与叙事方案 |
-| 小红书／抖音短视频，开头和字幕怎么设计？ | 开场方案、字幕与声音设计、真实关键帧视觉样稿 |
-| 已确认方案，怎样落实成片？ | 可执行时间轴、渲染清单与导出检查 |
-
-实际音画处理与渲染由当前环境中的视频工具完成。
-
-把长视频整理成可检索、可回查的素材索引，和 AI 一起找选题、推敲故事、反复改稿，再把确认的方案交给剪辑执行。
+**它和“一键 AI 剪辑”的区别：** 不要求模型一次黑箱看完整部长视频并直接出成片。Broad 负责低成本建立全局索引，Detail 只深挖真正命中的区域；Direct 1 / Direct 2 保留人的创意判断，Execute 再把已确认结果变成可复现、可审计的剪辑执行。
 
 ![流程示意：长视频素材、可回查的结构化索引、人与 AI 的编导讨论，以及确认后的剪辑执行。](assets/workflow-overview.zh.png)
 
-适合需要反复使用长视频素材、持续讨论创意、制作不同内容版本的 **MCN、编导与内容编辑**。
-
-| 核心价值 | 怎么实现 |
+| 你最容易遇到的问题 | Long Video Remix 怎么处理 |
 |---|---|
-| **低成本复用** | Broad 建全局内容地图；创意讨论、检索和改稿复用数据，Detail 集中核实被选区域 |
-| **结构足够丰富** | 保留逐抽样帧事实、动作变化、对白 / 说话人依据、上下文、情绪线索、问题、未验证项和源时间 |
-| **创意由人掌握** | 两次 Direct：先定“讲什么”，证据补齐后再定“具体怎么讲”；Execute 落实已确认决定 |
-| **执行可检查** | 证据与源版本绑定、切点与对白保护、授权取段与顺序、时间轴校验、分层缓存和导出审计 |
+| **长视频每次都要重新看、重新理解** | Broad Structure 建立 searchable video index、Content Map 和源时间回查路径 |
+| **创意和素材证据经常混在一起** | Direct 1 先定叙事方向，Detail 再定向核实，Direct 2 最后锁定执行方案 |
+| **Detail / ASR 越做越重** | 最小充分证据后 STOP；字幕 + waveform / signals 优先，只在关键歧义点局部精听 / ASR |
+| **Mockup 很漂亮，真正执行却变样** | Aesthetic Mockup → Executable Proof；Proof 必须使用最终 Execute 可访问的同一工具链 |
+| **跨模型、跨会话以后决定容易漂** | source refs、boundary、D2 snapshot、authorization 与 render manifest 保留可机器检查的连续性 |
 
-目标是减少反复理解原始多模态素材的开销。抽帧、ASR、定向回看与 GPU 渲染仍需资源；具体成本取决于素材、模型和工具，本项目未承诺固定降幅。
+**核心产出：** `Content Map` · structured observations · Detail evidence · real keyframes · Direct 2 execution plan · executable visual proof · verified edit ranges · render manifest · QA / audit records
+
+适合需要反复使用长视频素材、持续讨论创意、制作不同内容版本的 **MCN、编导、内容编辑、AI 视频工作流开发者**。
+
+目标是减少反复理解原始多模态素材的开销，而不是承诺“零成本自动剪辑”。抽帧、局部 ASR、定向回看与 GPU 渲染仍需资源，具体成本取决于素材、模型和工具。
 
 请仅使用你有权使用的素材。
 
@@ -50,7 +44,7 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 
 1. 安装完整文件夹，复制 `assets/project-template.json` 建立独立项目，登记源与可用模型 / 视频工具。
 2. 完成 Broad 的正式观察层和 Content Map；只做结构化时可在此交付，后续剪辑可复用。
-3. 人 / Director 定主线，Detail 核实命中区域并交付真实关键帧与独立 handoff；Direct 2 先推荐并确认音乐模式与声音形式，再展示真实关键帧 Mockup，分别记录视觉与完整执行包确认（可同轮），最后生成机器授权。
+3. 人 / Director 定主线，Detail 核实命中区域并交付真实关键帧与独立 handoff，再由 Direct 2 确认 Execution Package（计划 + 制作 reference）与 planned ranges；回到实际执行环境后先做 Execute Step 0 精校入选边界，再按最终 ranges 准备 / 确认机器授权。
 4. 执行静态校验与编译，渲染适配器在消费清单前检查授权：
 
 ```sh
@@ -63,11 +57,7 @@ python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.js
 
 本地原片抽帧优先用 `scripts/extract_frames.py`；MCP / 代理等按 [MCP 适配](references/mcp-adapter.md) 保留实测时间与源绑定。脚本的 `signals` 模式标出画面变化与有声区间，`strip` 模式输出逐帧条用于定切点。E 阶段的取证、切点与问题闭环见 [Detail 证据获取](references/detail-evidence.md)。
 
-**v1.2.2：** 延续 v1.2.1 的 Sound & Music Execution，并补齐 capability 自准备与发布闭环：缺工具时先复用，许可证允许当前用途且环境允许时再准备本地后端并 smoke test。Demucs 代码可作为 MIT 的可选分离实现，但第三方模型权重单独核对许可且不随 Release 打包；重依赖默认进入项目独立 venv。Music Direction 只要被项目引用就按 fail-closed 校验，不能因漏写 policy 绕过确认。
-
-**v1.2.2 确认节点修订：** 单独呈现主线、声音方案、Mockup 与完整执行包的确认内容；视觉可与整包同轮确认，已有明确选择直接沿用。新增 `visual-confirmation.json` 绑定实际样稿、原图、参数与目标画幅；缺图或未确认只交草案，正式渲染阻断。音乐模式同时确认声音形式，采用配乐时核对文件、版本、区间及有效 Music Map；仅 complete 标签不能放行。详见 [执行包契约](references/execution-package.md)。
-
-**v1.2.1：** 在 v1.2.0 上增加 Sound & Music Execution。Direct 2 先主动推荐 `narrative_led / hybrid / music_led`；已有明确用户选择直接承接，否则必须停在 proposed 等待确认。`hybrid / music_led` 可用 Music Map 把 beat / phrase / section 与可调整画面映射；Audio Treatment 支持 preserve / isolate / attenuate / replace / remove / designed silence，以及 gain / fade / duck / mix / normalize。新增抽象 MCP capabilities 与可选 dialogue separation；不把 Demucs 等具体后端写死。迁移见 [INSTALL.md](INSTALL.md)。
+**v1.2.4：** 延续 v1.2.3 的 Selected Range Verification，并把发布前约束补严：D2 把 planned range、boundary 与当时 safe windows 写进 `d2_selection_snapshot`；Execute Step 0 只能在这份快照允许范围内校准，越界即停并返回确认。Visual Proof 还必须由 `capability-map.json` 中 `output_mapping` 实际指向当前 proof 的可执行 capability 生成。schema 1.7 继续保持旧边界严格度，schema_version 非纯数字点号格式会直接报错。迁移见 [INSTALL.md](INSTALL.md)。
 
 ## 常用提问示例
 
@@ -101,25 +91,25 @@ python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.js
 
 **可以怎么问：**
 
-> 请按〔已确认主线〕和〔精查任务单〕，回到原片做 Detail Structure。核实完整画面、对白、说话人、动作及前后语境，区分事实、解释和未验证项；给出完整可剪单元、建议切点、安全切点范围、必须保留的对白与动作，以及剪辑风险。交付 Detail 证据表、真实关键帧和可独立阅读的 handoff，说明素材是否支持原主线。
+> 请按〔已确认主线〕和〔精查任务单〕回到原片做 Detail Structure。先用已有字幕原话和 waveform / signals 定位，只对会改变叙事判断的原话、speaker 或字幕冲突做局部精听 / ASR；不要等待整段 ASR。交付最小充分证据、可供 D2 选择的保守 edit boundary（未做最终精校可标 partial）、真实关键帧和独立 handoff。
 
-**会拿到什么：** Detail 证据包，包括精查区间与深度观察、说话人核验、剪辑边界、真实关键帧和交接文件。交接文件写清下一轮 Direct 所需的执行包要求，未完成项明确标注。
+**会拿到什么：** Detail 证据包，包括精查区间、深度观察、必要说话人核验、selection-ready 边界、真实关键帧和交接文件。未入选候选不需要先做最终帧级声音精修。
 
-### 5. Detail 已完成，请确定最终执行方案
-
-**可以怎么问：**
-
-> 请基于〔已确认主线〕和〔Detail handoff〕进入 Direct 2。音乐模式：`narrative_led`，保留节目混音，不新增配乐，不需要人声分离。沿用已确认的叙事与证据，完成 Music Direction、Execution Plan 和 Execution Reference；明确最终取舍、文字、声音处理、转场、视觉样稿 / 风格规则与 QA 要求，先展示 Mockup 与参数供我确认；确认后形成完整 Execution Package，不重新改写主线。
-
-**会拿到什么：** 已确定的声音方向和待确认视觉样稿；视觉与完整执行包确认后再交执行。上例提前明确的声音选择直接承接，不重复询问。
-
-### 6. 执行方案已确认，请按包出片
+### 5. Detail 已完成，请做 Direct 2 和视觉确认
 
 **可以怎么问：**
 
-> 请严格按〔已确认 Execution Package〕进入 Execute。不要重新决定叙事、音乐模式或视觉方向；按包内时间轴、声音处理、文字、转场与 reference 执行，输出 render manifest 和当前环境能生成的粗剪 / 成片，并完成导出审计与未验证项记录。
+> 请读取〔Detail handoff〕和真实关键帧，先形成 Direct 2 的最终叙事与执行计划；基于关键帧生成少量 Aesthetic Mockup 供我选择。mockup 确认后，如果当前环境具备最终 Execute 会继续使用的 renderer / layout 工具，请用同一工具链重建 Executable Proof，并把 actual_tool、entrypoint、字体 / 资源和关键参数写进 execution-reference；如果当前环境不能完成 proof，状态保持 awaiting_proof 并完整交接，不要用下游不可用的工具代替。
 
-**会拿到什么：** 与已确认方案一致的执行结果、render manifest、技术 QA / 审计和需要人工最终观看的项目；若当前缺少渲染能力，会按 capability 规则处理而不是伪称已出片。
+**会拿到什么：** 已确认的 Execution Plan、视觉 mockup；条件允许时还包括由最终执行工具链真实生成的 proof 和可复现入口。
+
+### 6. Execution Package 已确认，请渲染并做 QA
+
+**可以怎么问：**
+
+> 请按〔Execution Package〕执行，不重新选择主线、素材或视觉风格。先做 Execute Step 0：只打开 D2 已选片段及 handles，用连续音画精校最终 in/out、句尾、停顿、尾音 / 反应和必要 J/L-cut；ASR 仅在局部确有需要时使用。逐段输出“D2 planned range → Step 0 verified range → delta / reason”对照；任何结果超出 `d2_selection_snapshot` 允许范围时立即停止并等确认，不自行扩张选段。全部在范围内且 selected boundary 已升为 supported 后，才准备 / 确认授权、编译 timeline / render manifest、渲染并做 QA。
+
+**会拿到什么：** 可执行时间轴 / render manifest、成片（环境支持时）、技术审计与实际观看 QA 记录。
 
 ## 工作路径
 
@@ -127,9 +117,11 @@ python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.js
 |---|---|
 | Broad Structure → Structured Observation Layer → Content Map | 全局观察表、场景 / 动作 / 问题索引，保留覆盖与缺口 |
 | Direct 1 · Narrative Direction | 人 / Director 确定主线、候选区域和待核问题 |
-| Directed Deep / Detail Structure + Edit Boundary | 核实连续音画、前后语境、反证和可剪范围；随证据交付真实关键帧与独立 handoff；证据不足返回 Direct 1 |
-| Direct 2 · Music Mode Gate → Execution Package | 先推荐并确认叙事优先 / 混合 / 音乐优先；再确认事件、Music Map / AV Mapping（如需）、声音 / 文字 / 转场和风格规则 |
-| Execute → Render / QA | 按完整执行包与机器授权制作，再完成技术检查、动态听看与 Reference Compliance |
+| Detail Structure + Edit Boundary | 最小充分证据后 STOP；字幕 / signals 优先，候选可交 partial 保守边界；证据不足返回 Direct 1 |
+| Direct 2 · Execution Package | 锁定选段、planned range / boundary ref 与允许校准范围；mockup→proof 关闭 Visual Gate |
+| Execute → Render / QA | Step 0 先精校入选 range 并把 boundary 升为 supported，再确认授权、制作与 QA |
+
+**阶段命名统一：** 本版正式名称只使用 `Broad Structure → Direct 1 → Detail Structure → Direct 2 → Execute`。历史文档中的 Board、Deep、Directed Deep、Detailed Structure 都是旧称，不代表额外阶段。
 
 ## 丰富结构如何可靠进入执行
 
@@ -159,15 +151,13 @@ python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.js
 
 Structure 解决“素材怎么看得清、怎么复用”，但最终要做成视频，还需要把已经确认的创意方案变成**保留证据与保护范围、可以渲染和核查**的时间轴。
 
-Execute 负责把 Directed Deep Structure 已经核实过的素材继续收敛成：
+Detail Structure 负责核实 verified units、必要前后文、`context_ranges` / `protected_ranges`，并给出足以供 D2 选段的 edit boundary；未入选候选可以保持 partial。Execute **不重做叙事选择**，但先用 Step 0 把 D2 真正采用的边界精校为 supported，然后负责：
 
-- verified units 与必要前后文；
-- `context_ranges` / `protected_ranges`，避免剪掉关键语义或动作；
-- `edit-boundaries.csv`：把“内容结束”与“真正可切”分开，记录音频尾部、动作 / 反应收束、preferred in/out、safe windows、must-keep ranges 和 cut risk；
-- assembly timeline 与 output timeline；
-- hard cut / xfade、音轨、文字轨和章节卡；
-- `render-manifest.json`；
-- 导出后的完整解码、帧数 / 时长检查、近静音扫描、全部接点对照图与最终 QA。
+- 仅对 D2 已选片段 + handles 精听 / 精看，按需定向 ASR，校准最终音画 in/out；
+- 把 Direct 2 已确认的顺序与 verified cut 编译为 assembly timeline 与 output timeline；
+- 落实 hard cut / xfade、音轨、文字轨和章节卡；
+- 生成 `render-manifest.json` 并按授权入口执行渲染；
+- 导出后做完整解码、帧数 / 时长检查、近静音扫描、全部接点对照图、Reference Compliance 与最终 QA。
 
 因此，这个仓库不是“先结构化，后面交给你自己想办法剪”。**Structure 和 Execute 是两端的稳定能力，Direct 是两次需要人参与的创意决策点：先定主线，再定最终执行方案。**
 
@@ -219,7 +209,7 @@ Structure 之后，每一个已分析时间点都可以对应到结构化内容�
 一次把整部长视频扫到帧级既昂贵，也容易在创意方向尚未确定时浪费计算。这里采用两轮不同目标的 Structure：
 
 - **第一轮 Broad Structure：覆盖优先。** 用较低密度看完整素材，并把结果压成可复用的结构化工作层；
-- **第二轮 Directed Deep Structure：完整度优先。** 脚本方向确认后，只回到命中的区域补高密度画面、原声、前后语境和反证。
+- **第二轮 Detail Structure：完整度优先。** 脚本方向确认后，只回到命中的区域补高密度画面、原声、前后语境和反证。
 
 因此，真正昂贵的多模态观察集中在少量高价值区域；而创意讨论、检索和跨视频分析可以尽量基于已经结构化的数据进行。
 
@@ -231,7 +221,7 @@ Structure 之后，每一个已分析时间点都可以对应到结构化内容�
 
 - **减少重复多模态读取**：后续 Direct 不需要为了每次创意讨论都重新把原视频、九宫格或大量图片塞进上下文；
 - **降低创意阶段的上下文负担**：人工、Director 或其他 Skill 可以直接在 `frame-observations.csv`、scene / overview 和 `content-map.md` 上做组合与判断；
-- **把高成本计算集中到命中区域**：只有确认脚本涉及的段落才回到原片进入 Directed Deep Structure，高密度读取画面、原声和前后语境。
+- **把高成本计算集中到命中区域**：只有确认脚本涉及的段落才回到原片进入 Detail Structure，高密度读取画面、原声和前后语境。
 
 这不是把原始证据丢掉。所有结构化记录仍保留 `frame_id`、`scene_id`、时间码、evidence refs 等回查路径，需要时可以重新落回原素材。
 
@@ -293,7 +283,7 @@ Direct 默认由外部完成，而且通常适合在一个**独立的研究 / �
 
 ### Direct 2：Execution Package — “这些材料最终怎么讲？”
 
-Directed Deep / Detail Structure 完成后，Director 第二次接收的是完整证据包：deep observations、原声 / 硬字幕核验、说话人裁决、context / counterevidence、verified units、protected ranges 与 evidence gaps。此时才形成最终执行包，其中 Editorial Execution Plan 包括：
+Detail Structure 完成后，Director 第二次接收的是完整证据包：deep observations、原声 / 硬字幕核验、说话人裁决、context / counterevidence、verified units、protected ranges 与 evidence gaps。此时才形成最终执行包，其中 Editorial Execution Plan 包括：
 
 - 最终选择 / 排除哪些 verified units；
 - 顺序和每段叙事功能；
@@ -303,23 +293,23 @@ Directed Deep / Detail Structure 完成后，Director 第二次接收的是完�
 
 同时交付 `execution-reference.md`：实际文字样式 / 位置 / 停留、画面处理、声音 / 转场、资源与 QA 判据；通常一两个样本即可锁定全片风格，不要求每个镜头 / 字幕逐项对应。Detail 的 handoff 已直接携带这套输出要求，换模型无需依赖安装环境。详见 [完整交付契约](references/execution-package.md)。可使用 `assets/execution-plan-template.md` 和 `assets/execution-reference-template.md`。`assets/editorial-plan-template.md` 保留为兼容旧项目的合并式模板。Execute 默认只落实这个第二次 Director 已确认的方案；**最终素材取舍属于 Direct 2，不属于 Execute。** 如果核心 evidence 仍是 `pending / contradicted`，或两次 Direct 尚未确认，时间轴不能标为 `ready_for_render`。
 
-## Directed Deep Structure 为什么单独存在
+## Detail Structure 为什么单独存在
 
 第一次 Content Map 不应该为了某个主题把所有区域都扫描到帧级；那会非常昂贵，也会让 Structure 变成提前押题。
 
-有了第一次 Direct 的 Narrative Direction 后，系统才知道应该在哪些区域增加信息密度。第二轮仍然先做**完整素材理解**，再做剪辑判断，而不是找到候选后马上标切点。典型动作包括：
+有了第一次 Direct 的 Narrative Direction 后，系统才知道应该在哪些区域增加信息密度。第二轮先把**当前目标问题所需的最小完整语境**看清，再做选段判断；它不要求把所有候选声音都做成最终逐字稿或帧级切点。典型动作包括：
 
 - 从十秒级概览抽样提高到一秒一至两张或连续播放；动作 / 视线 / 站位等关键变化节点继续使用默认 4fps 局部窗口加密观察；
 - 先建立 **Detail Interval Card**：写清为什么进入精查、前情、当前背景、后续、目标问题和主题关联；
 - 对选中的核心区域建立 **Deep Observation Index**，记录完整画面描述：人物、站位 / 朝向、动作链、关键视觉变化、可观察情绪线索 / 谨慎情绪解释、表情 / 视线、人物间距离、关键物件、意象标签、景别 / 构图；
 - 补充**内容描述**：这一小段实际发生了什么，而不是只抄关键词或台词；
 - 补充**场景背景与叙事背景**：地点 / 时间 / 环境、前一事件、为什么会来到这一刻；
-- 从字幕关键词回到整段对话核听，区分硬字幕 / ASR / 真实原声，记录说话人、对象、语气、停顿、环境声 / 音乐和 audio_verified；有歧义时用 **Speaker Adjudication** 做帧级口型 / 原声 / 字幕 / ASR 裁决；
+- 从字幕关键词回到**足以裁决目标问题的必要原声窗口**；字幕 + waveform / signals 先定位，只对关键原话、speaker / addressee、重叠说话或字幕冲突做局部核听 / ASR。区分硬字幕 / ASR / 真实原声；有歧义时用 **Speaker Adjudication** 做口型 / 原声 / 字幕 / ASR 裁决；
 - 从单个场景扩到前后十五至三十秒，必要时继续扩到完整事件，记录 before_state / after_state；
 - facts、interpretations、unknowns 分开，保留 `question_refs` / 未验证项，并检查 Narrative Direction 的反证、缺口、错误因果和时空关系；
 - 最后才把已充分理解的核心区域收敛为 unit、context_ranges、protected_ranges 和可执行剪辑判断。
 
-如果证据与 Narrative Direction 冲突，工具应报告问题并返回 Direct 1 调整；如果证据成立，则把 Detailed Structure 的完整证据包交回 Director，形成第二次 Direct 的 Execution Package（Editorial Execution Plan + 制作 reference），再进入 Execute。
+如果证据与 Narrative Direction 冲突，工具应报告问题并返回 Direct 1 调整；如果证据成立，则把 Detail Structure 的完整证据包交回 Director，形成第二次 Direct 的 Execution Package（Editorial Execution Plan + 制作 reference），再进入 Execute。
 
 ## Execute 能做什么
 
@@ -348,6 +338,7 @@ long-video-remix/
 ├── README.en.md
 ├── CHANGELOG.md
 ├── INSTALL.md
+├── INSTALL.en.md
 ├── RELEASE_NOTES.md
 ├── LICENSE
 ├── SHA256SUMS
@@ -356,6 +347,7 @@ long-video-remix/
 │   └── openai.yaml
 ├── assets/
 │   ├── icon.svg
+│   ├── capability-map-template.json
 │   ├── workflow-overview.zh.png
 │   ├── workflow-overview.en.png
 │   ├── frame-observation-template.csv
@@ -371,8 +363,6 @@ long-video-remix/
 │   ├── execution-plan-template.md
 │   ├── execution-reference-template.md
 │   ├── execution-handoff-template.md
-│   ├── music-direction-template.json
-│   ├── music-map-template.json
 │   ├── keyframe-reference-template.json
 │   ├── structure-exception-template.json
 │   ├── editorial-plan-template.md
@@ -414,7 +404,6 @@ long-video-remix/
 │   ├── regression-checklist.md
 │   ├── structure-regression-matrix.md
 │   ├── mcp-adapter.md
-│   ├── sound-music-execution.md
 │   └── worked-example.md
 ├── tests/
 │   ├── test_dialogue_continuity.py
@@ -423,7 +412,9 @@ long-video-remix/
 │   ├── test_independent_audio_dialogue.py
 │   ├── test_extract_frames.py
 │   ├── test_detail_gates.py
+│   ├── test_selected_range_verification.py
 │   ├── test_size_budget.py
+│   ├── test_checksums.py
 │   └── fixtures/ready-project.json
 └── scripts/
     ├── extract_frames.py
@@ -451,10 +442,10 @@ long-video-remix/
 
 1. 先完成 Broad Structure，交付正式的 Structured Observation Layer + Content Map；
 2. 由人 / Director 基于这些文字化结构数据和必要外部研究形成 Narrative Direction（Narrative Spine + candidate regions + verification questions）；
-3. 把 Narrative Direction 接回项目，对命中区域进行 Directed Deep / Detail Structure，并生成 `deep-observations.csv`，把核心区域的画面、内容、背景、前后状态、原声证据、反证和保护范围补全；
-4. 交付真实关键帧、证据与独立 handoff；Direct 2 先基于这些材料推荐 Music Mode，若用户此前未明确选择则等待一次明确确认；
-5. mode 确认后形成 Execution Package；需要音乐参与组织画面时加入 Music Map / AV Mapping，Execute 再按已确认计划 + reference 完成声音准备、混音与画面时间轴；
-6. 先按 [执行完整性契约](references/execution-integrity.md) 保存当前证据绑定和 Direct 2 的机器授权，再运行：
+3. 把 Narrative Direction 接回项目，对命中区域进行 Detail Structure，并生成 `deep-observations.csv`，把核心区域的画面、内容、背景、前后状态、原声证据、反证和保护范围补全；
+4. 交付真实关键帧、证据与独立 handoff（含下游完整输出要求），交回 Director 形成 Execution Package；
+5. Execute 先做 Step 0：只回看 D2 已选片段 + handles，精校最终音画边界并把入选 boundary 升为 `supported`；随后按已确认计划 + 制作 reference 编译 edit plan / timeline，按冻结样式制作；
+6. Step 0 后按 [执行完整性契约](references/execution-integrity.md) 用最终 ranges 保存证据绑定并准备 / 确认机器授权，再运行：
 
 ```text
 python3 scripts/validate_project.py 项目目录
@@ -474,8 +465,8 @@ python3 scripts/audit_render.py 成片.mp4 项目目录/render-manifest.json --o
 - 字幕 / ASR 负责检索，不等于核听原声；
 - Broad Structure 的正式表单是文字化结构数据，Content Map 建立在其上，不能反向替代表单；
 - Direct 1 的 Narrative Direction 是编导意图，不等于已经得到素材证明；
-- Directed Deep Structure 负责把 Narrative Direction 重新压回原片证据；
-- Direct 2 基于核实后的证据与关键帧先完成 Music Mode Gate，再形成完整 Execution Package；只有 Director 推断时才要求用户确认，已有明确选择不重复问；Execute 不跨过这一步自行决定最终讲法、音乐结构或风格；
+- Detail Structure 负责把 Narrative Direction 重新压回原片证据；
+- Direct 2 基于核实后的证据与关键帧形成完整 Execution Package；Execute 不默认跨过这一步自行决定最终讲法或风格；
 - 工具可以建议某个节点的素材不足或替代片段，但默认不擅自改写已经确认的核心表达；
 - 渲染成功日志不等于成片通过验收。
 

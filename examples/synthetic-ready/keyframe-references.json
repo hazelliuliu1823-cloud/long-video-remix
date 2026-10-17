@@ -3,13 +3,13 @@
     "frame_id": "F001",
     "source_id": "SRC001",
     "timestamp_ms": 1000,
-    "image_ref": "keyframe-synthetic.png",
+    "image_ref": "keyframe.svg",
     "source_segment": "U001",
-    "narrative_role": "synthetic opening",
-    "notes": "Synthetic paired image fixture, not actual source footage.",
+    "narrative_role": "opening",
+    "notes": "Synthetic keyframe fixture used only to demonstrate the handoff; it is not a real reviewed frame.",
     "status": "available",
-    "reason": null,
-    "impact": null,
-    "downstream_handling": null
+    "reason": "synthetic fixture",
+    "impact": "low",
+    "downstream_handling": "Use only to exercise the example Visual Gate."
   }
 ]

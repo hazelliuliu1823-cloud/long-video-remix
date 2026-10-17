@@ -14,11 +14,6 @@
 | extract_frames | source_id、时间列表或抽样规则 | 原图、实际时间戳、frame_id | 用已有带时间码的图片；无法定位则只做粗索引 |
 | make_contact_sheet | frames、版式、标签 | 九宫格、每格与原图映射 | 不拼图，按带标签的单帧阅读 |
 | inspect_av | source_id、区间、所需模态 | 真实观察记录、可回查证据与能力范围 | 请求用户核听/观看；保持 provisional |
-| extract_audio | source_id / asset、source range | 可追溯音频片段、实际参数 | 由已验证媒体工具导出；无能力则保留原轨并声明 |
-| separate_dialogue | 已授权音频片段、分离目标 | derived dialogue / background assets、处理记录 | 可选能力；保留原混音并标记人工处理，不宣称已去除 BGM |
-| analyze_music | music asset | duration、BPM、beats、accents、energy、section candidates | 人工标记可用结构；不凭猜测生成 Music Map |
-| mix_audio | 已确认 audio tracks / treatment | 混音文件、处理参数、日志 | 交付精确音轨计划，不宣称已混音 |
-| inspect_audio | 音频或最终文件、检查项目 | 核听 / 扫描 / 响度 / 静音 / 伪影记录 | 保留 not_tested；生成成功不等于通过 |
 | render_timeline | 已核对时间轴、源文件、输出配置 | 新输出文件、日志、实际参数 | 交付详细稿，不宣称有粗剪 |
 | inspect_output | 输出文件、检查项目 | 时长、可播放性、音画与文字检查记录 | 只完成技术或静态检查，保留实看待办 |
 | export_editor_project | 时间轴、目标软件已验证格式 | 工程文件或导入文件、日志 | 交付中立时间轴，标记尚需格式适配 |
@@ -29,28 +24,15 @@
 
 inspect_av 可以由具备对应模态能力的模型、工具或人工完成。仅返回抽样图片的工具不能登记为连续音画观察。纯文字模型可处理记录与方案，但必须保留上游证据来源。
 
-## 缺失能力的解析与主动准备
-
-Capability discovery 不是终点。任务确实需要某项能力、当前环境尚未暴露可用工具时，按以下顺序处理：
-
-1. **复用已有能力。** 先检查已注册 MCP、系统程序、Python 环境与项目已有 adapter；同一能力不重复安装另一套实现。
-2. **先核许可证，再准备后端。** 当前 Agent 具备 shell / 包管理与写入权限时，也只有在软件许可证允许本次实际用途、来源明确且可本地运行时，才能主动安装 / 获取所需依赖；“免费”不等于允许商业使用。代码、模型权重、模型卡指向的下载资源和其他第三方资产分别核对，不把代码仓库的许可证自动套到权重。
-3. **隔离重依赖与大下载。** Demucs / PyTorch 等可能产生较大下载量或改变 Python 依赖图。预计下载量大、需要 GPU / 系统依赖或会修改全局环境时，先向用户说明影响；Python 类依赖默认安装到项目独立 venv，不写入用户已有全局 Python，除非用户明确要求。
-4. **首次模型 / 权重获取。** 获取前记录来源、版本 / 哈希与许可状态；只有许可明确允许当前用途时才自动获取并缓存。权重若未明确允许商业使用，不得在商业工作流中静默使用；若只是再分发许可不明确，也不得把它打入本项目 Release。
-5. **smoke test 后才可用。** 安装成功不等于 capability available。用最小非破坏性样本验证输入、输出、时间 / 声音语义和返回文件，再更新 capability-map。
-6. **高影响操作不静默。** 若需要付费 API、账号 / token、向第三方上传用户素材、管理员 / root 提权、修改系统安全设置、来源不明的软件，或许可证不允许 / 无法确认当前用途，停止自动准备，说明缺口并使用已定义 fallback。
-7. **失败即回退。** 安装或 smoke test 失败时保留日志与已完成产物，将能力记为 unavailable / unverified，继续采用表中 fallback；不得把“已安装”写成“已执行成功”。
-
-本规则描述 Agent 的环境自准备行为，不要求包内携带第三方二进制、模型或安装器，也不把某个具体软件变成长期硬依赖。
-
 ## capability-map.json
 
-每个映射至少写以下字段：
+复制 `assets/capability-map-template.json` 建立项目能力映射。顶层为 `schema_version` 与 `capabilities`；每个 capability 至少写以下字段。`entrypoint` 是实际可调用的脚本、命令、模板、组件或服务入口；仅有工具名但没有可复现入口时，不能把 Visual Proof 标为 confirmed。
 
 ```json
 {
   "capability": "extract_frames",
   "actual_tool": null,
+  "entrypoint": null,
   "status": "unavailable",
   "input_mapping": {},
   "output_mapping": {},
@@ -61,19 +43,13 @@ Capability discovery 不是终点。任务确实需要某项能力、当前环�
   "timestamp_method": null,
   "audio_observation": false,
   "video_observation": false,
-  "fallback": "读取用户提供的带时间码单帧",
-  "resolution": {
-    "policy": "discover_then_prepare_if_permitted",
-    "preferred_local_backend": null,
-    "prepared_by_agent": false,
-    "setup_status": "not_needed",
-    "smoke_test": null,
-    "tool_version": null
-  }
+  "fallback": "读取用户提供的带时间码单帧"
 }
 ```
 
-status 只用 available、unavailable、unverified。工具存在但未试过所需功能时写 unverified。一次成功测试只能证明该功能在测试条件下可用，不能推断所有编解码器和素材都支持。`resolution` 为可选运行记录：发生主动准备时填写首选后端、安装状态、smoke test 与实际版本；未发生时可以省略，不把它作为旧项目迁移要求。
+status 只用 available、unavailable、unverified。工具存在但未试过所需功能时写 unverified。一次成功测试只能证明该功能在测试条件下可用，不能推断所有编解码器和素材都支持。Visual Gate=`proof_confirmed` 时，不能由任意 available capability 代替 proof renderer：至少一条 capability 的 `output_mapping` 必须实际映射到当前 `visual_proof_ref`，并同时具有可调用的 `actual_tool + entrypoint`。
+
+Broad / Detail 使用过的真实能力继续保留在同一 `capability-map.json`；进入 D2 时，execution-handoff 只摘录与本条有关的分析能力和最终 Execute 可访问的 render / layout / text / image 能力，不另建 toolchain 文件。Visual Proof 可以由其他模型 / 会话补做，但必须使用这里已登记且最终 Execute 可继续访问的 actual_tool / entrypoint；工具链变化先更新 capability-map 与 execution-reference，再重做 proof。
 
 ## 适配和调用顺序
 
@@ -81,7 +57,7 @@ status 只用 available、unavailable、unverified。工具存在但未试过所
 2. 映射参数：将项目毫秒转换为工具单位，明确 end 是包含还是不包含。不要对时间戳连续取整；适配层返回原始值和规范化值。
 3. 先用短区间检查元数据、时间码、画面及声音是否匹配。跨工具切换后复核偏移，不能只因同名文件就认为一致。
 4. 每次调用登记 job_id、source_id、源版本、区间、参数、工具名、任务状态、返回文件和错误。除源路径外，日志不记录访问令牌、签名 URL 或秘密信息。
-5. 独立只读处理可在服务限制内并发；有依赖的处理顺序执行。Broad Structure 与 Directed Deep Structure 可以复用同一能力映射和缓存。第一轮应把已分析 sampled frames 同步整理为人可读 `frame-observations.csv`；第二轮除记录更密的实际观察范围，还应形成 `deep-observations.csv`，把核心区域的画面、内容、场景 / 叙事背景、前后状态和原声核验留下来。不要未经要求开多智能体流程。
+5. 独立只读处理可在服务限制内并发；有依赖的处理顺序执行。Broad Structure 与 Detail Structure 可以复用同一能力映射和缓存。第一轮应把已分析 sampled frames 同步整理为人可读 `frame-observations.csv`；第二轮除记录更密的实际观察范围，还应形成 `deep-observations.csv`，把核心区域的画面、内容、场景 / 叙事背景、前后状态和原声核验留下来。不要未经要求开多智能体流程。
 6. 异步任务轮询已有 job_id，不反复提交相同渲染。限流或临时失败可按服务建议退避重试，默认最多两次；参数、权限、无效素材错误先修正原因。
 7. 渲染到新文件。仅在成功读取并检查输出后标记 completed。错误或缺失的片段不得从 coverage 中悄悄消失。
 
@@ -106,7 +82,5 @@ status 只用 available、unavailable、unverified。工具存在但未试过所
 - FFmpeg 官方过滤器文档：https://ffmpeg.org/ffmpeg-filters.html
 - PySceneDetect 官方命令文档：https://www.scenedetect.com/docs/head/cli.html
 - Whisper 官方模型局限说明：https://github.com/openai/whisper/blob/main/model-card.md
-
-`separate_dialogue`、`analyze_music` 等始终是抽象 capability。当前环境可以把它们映射到本地程序、MCP 或远程服务；`separate_dialogue` 可优先采用 Demucs 兼容的本地 source-separation 后端，`analyze_music` 使用实际环境中许可证兼容且经 smoke test 的分析实现，基础抽取 / 混音 / 检查优先复用已验证的 FFmpeg / Media 能力。Demucs 代码按官方 MIT License 使用；其预训练模型权重仍按独立资源核对许可证，本项目 Release 不随包分发这些权重。
 
 上述资料于 2026年9月29日查阅。运行时仍须核对实际安装版本；本规范不依赖某个模型名称或 API 版本。

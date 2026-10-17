@@ -24,7 +24,7 @@
 
 ## 四种重组方式
 
-rough plan 可以采用下列一种或多种结构关系。Directed Deep Structure 负责检查这些关系是否真的得到原素材支持；若不成立，返回 Direct 调整，不用剪辑手法硬做。
+rough plan 可以采用下列一种或多种结构关系。Detail Structure 负责检查这些关系是否真的得到原素材支持；若不成立，返回 Direct 调整，不用剪辑手法硬做。
 
 
 | 方式 | 段落组织 | 核对重点 |

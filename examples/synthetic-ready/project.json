@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.6",
+  "schema_version": "1.8",
   "project_id": "synthetic-review",
   "version": 2,
   "goal": null,
@@ -78,7 +78,7 @@
     "require_confidence_with_basis": true,
     "require_detail_interval_context": true,
     "require_speaker_adjudication_artifact": true,
-    "detail_precision_target_ms": "100-500",
+    "detail_precision_target_ms": "selection_ready; final selected cut verified in Execute Step 0",
     "negative_claim_policy": "not_observed_is_not_absent",
     "evidence_conflict_policy": "resolve_by_fact_type_and_record_conflict",
     "dialect_asr_policy": "locator_only_until_verified",
@@ -116,5 +116,18 @@
   "execution_plan_ref": "execution-plan.md",
   "execution_plan_status": "confirmed",
   "execution_authorization_ref": "execution-authorization.json",
-  "execution_authorization_digest": "ea3594df8d0dd094539b19d39c6625eb853b406ca969c50dea17f674fa513eef"
+  "execution_authorization_digest": "e52dde75d224606034007fd4aa8bb5d513adeaf15df1f076979aa222b7b58b1e",
+  "execution_package_policy": "plan_and_reference",
+  "structure_exceptions_ref": "structure-exceptions.jsonl",
+  "keyframe_references_ref": "keyframe-references.json",
+  "execution_handoff_ref": "execution-handoff.md",
+  "execution_reference_ref": "execution-reference.md",
+  "execution_reference_asset_refs": [
+    "mockup.svg",
+    "proof.svg",
+    "capability-map.json"
+  ],
+  "visual_gate_status": "proof_confirmed",
+  "visual_mockup_ref": "mockup.svg",
+  "visual_proof_ref": "proof.svg"
 }

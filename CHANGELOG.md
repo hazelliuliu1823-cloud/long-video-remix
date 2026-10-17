@@ -1,33 +1,42 @@
 # Changelog
 
-Release history below follows repository tags. v1.2.2 is packaged for a tagged GitHub Release; attach the complete github-ready package as the release asset when publishing.
+Public release packaging targets v1.2.4. Earlier entries are retained as development history; their dates do not imply published GitHub Releases or tags.
 
 
-## v1.2.2 — Confirmation Review Revision · 2026-10-14
 
-- Retained the version number and current package baseline; separately present narrative, sound, actual mockup and complete-package decisions, with visual/package approval allowed in the same turn.
-- Added visual-confirmation records binding readable target-size mockups, their original keyframes, reference parameters and explicit approval provenance. Missing/unapproved visual work remains a draft and blocks formal rendering; preparation never confirms a record.
-- Sound confirmation now includes sound form and separation/fallback decisions. Adopted music files and excerpts are checked and fingerprinted; required Music Maps contain real anchors, AV mappings and declared verification instead of only a completion label.
-- Updated standalone handoff requirements, templates, bilingual prompts and synthetic fixtures. Original Structure CSV headers, time mapping, dialogue/boundary protection and timeline algorithms remain unchanged.
-- No project-migration work is included in this revision. Test evidence is recorded in docs/qa/v1.2.2-QA.
+## v1.2.4 — Gate & Compatibility Hardening · 2026-10-17
 
-## v1.2.2 — Capability Auto-Preparation · 2026-10-14
+- Fixed checksum regression for real Git installs: the test now verifies the files declared by `SHA256SUMS` instead of treating `.git/` or local OS metadata as packaged files; added `.gitattributes` with LF text normalization.
+- Restored schema 1.7 boundary strictness. The deferred partial-boundary precision introduced in v1.2.3 applies only to schema 1.8+ projects.
+- Unified strict project schema parsing in one shared helper. Malformed values such as `v1.8` and `1.8-rc1` are errors rather than silent legacy fallbacks.
+- Corrected the `capability-map.json` contract to the actual `{schema_version, capabilities:[...]}` object format. Visual Proof now requires an available capability whose `output_mapping` resolves to the declared `visual_proof_ref`, not merely any tool with an entrypoint.
+- Added a compact `d2_selection_snapshot` on schema 1.8 source events. It records the Direct 2 planned range, selected boundary, safe windows, and allowed trim / handle adjustments; Execute Step 0 cannot widen that envelope or switch the boundary without returning for confirmation.
+- `prepare_execution_authorization.py` carries the snapshot's allowed adjustments into the draft authorization; the existing event spec / asset fingerprints continue to lock the final confirmed state.
 
-- Changed missing-capability handling from immediate unavailable/fallback to discover → reuse → prepare-if-permitted → smoke-test → register, while keeping fallbacks for blocked or failed setup.
-- Agents may prepare a compatible local backend when shell/package installation is available, but only after checking that the software licence permits the actual use. Demucs remains an optional dialogue-separation implementation; its code is MIT-licensed, while model-weight licensing is checked separately and weights are not bundled in this Release.
-- Heavy installs that may download large dependencies or alter Python environments are disclosed first and default to a project-local virtual environment rather than the user's global Python. Code, model-weight and other downloadable-resource licences are evaluated independently; unclear commercial-use rights are not treated as permission.
-- Added safety boundaries: no silent paid API use, credentials, third-party media upload, privilege escalation, security-setting changes, unknown-source installers, or redistribution of third-party model weights without a clear licence.
-- Music Direction is now fail-closed whenever `music_direction_ref` is present, even if `music_direction_policy` was accidentally omitted. Added regressions for stale Music Map authorization and the missing-policy bypass; synthetic-ready now carries a confirmed `narrative_led` music direction.
-- Added optional capability resolution provenance to capability-map and `capability_resolution_policy=discover_then_prepare_if_permitted` to new project templates. Backends remain replaceable rather than hard dependencies. README now includes Direct 2 / Execution Package and execution prompt examples, including how to predeclare `narrative_led` with no new music.
-- 200 regression tests pass; timeline schema, Structure CSV headers and existing Direct 2 authorization semantics remain unchanged apart from the fail-closed Music Direction gate above.
 
-## v1.2.1 — Sound & Music Execution · 2026-10-14
+## v1.2.3 — Selected Range Verification · 2026-10-17
 
-- Added a Direct 2 Music Mode Confirmation Gate with `narrative_led / hybrid / music_led`. The Director must recommend a mode from confirmed Narrative Direction + Detail evidence; explicit prior user choices are reused, while inferred modes stop at `proposed` until the user confirms.
-- Added `music-direction.json` and optional `music-map.json`. New projects mechanically block ready_for_render until music mode is confirmed; adopted music-direction / Music Map bytes are bound into Direct 2 authorization so post-confirmation changes invalidate the old render entry. Legacy projects without the new policy remain compatible.
-- Added Music-Aware Editing and Audio Treatment: narrative anchors vs flexible regions, beat / phrase / section mapping, preserve / isolate / attenuate / replace / remove / designed silence, gain / fade / duck / mix / normalize, derived-audio provenance, QA and fallback.
-- Added backend-agnostic MCP capabilities `extract_audio`, `separate_dialogue`, `analyze_music`, `mix_audio`, and `inspect_audio`; Demucs or specific analysis libraries are optional implementations, not hard dependencies.
-- Added two templates and one reference document; formal timeline schema and Structure CSV headers remain unchanged. 196 regression tests pass, including 4 new Music Mode / Music Map authorization cases.
+- Moved final A/V boundary precision out of every Detail candidate and into **Execute Step 0**, which reopens only Direct 2 selected ranges + handles.
+- Detail is now explicitly subtitle + waveform / signals first. Full-interval ASR is not a completion condition; targeted ASR is used only for decisive wording / speaker ambiguity or final subtitle needs.
+- `edit-boundaries.csv` keeps the same header. `partial` now supports selection-ready conservative boundaries with unknown exact audio/action tails; `supported` means the applicable continuity boundary has been verified.
+- New projects use project schema 1.8. `ready_for_render` requires each selected source event's boundary to be `supported`, while unselected partial candidates may remain untouched. Schema 1.7 keeps the v1.2.2 ready behavior.
+- Direct 2 may run in another model/session and hand off planned ranges + boundary refs + allowed calibration. Execute Step 0 may calibrate boundaries but may not change narrative selection; semantic conflicts return to Direct 2. Final machine authorization is prepared / confirmed after Step 0 against the actual adopted ranges.
+- No Audio Gate, Audio Closure file, new creative stage, timeline schema, authorization schema, or formal CSV header was added. Visual Gate and Toolchain Continuity are unchanged.
+
+## v1.2.2 — Release Hardening · 2026-10-17
+
+- Bumped `project.json` to schema 1.7 for new projects so the three-field Visual Gate cannot be bypassed by omission; schema 1.6 projects retain compatibility behavior.
+- `proof_confirmed` now requires distinct mockup / proof content plus `capability-map.json` with at least one available `actual_tool + entrypoint`; all three are authorization-bound reference assets, so toolchain-entry changes invalidate old confirmation.
+- Upgraded `examples/synthetic-ready` to exercise the current Detail handoff, keyframe reference, execution reference, capability map, mockup, executable proof, and authorization path.
+- Added `assets/capability-map-template.json`, an English install guide, Direct 2 / Render+QA prompt examples, canonical stage naming, and corrected Execute-vs-Detail responsibilities in both READMEs.
+- Added a checksum regression test so edits cannot silently leave a stale repository `SHA256SUMS`.
+
+## v1.2.1 — Lean Scope & Visual Reproducibility Gate · 2026-10-17
+
+- Added a minimum-sufficient Detail STOP rule without adding tables or stages.
+- Replaced the heavier state-file idea with a four-line Scope Lock carried inside existing Direct / handoff documents.
+- Split visual confirmation into Aesthetic Mockup and Executable Proof Frame. Proof may be completed in another model or session, but must use the same real execution toolchain available to final Execute; the existing `capability-map.json` carries that mapping.
+- Added only three project fields (`visual_gate_status`, `visual_mockup_ref`, `visual_proof_ref`). No current-state, visual-style, music-gate file, formal CSV, or schema-version change. Legacy projects without these fields retain v1.2.0 warning-only behavior.
 
 ## v1.2.0 — Keyframe Mockup Handoff · 2026-10-08
 

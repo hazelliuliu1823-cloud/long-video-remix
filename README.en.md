@@ -1,29 +1,38 @@
-# Long Video Remix
+# Long Video Remix — AI Video Editing Skill for Claude Code & Codex
 
 [中文](README.md) | **English**
 
-Turn long videos into a searchable index you can trace back to the source. Work with AI to find topics, shape the story, and revise the plan, then hand the confirmed plan over for execution.
+**An AI video editing / Agent Skill for long-video remix, short-form editing, and reusable video understanding.** Turn long-form footage into a **searchable, traceable structured layer**, use two human-in-the-loop Director passes to decide *what to tell* and *how to tell it*, then turn the confirmed selections, visual proof, audiovisual boundaries, and authorization into an inspectable execution package.
+
+`Claude Code · Codex · FFmpeg / FFprobe · MCP-ready · Human-in-the-loop · Bilingual`
+
+**Use it for:** long video → short-form remix, drama / variety recuts, interview highlights, course / event footage reuse, cross-video retrieval, and content-performance analysis.
+
+**Why it is different from one-click AI editors:** it does not ask one model to black-box an entire long video and jump straight to a finished cut. Broad builds a low-cost global index; Detail revisits only the regions that matter; Direct 1 and Direct 2 keep creative decisions human-controlled; Execute turns confirmed decisions into reproducible, auditable editing work.
 
 ![Workflow schematic: long video footage, a traceable structured index, editorial discussion with AI, and execution of the confirmed edit.](assets/workflow-overview.en.png)
 
-For **MCNs, directors, and content editors** who reuse long video footage, develop ideas through discussion, and produce different versions.
-
-| Core value | How it works |
+| Common problem | How Long Video Remix handles it |
 |---|---|
-| **Lower-cost reuse** | Broad builds a global content map; creative discussion, retrieval, and revision reuse the data, while Detail focuses on verifying selected regions |
-| **Rich structure** | Preserves facts for each sampled frame, action changes, dialogue / speaker evidence, context, emotional cues, questions, unverified items, and source time |
-| **Human creative control** | Two Direct stages: first decide what to tell, then decide exactly how to tell it once the evidence is complete; Execute implements confirmed decisions |
-| **Checkable execution** | Binds evidence to source versions and checks edit boundaries, dialogue protection, authorized source ranges and order, timelines, layered caches, and export audits |
+| **Every new edit requires rewatching the same long footage** | Broad Structure creates a searchable video index, Content Map, and source-time tracebacks |
+| **Creative ideas get mixed with unverified evidence** | Direct 1 chooses the narrative direction, Detail verifies targeted regions, and Direct 2 locks the execution plan |
+| **Detail / ASR becomes expensive and slow** | STOP after minimum sufficient evidence; prefer subtitles + waveform / signals and use targeted listening / ASR only for material ambiguity |
+| **The mockup looks great but the real render drifts** | Aesthetic Mockup → Executable Proof; the proof must use the same toolchain available to final Execute |
+| **Decisions drift across models or sessions** | source refs, boundaries, the D2 snapshot, authorization, and render manifest preserve machine-checkable continuity |
 
-The goal is to reduce the cost of repeatedly interpreting raw multimodal material. Frame extraction, ASR, targeted review, and GPU rendering still require resources. Actual costs depend on the material, models, and tools; this project promises no fixed percentage reduction.
+**Core outputs:** `Content Map` · structured observations · Detail evidence · real keyframes · Direct 2 execution plan · executable visual proof · verified edit ranges · render manifest · QA / audit records
 
-Use only source material you have the right to use.
+Built for **MCNs, directors, content editors, creators, and AI video-workflow developers** who repeatedly reuse long-form footage and need creative control without repeatedly re-reading the same multimodal source.
 
-For version updates, validation results, and installation, see [Release notes](RELEASE_NOTES.md) · [CHANGELOG](CHANGELOG.md) · [Installation and updates](INSTALL.md) · [Historical QA](docs/qa/README.md).
+The goal is to reduce repeated interpretation of source media, not to promise zero-cost automatic editing. Frame extraction, targeted ASR, focused rewatching, and GPU rendering still require resources depending on the footage, model, and toolchain.
+
+Use only media you have the right to use.
+
+See [Release notes](RELEASE_NOTES.md) · [CHANGELOG](CHANGELOG.md) · [Install / update](INSTALL.en.md) · [QA history](docs/qa/README.md) (Chinese).
 
 ## Quick start
 
-For a first local installation, choose the command for your tool. For an existing installation directory, see [Installation and updates](INSTALL.md).
+For a first local installation, choose the command for your tool. For an existing installation directory, see [Installation and updates](INSTALL.en.md).
 
 ```sh
 # Claude Code
@@ -35,7 +44,7 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 
 1. Install the complete folder, copy `assets/project-template.json` to create a separate project, and register sources and available models / video tools.
 2. Complete Broad's formal observation layer and Content Map. If you only need structured analysis, deliver at this point; later editing can reuse the results.
-3. A human / Director defines the narrative spine. Detail verifies selected regions and delivers real keyframes plus a standalone handoff. Direct 2 first recommends and confirms a Music Mode, then finalizes the Execution Package (plan + production reference) and machine-readable authorization.
+3. A human / Director defines the narrative spine. Detail verifies the selected regions and delivers real keyframes and a standalone handoff. Direct 2 then confirms the Execution Package (plan + production reference) and planned ranges; after returning to the actual execution environment, Execute Step 0 verifies selected boundaries before machine authorization is prepared / confirmed against the final ranges.
 4. Run static validation and compilation. The rendering adapter checks authorization before consuming the manifest:
 
 ```sh
@@ -48,11 +57,7 @@ Raw audiovisual processing and actual rendering are handled by the models, video
 
 Prefer `scripts/extract_frames.py` for local identity-mapped sources; for MCP / proxies, follow the [MCP adapter](references/mcp-adapter.md), retaining measured times and source bindings. The script's `signals` mode marks visual-change and sound segments; `strip` returns frame-by-frame edit-point strips. See [Detail evidence](references/detail-evidence.md) for evidence and question closure.
 
-**v1.2.2:** keeps the v1.2.1 Sound & Music Execution model and closes the capability/release loop. Missing tools are reused first; a local backend is prepared only when its licence permits the actual use and the environment allows installation, then smoke-tested before it is marked available. Demucs code can be an optional MIT-licensed separation implementation, while third-party model weights are licensed separately and are not bundled in the Release; heavy Python dependencies default to a project-local venv. A referenced Music Direction is validated fail-closed even if its policy field was accidentally omitted.
-
-**v1.2.2 confirmation revision:** separately present narrative, sound, mockup and complete-package decisions. Visual approval may share the package-approval turn; explicit existing decisions are reused. `visual-confirmation.json` binds readable mockups, original frames, production parameters and output dimensions. Missing/unapproved mockups permit drafts, never formal rendering. Sound approval includes its form; adopted music files, versions, excerpts and meaningful Music Maps are checked. A `complete` label alone is insufficient. See the [execution-package contract](references/execution-package.md).
-
-**v1.2.1:** adds Sound & Music Execution on top of v1.2.0. Direct 2 first recommends `narrative_led / hybrid / music_led`; an already explicit user choice is reused, otherwise the workflow stops at `proposed` until the user confirms. `hybrid / music_led` can use a Music Map to align beat / phrase / section structure with flexible visual regions. Audio Treatment covers preserve / isolate / attenuate / replace / remove / designed silence plus gain / fade / duck / mix / normalize. New MCP capabilities stay backend-agnostic rather than hard-coding Demucs or another model. See [INSTALL.md](INSTALL.md).
+**v1.2.4:** keeps v1.2.3 Selected Range Verification but hardens the release path. Direct 2 stores planned ranges, boundary refs, and the then-current safe windows in `d2_selection_snapshot`; Execute Step 0 may calibrate only inside that snapshot and must stop for confirmation if it would exceed it. Visual Proof must also be produced by an available capability whose `output_mapping` resolves to the current proof artifact. Schema 1.7 retains its previous strict boundary behavior, and malformed project schema versions fail instead of falling back to legacy rules. See [INSTALL.en.md](INSTALL.en.md).
 
 ## Common prompt examples
 
@@ -86,25 +91,25 @@ Replace the placeholders with your sources, narrative direction, or working file
 
 **What to ask:**
 
-> Follow 〔confirmed narrative direction〕 and 〔detailed-review task list〕 to return to the original footage for Detail Structure. Verify the complete visuals, dialogue, speakers, actions, and surrounding context; separate facts, interpretations, and unverified items. Provide complete editable units, preferred edit points, safe edit-point windows, dialogue and actions that must be kept, and edit risks. Deliver the Detail evidence tables, real source keyframes, and a self-contained handoff, and explain whether the material supports the original narrative direction.
+> Follow 〔confirmed narrative direction〕 and 〔detailed-review task list〕 for Detail Structure. Start from existing subtitles plus waveform / signals, and use local listening / ASR only when exact wording, speaker identity, or a subtitle conflict can change the narrative decision. Do not wait for full-interval ASR. Deliver minimum-sufficient evidence, selection-ready conservative edit boundaries (which may remain partial before final calibration), real keyframes, and a self-contained handoff.
 
-**What you get:** A Detail evidence package with interval and deep-observation records, speaker verification, edit boundaries, real source keyframes, and a handoff file. The handoff states the execution-package requirements for the next Direct stage and explicitly marks incomplete items.
+**What you get:** A Detail evidence package with intervals, deep observations, only the necessary speaker checks, selection-ready boundaries, real source keyframes, and a handoff. Unselected candidates do not need frame-exact audio finishing first.
 
-### 5. Detail is complete: lock the final execution plan
-
-**What to ask:**
-
-> Use 〔confirmed narrative direction〕 and 〔Detail handoff〕 for Direct 2. Music mode: `narrative_led`; preserve the programme mix, add no new music, and do not separate dialogue. Preserve the confirmed narrative and evidence, complete Music Direction, the Execution Plan, and the Execution Reference, and specify final selections, text, audio treatment, transitions, visual mockups / style rules, and QA requirements. Present the mockups and parameters for my review first; after approval, deliver the complete Execution Package without rewriting the narrative direction.
-
-**What you get:** The specified sound direction and visual mockups awaiting review, followed by the approved complete package. Explicit sound choices are reused without asking again; they do not implicitly approve a new visual design.
-
-### 6. The package is confirmed: execute the edit
+### 5. Detail is complete: run Direct 2 and visual confirmation
 
 **What to ask:**
 
-> Enter Execute and follow 〔confirmed Execution Package〕 exactly. Do not re-decide the narrative, music mode, or visual direction. Apply the package timeline, audio treatment, text, transitions, and references; output the render manifest and any rough cut / final output the current environment can actually render, then run export audit and record anything still unverified.
+> Read 〔Detail handoff〕 and the real keyframes. First produce Direct 2's final narrative and execution plan, then generate a small set of Aesthetic Mockups for selection. After a mockup is confirmed, if this environment has the same renderer / layout tool that final Execute will use, rebuild it as an Executable Proof with that toolchain and record the actual_tool, entrypoint, fonts / assets, and key parameters in execution-reference. If this environment cannot produce the proof, keep the status at awaiting_proof and hand off the open item; do not substitute a tool unavailable to downstream Execute.
 
-**What you get:** An execution result aligned with the confirmed package, its render manifest, technical QA / audit, and explicit items that still require final human playback. If rendering is unavailable, capability fallback is recorded instead of claiming a finished video.
+**What you get:** A confirmed Execution Plan and selected visual mockup; when the toolchain is available, also an executable proof and reproducible entrypoint.
+
+### 6. Execution Package is confirmed: render and QA
+
+**What to ask:**
+
+> Execute 〔Execution Package〕 without reselecting the narrative, source material, or visual style. Start with Execute Step 0: reopen only the Direct 2 selected ranges + handles and verify final video/audio in/out, sentence tails, meaningful pauses, reactions, and any J/L-cuts; use ASR only for small windows when needed. For every clip, output a planned-range → verified-range → delta/reason comparison. If any calibration exceeds `d2_selection_snapshot`, stop for confirmation instead of widening the selection yourself. Only after all selected boundaries are supported and remain within the snapshot should you prepare / confirm authorization, compile the timeline / render manifest, render, and run QA.
+
+**What you get:** An executable timeline / render manifest, rendered media when the environment supports it, technical audit results, and actual playback QA records.
 
 ## Workflow
 
@@ -112,9 +117,11 @@ Replace the placeholders with your sources, narrative direction, or working file
 |---|---|
 | Broad Structure → Structured Observation Layer → Content Map | Global observation tables and scene / action / question indexes, preserving coverage and gaps |
 | Direct 1 · Narrative Direction | A human / Director determines the narrative spine, candidate regions, and questions to verify |
-| Directed Deep / Detail Structure + Edit Boundary | Verifies continuous audiovisual material, surrounding context, counterevidence, and editable ranges; delivers real keyframes and a standalone handoff with the evidence; returns to Direct 1 if evidence is insufficient |
-| Direct 2 · Music Mode Gate → Execution Package | Recommends and confirms narrative-led / hybrid / music-led first, then locks events, optional Music Map / AV Mapping, audio / text / transitions, style rules, and allowed adjustments |
-| Execute → Render / QA | Produces the video from the complete execution package and machine-readable authorization, then performs technical checks, playback review, and Reference Compliance |
+| Detail Structure + Edit Boundary | Stops at minimum-sufficient evidence; subtitles / signals first; candidates may carry partial conservative boundaries; returns to Direct 1 if evidence is insufficient |
+| Direct 2 · Execution Package | Locks selected clips, planned ranges / boundary refs, and allowed calibration; mockup → proof closes the Visual Gate |
+| Execute → Render / QA | Step 0 verifies only selected ranges and promotes boundaries to supported; then authorize, render, and QA |
+
+**Canonical stage names:** this release uses only `Broad Structure → Direct 1 → Detail Structure → Direct 2 → Execute`. Board, Deep, Directed Deep, and Detailed Structure are legacy aliases in historical records, not extra stages.
 
 ## How rich structure reliably reaches execution
 
@@ -122,7 +129,7 @@ A fixed information baseline preserves facts, derived interpretations, and unkno
 
 Drafts that are not ready may only be compiled into non-renderable manifests by explicitly using `--planning`. Audio continuity checks protect dialogue and audio tails. J/L-cuts or creative truncation require specific confirmed grounds. Results continue to distinguish technical success from final listening and viewing approval.
 
-For engineering fields and migration, see the [Execution integrity contract](references/execution-integrity.md). A runnable example is available in `examples/synthetic-ready` (synthetic records, no real media). The same structured layer can also support [Content performance analysis](examples/content-performance-analysis.md).
+For engineering fields and migration, see the [Execution integrity contract](references/execution-integrity.md). A runnable example is available in `examples/synthetic-ready` (synthetic records, no real media). The same structured layer can also support [Content performance analysis](examples/content-performance-analysis.md) (Chinese).
 
 <details>
 <summary><strong>Full method, Structure forms, Direct responsibilities, and engineering notes</strong></summary>
@@ -144,15 +151,13 @@ This produces a straightforward change:
 
 Structure makes source material understandable and reusable. Producing a video still requires turning a confirmed creative plan into a timeline that **preserves evidence and protected ranges, can be rendered, and can be checked**.
 
-Execute further refines material already verified by Directed Deep Structure into:
+Detail Structure establishes verified units, necessary context, and `context_ranges` / `protected_ranges`, then supplies edit boundaries sufficient for Direct 2 selection; unselected candidates may remain partial. Execute **does not redo narrative selection**. Step 0 first promotes the actually selected boundaries to supported, then it is responsible for:
 
-- verified units and necessary surrounding context;
-- `context_ranges` / `protected_ranges`, preventing removal of essential meaning or actions;
-- `edit-boundaries.csv`: separates the end of content from a genuinely safe cut, recording audio tails, action / reaction closure, preferred in/out, safe windows, must-keep ranges, and cut risk;
-- an assembly timeline and an output timeline;
-- hard cuts / xfade, audio tracks, text tracks, and chapter cards;
-- `render-manifest.json`;
-- full decoding after export, frame-count / duration checks, near-silence scans, comparison images for every join, and final QA.
+- reopening only Direct 2 selected ranges + handles for final A/V boundary verification, with targeted ASR only when needed;
+- compiling the confirmed order and verified cuts into assembly and output timelines;
+- applying hard cuts / xfade, audio tracks, text tracks, and chapter cards;
+- producing `render-manifest.json` and rendering through the authorized entrypoint;
+- after export, performing full decoding, frame-count / duration checks, near-silence scans, join comparisons, Reference Compliance, and final QA.
 
 This repository therefore does not stop at structured analysis and leave you to work out the edit yourself. **Structure and Execute provide stable capabilities at both ends. Direct provides two creative decision points that require human participation: first confirm the narrative spine, then confirm the final execution plan.**
 
@@ -185,7 +190,7 @@ The analysis can then move beyond which video performs well to ask:
 
 **Structure's value is turning video from a multimodal object that is difficult to compute over and combine into a data layer that can be searched, filtered, joined, compared, and used for further creation.**
 
-The same structured results support editing, content review, audience behavior analysis, comparisons across videos, research, retrieval, and other AI workflows. For a fuller example, see [`examples/content-performance-analysis.md`](examples/content-performance-analysis.md).
+The same structured results support editing, content review, audience behavior analysis, comparisons across videos, research, retrieval, and other AI workflows. For a fuller example, see [`examples/content-performance-analysis.md`](examples/content-performance-analysis.md) (Chinese).
 
 ## Suitable uses
 
@@ -204,7 +209,7 @@ It is especially useful when:
 Scanning an entire long video at frame-level detail in one pass is expensive and can waste computation before creative direction is established. This workflow uses two Structure passes with different goals:
 
 - **First pass, Broad Structure: prioritize coverage.** Review all source material at a lower sampling density and compress the results into a reusable structured working layer;
-- **Second pass, Directed Deep Structure: prioritize completeness.** Once the script direction is confirmed, return only to selected regions to add dense visual observation, original audio, surrounding context, and counterevidence.
+- **Second pass, Detail Structure: prioritize completeness.** Once the script direction is confirmed, return only to selected regions to add dense visual observation, original audio, surrounding context, and counterevidence.
 
 Costly multimodal observation is therefore concentrated in a small number of valuable regions, while creative discussion, retrieval, and analysis across videos can work from already structured data wherever possible.
 
@@ -216,7 +221,7 @@ It addresses three main problems:
 
 - **Reduce repeated multimodal reading**: later Direct stages do not need to reload original videos, nine-frame grids, or large image collections into context for every creative discussion;
 - **Reduce context load during creative work**: people, Directors, or other Skills can combine and assess `frame-observations.csv`, scene / overview records, and `content-map.md` directly;
-- **Concentrate costly computation on selected regions**: only passages involved in the confirmed script return to the original footage for Directed Deep Structure, with dense reading of visuals, original audio, and surrounding context.
+- **Concentrate costly computation on selected regions**: only passages involved in the confirmed script return to the original footage for Detail Structure, with dense reading of visuals, original audio, and surrounding context.
 
 Original evidence is retained. All structured records preserve trace-back paths such as `frame_id`, `scene_id`, timecodes, and evidence refs, so work can return to the source material whenever needed.
 
@@ -278,7 +283,7 @@ This step **does not require precise edit points and must not present structured
 
 ### Direct 2: Execution Package — “How do these materials tell the story?”
 
-After Directed Deep / Detail Structure, the Director receives the complete evidence package for a second time: deep observations, original-audio / burned-in-subtitle verification, speaker adjudications, context / counterevidence, verified units, protected ranges, and evidence gaps. Only then is the final execution package formed. Its Editorial Execution Plan includes:
+After Detail Structure, the Director receives the complete evidence package for a second time: deep observations, original-audio / burned-in-subtitle verification, speaker adjudications, context / counterevidence, verified units, protected ranges, and evidence gaps. Only then is the final execution package formed. Its Editorial Execution Plan includes:
 
 - which verified units are finally selected / excluded;
 - their order and each segment's narrative function;
@@ -288,23 +293,23 @@ After Directed Deep / Detail Structure, the Director receives the complete evide
 
 Also deliver `execution-reference.md`: specific text styles / positions / display duration, visual treatment, audio / transitions, resources, and QA criteria. Usually one or two samples suffice to lock the style across the video; individual references are not required for every shot / subtitle. Detail's handoff already carries these output requirements, so switching models does not depend on the installed environment. See the [Complete delivery contract](references/execution-package.md). Use `assets/execution-plan-template.md` and `assets/execution-reference-template.md`. `assets/editorial-plan-template.md` remains as a combined template for older projects. By default, Execute only implements the plan confirmed by this second Director. **Final source-material selection belongs to Direct 2, not Execute.** If core evidence remains `pending / contradicted`, or either Direct stage is unconfirmed, the timeline cannot be marked `ready_for_render`.
 
-## Why Directed Deep Structure is a separate stage
+## Why Detail Structure is a separate stage
 
 The first Content Map should not scan every region at frame-level detail for a particular topic. That would be costly and would make Structure commit to a topic prematurely.
 
-Once the first Direct provides Narrative Direction, the system knows where to increase information density. The second pass still begins with **complete understanding of the material**, then makes editing judgments, rather than immediately marking cuts after finding candidates. Typical actions include:
+Once the first Direct provides Narrative Direction, the system knows where to increase information density. The second pass first establishes the **minimum complete context needed to resolve the current target questions**, then makes selection judgments; it does not require final transcripts or frame-level cut points for every candidate. Typical actions include:
 
 - increase sampling from an overview at roughly ten-second intervals to one or two frames per second or continuous playback; key changes in actions / gaze / positions continue to use local windows at the default 4fps density;
 - first create a **Detail Interval Card**: explain why the region requires detailed review, preceding context, current background, what follows, target questions, and its connection to the topic;
 - create a **Deep Observation Index** for selected core regions, recording complete visual descriptions: people, positions / orientation, action chains, key visual changes, observable emotional cues / cautious emotional interpretations, expressions / gaze, distances between people, key objects, motif tags, shot size / composition;
 - add a **content description**: what actually happens in the short segment, rather than just copying keywords or dialogue;
 - add **scene and narrative background**: location / time / environment, the preceding event, and how the current moment came about;
-- return from subtitle keywords to listening to the full conversation; distinguish burned-in subtitles / ASR / actual original audio, and record speakers, addressees, tone, pauses, environmental sound / music, and audio_verified; resolve ambiguity through frame-level lip / original-audio / subtitle / ASR evidence in **Speaker Adjudication**;
+- return from subtitle keywords only to the **audio window needed to resolve the target question**; use subtitles + waveform / signals for localization, and local listening / ASR only for decisive wording, speaker / addressee, overlap, or subtitle conflicts. Distinguish burned-in subtitles / ASR / actual original audio, and use **Speaker Adjudication** when the ambiguity matters;
 - expand beyond a single scene to fifteen to thirty seconds before and after it, or to the complete event when necessary, recording before_state / after_state;
 - separate facts, interpretations, and unknowns; preserve `question_refs` / unverified items, and check counterevidence, gaps, incorrect causality, and spatiotemporal relationships against Narrative Direction;
 - only then refine sufficiently understood core regions into units, context_ranges, protected_ranges, and executable editing judgments.
 
-If evidence conflicts with Narrative Direction, the tool reports the problem and returns to Direct 1 for adjustment. If the evidence supports it, the complete Detailed Structure evidence package goes back to the Director to form the second Direct's Execution Package (Editorial Execution Plan + production reference), then proceeds to Execute.
+If evidence conflicts with Narrative Direction, the tool reports the problem and returns to Direct 1 for adjustment. If the evidence supports it, the complete Detail Structure evidence package goes back to the Director to form the second Direct's Execution Package (Editorial Execution Plan + production reference), then proceeds to Execute.
 
 ## What Execute can do
 
@@ -333,6 +338,7 @@ long-video-remix/
 ├── README.en.md
 ├── CHANGELOG.md
 ├── INSTALL.md
+├── INSTALL.en.md
 ├── RELEASE_NOTES.md
 ├── LICENSE
 ├── SHA256SUMS
@@ -341,6 +347,7 @@ long-video-remix/
 │   └── openai.yaml
 ├── assets/
 │   ├── icon.svg
+│   ├── capability-map-template.json
 │   ├── workflow-overview.zh.png
 │   ├── workflow-overview.en.png
 │   ├── frame-observation-template.csv
@@ -356,8 +363,6 @@ long-video-remix/
 │   ├── execution-plan-template.md
 │   ├── execution-reference-template.md
 │   ├── execution-handoff-template.md
-│   ├── music-direction-template.json
-│   ├── music-map-template.json
 │   ├── keyframe-reference-template.json
 │   ├── structure-exception-template.json
 │   ├── editorial-plan-template.md
@@ -399,7 +404,6 @@ long-video-remix/
 │   ├── regression-checklist.md
 │   ├── structure-regression-matrix.md
 │   ├── mcp-adapter.md
-│   ├── sound-music-execution.md
 │   └── worked-example.md
 ├── tests/
 │   ├── test_dialogue_continuity.py
@@ -408,7 +412,9 @@ long-video-remix/
 │   ├── test_independent_audio_dialogue.py
 │   ├── test_extract_frames.py
 │   ├── test_detail_gates.py
+│   ├── test_selected_range_verification.py
 │   ├── test_size_budget.py
+│   ├── test_checksums.py
 │   └── fixtures/ready-project.json
 └── scripts/
     ├── extract_frames.py
@@ -436,21 +442,21 @@ long-video-remix/
 
 1. Complete Broad Structure first, delivering the formal Structured Observation Layer + Content Map;
 2. A human / Director uses this textual structured data and any necessary external research to form Narrative Direction (Narrative Spine + candidate regions + verification questions);
-3. Bring Narrative Direction back into the project, perform Directed Deep / Detail Structure on selected regions, and create `deep-observations.csv` to complete visuals, content, background, before/after states, original-audio evidence, counterevidence, and protected ranges for core regions;
-4. Deliver real keyframes, evidence, and a standalone handoff; Direct 2 first recommends a Music Mode and waits for one explicit confirmation only when the user has not already chosen it;
-5. After the mode is confirmed, form the Execution Package. When music structures the visuals, include a Music Map / AV Mapping; Execute then performs audio preparation / assembly and compiles the visual timeline from the confirmed package;
-6. Save current evidence bindings and Direct 2's machine-readable authorization according to the [Execution integrity contract](references/execution-integrity.md), then run:
+3. Bring Narrative Direction back into the project, perform Detail Structure on selected regions, and create `deep-observations.csv` to complete visuals, content, background, before/after states, original-audio evidence, counterevidence, and protected ranges for core regions;
+4. Deliver real keyframes, evidence, and a standalone handoff (including complete downstream output requirements), then return them to the Director to form the Execution Package;
+5. Execute starts with Step 0: reopen only D2-selected ranges + handles, verify final A/V boundaries, and promote adopted boundaries to `supported`; then compile the edit plan / timeline from the confirmed plan + production reference and produce with the frozen styles;
+6. After Step 0, save current evidence bindings and prepare / confirm machine authorization against the final ranges according to the [Execution integrity contract](references/execution-integrity.md), then run:
 
 ```text
-python3 scripts/validate_project.py 项目目录
-python3 scripts/compile_render_manifest.py 项目目录
-python3 scripts/check_render_authorization.py 项目目录 项目目录/render-manifest.json
+python3 scripts/validate_project.py PROJECT
+python3 scripts/compile_render_manifest.py PROJECT
+python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.json
 ```
 
 7. After producing the video with an actual renderer, run:
 
 ```text
-python3 scripts/audit_render.py 成片.mp4 项目目录/render-manifest.json --outdir 核查目录 --contacts
+python3 scripts/audit_render.py output.mp4 PROJECT/render-manifest.json --outdir audit-dir --contacts
 ```
 
 ## Boundaries
@@ -459,8 +465,8 @@ python3 scripts/audit_render.py 成片.mp4 项目目录/render-manifest.json --o
 - Subtitles / ASR support retrieval; they are not verification by listening to original audio;
 - Broad Structure's formal forms are textual structured data. The Content Map builds on them and cannot replace them;
 - Direct 1's Narrative Direction expresses directing intent; it is not proof from the source material;
-- Directed Deep Structure grounds Narrative Direction in original source evidence;
-- Direct 2 first completes the Music Mode Gate from verified evidence and keyframes, then forms the complete Execution Package; only inferred modes require a confirmation turn, while an explicit prior user choice is reused. Execute does not decide the final narrative, music structure, or style on its own;
+- Detail Structure grounds Narrative Direction in original source evidence;
+- Direct 2 forms a complete Execution Package from verified evidence and keyframes; Execute does not skip this step by default and decide the final narrative or style on its own;
 - Tools may suggest that a node lacks sufficient material or propose alternative segments, but do not rewrite confirmed core expression on their own by default;
 - A successful rendering log does not mean the finished video has passed acceptance.
 
