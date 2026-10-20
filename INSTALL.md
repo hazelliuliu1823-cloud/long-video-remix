@@ -1,4 +1,10 @@
-# 安装与更新 · v1.2.4
+# 安装与更新 · v1.3.1
+
+Long Video Remix 是面向 Claude Code 与 Codex 的 **AI video editing Agent Skill**，覆盖 long video to shorts、video highlights、Visual Methods、Blender motion composition、FFmpeg rendering 与 QA。
+
+本版沿用 v1.3.0 的 [制作方法、Blender 合成与动态验证](references/visual-production.md)，并加入 [Style System](references/style-system.md) / [Visual Router](references/visual-methods/index.md) 作为 Direct 2 的视觉方案生成与兜底知识层；不新增阶段、Gate、schema 或 QA。完整保留原文件；新项目复制 project-template（schema 1.9），填方法/合成/delivery 三个模板。静态脚本需 Python 3.9+，实际局部合成需安装 Blender，回接需 FFmpeg/ffprobe。Blender/MCP 不打进 ZIP，也不因解压自动可用；无执行能力时 Gate 保持 pending。实际 Linux 渲染、回归和未验证项见 [本版 QA](docs/qa/v1.3.1-QA.md)。
+
+旧项目要采用新管线先运行 `python scripts/visual_pipeline.py init PROJECT`；承接证据、范围和有效确认，不重扫。已有 schema 1.8 项目可维持原流程；不能在采用新管线后通过降级 schema 或删除 policy 规避确认。
 
 解压后得到 `long-video-remix/` 完整目录。SKILL.md、references、assets、scripts 和 agents 必须一起保留；只复制 SKILL.md 会丢失契约和检查能力。
 
@@ -16,7 +22,7 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 
 解压安装包时，也可将完整 `long-video-remix` 文件夹放入 `~/.claude/skills/`（Claude Code）或 `~/.agents/skills/`（Codex）。项目素材和工作数据放在独立项目目录，不放进安装目录。
 
-用 Git 安装的副本可在安装目录执行 `git pull --ff-only` 更新。仓库安装获取当前分支版本；需要固定 v1.2.4 时，可使用对应安装包，或在 Release/tag 发布后执行 `git clone --branch v1.2.4 --depth 1 <repo> <目标目录>`。安装或更新后检查工具的技能列表。
+用 Git 安装的副本可在安装目录执行 `git pull --ff-only` 更新。仓库安装获取当前分支版本；需要固定 v1.3.1 时，可使用对应安装包，或在 Release/tag 发布后执行 `git clone --branch v1.3.1 --depth 1 <repo> <目标目录>`。安装或更新后检查工具的技能列表。
 
 目录依据：[Claude Code 本地 skills](https://code.claude.com/docs/en/skills) · [Codex 本地 skills](https://learn.chatgpt.com/docs/build-skills)，核对日期：2026年10月2日。
 
@@ -28,7 +34,7 @@ mkdir -p ~/.agents/skills && git clone https://github.com/hazelliuliu1823-cloud/
 - 抽帧与时间信号（`extract_frames.py`）、导出审计：FFmpeg / ffprobe；生成拼图时额外需要 Pillow。
 - 模型、视频 MCP、渲染器的依赖按实际适配器配置，不在包内下载大模型或素材。
 
-Python 3.9 已做语法兼容检查，尚未在 3.9 解释器上实际运行回归；v1.2.4 发布前回归环境为 Python 3.13.5 + FFmpeg 7.1.5 + Pillow 12.3.0；216 项测试全部通过。缺少 FFmpeg 或 Pillow 时，抽帧相关测试会跳过。
+Python 3.9 已做语法兼容检查，尚未在 3.9 解释器上实际运行回归；v1.3.1 当前回归环境为 Python 3.13.5 + FFmpeg 7.1.5 + Pillow 12.3.0，共发现 265 项测试：263 通过、2 项因本轮未配置 `BLENDER_EXECUTABLE` 而条件跳过、0 失败。v1.3.0 QA 保留此前真实 Blender/FFmpeg 合成素材渲染验证；v1.3.1 不把该历史验证冒充成本轮重跑。缺少 FFmpeg / Pillow / Blender 时，对应集成测试会按条件跳过。
 
 ## 验证安装包
 

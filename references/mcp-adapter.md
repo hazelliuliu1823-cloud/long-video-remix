@@ -84,3 +84,8 @@ Broad / Detail 使用过的真实能力继续保留在同一 `capability-map.jso
 - Whisper 官方模型局限说明：https://github.com/openai/whisper/blob/main/model-card.md
 
 上述资料于 2026年9月29日查阅。运行时仍须核对实际安装版本；本规范不依赖某个模型名称或 API 版本。
+
+
+## v1.3.0 Blender 合成入口
+
+制作方法和交付契约见 [visual-production.md](visual-production.md)。先检查真实 Blender 可执行文件或 MCP 的工具 schema，不能把插件里的说明当作 MCP 已安装。固定入口是 `scripts/render_blender_composition.py`（Blender CLI + FFmpeg）；复杂处理可由已验证 MCP / Blender Python 制作 `native_blend`，再用同一入口渲染并回读。MCP 只改变操作通道，不绕过 build_composition、动态 review、当前版本确认或最终授权。记录依赖、版本、局部帧与源时间映射；能力失败时交付缺口，不把效果静默替换成简单推拉。FFmpeg 回接入口是 `scripts/finish_ffmpeg.py`，保留现有 clean-video / mix 工作。

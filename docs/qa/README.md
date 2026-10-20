@@ -6,6 +6,8 @@ These are the original validation records for the development versions. Baseline
 
 | 版本 / Version | 报告 / Report | 明细 / Details |
 |---|---|---|
+| v1.3.1 | [Markdown](v1.3.1-QA.md) | [JSON](v1.3.1-QA.json) / [完整日志](v1.3.1-tests.txt) |
+| v1.3.0 | [Markdown](v1.3.0-QA.md) | [JSON](v1.3.0-QA.json) / [完整日志](v1.3.0-tests.txt) |
 | v1.0.3 | [Markdown](v1.0.3-QA.md) | [JSON](v1.0.3-QA.json) |
 | v1.0.4 | [Markdown](v1.0.4-QA.md) | [JSON](v1.0.4-QA.json) |
 | v1.0.5 | [Markdown](v1.0.5-QA.md) | [JSON](v1.0.5-QA.json) |

@@ -143,3 +143,7 @@
 - preserve_dialogue / 删句例外 / dialogue_policy_reason（明确改变政策时）：
 
 先用 prepare_execution_authorization.py 生成 draft，再根据本轮已确认决定核对并记录；草稿不能自动升为 confirmed。发生实际证据变化须回查，发生方案变化须按已有用户授权重新裁决，不能仅重算指纹掩盖变化。详见 references/execution-integrity.md。
+
+## 阶段内关口与续接
+
+按 `references/workflow-control.md` 恢复 project.json 中的关口与已有确认。交接前运行 `workflow_control.py handoff`，保留声音策略、Mockup、Proof、两次 Direct 和后续核验的当前状态、确认来源、缺口及下一步；不要因换会话而重置或默认关闭。

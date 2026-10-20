@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "project_id": null,
+  "output": {
+    "width": null,
+    "height": null,
+    "fps_num": null,
+    "fps_den": null
+  },
+  "proof_composition_id": "C01",
+  "compositions": [
+    {
+      "composition_id": "C01",
+      "backend": "blender",
+      "mode": "layers",
+      "method_ids": [
+        "PM001"
+      ],
+      "event_ids": [],
+      "anchor_event_id": null,
+      "local_start_frame": 0,
+      "frame_count": null,
+      "groups": {},
+      "layers": [],
+      "joins": [
+        {
+          "frame": null,
+          "before_frames": null,
+          "after_frames": null,
+          "from_event_id": null,
+          "to_event_id": null,
+          "cut_intent": null,
+          "outgoing_state": null,
+          "incoming_state": null,
+          "motion_handoff": null
+        }
+      ],
+      "preview_audio_ref": null,
+      "silent_demo": false,
+      "silent_reason": null,
+      "scene_ref": "compositions/C01/v1.blend",
+      "video_ref": "compositions/C01/v1-visual.mp4",
+      "demo_ref": "compositions/C01/v1-demo.mp4",
+      "proof_ref": "compositions/C01/v1-proof.png",
+      "receipt_ref": "compositions/C01/v1-render.json",
+      "readback_ref": "compositions/C01/v1-readback.json",
+      "review_ref": "compositions/C01/v1-review.json"
+    }
+  ]
+}

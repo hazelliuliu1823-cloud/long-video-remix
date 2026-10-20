@@ -60,6 +60,8 @@
 
 ## 下游任务：生成完整 Execution Package
 
+采用 v1.3.1 制作流程时，D2 另交制作方法（叙事作用→视觉问题→视觉重点→原画条件→处理依据→参数/失败情形）；已有方案可由 Visual Methods 校正深化，没有成熟方案时按 Router + 完整方法库 / fallback 提出可制作候选后再选定 Project Method，以及 Blender 合成工程、可访问资源、含接点两侧的动态 demo、技术 receipt 和逐项实看 review；方法与当前工程/demo 均需真实确认。确认后按当前 manifest 回到既有 FFmpeg 流程，并完成原 QA 与 CompositionCompliance / MotionContinuity / DeliveryTechnical。缺项随包传递，不能以以后再反馈代替本轮 Gate。详细规范与入口是 [视觉制作](../references/visual-production.md)。
+
 Director 2 基于以上已核实素材和 Narrative Direction 决定最终呈现；保留两次 Direct 的职责，不重做已确认主线，不把未核实项当成事实。素材不足只补对应缺口；主线冲突说明证据并返回 Direct 1。
 
 请一次交付以下内容，已明确的规则填具体参数，不将必要判断留到 Execute：
@@ -78,3 +80,7 @@ Director 2 基于以上已核实素材和 Narrative Direction 决定最终呈现
 ## Execute 接手入口
 
 接收 Source Clips + Detail Structure + execution-plan + execution-reference + Constraints。先执行 Selected Range Verification，再按已确认方案制作；边界可在 D2 允许范围内校准，但不重新选择核心主题、片段或风格。资源 / 参数有缺口时先明确处理，不补造确认结果。
+
+## 阶段内关口与续接
+
+按 `references/workflow-control.md` 恢复 project.json 中的关口与已有确认。交接前运行 `workflow_control.py handoff`，保留声音策略、Mockup、Proof、两次 Direct 和后续核验的当前状态、确认来源、缺口及下一步；不要因换会话而重置或默认关闭。

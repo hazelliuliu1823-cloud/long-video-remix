@@ -1,13 +1,8 @@
 interface:
-  display_name: 长视频结构化与混剪执行
-  short_description: 长视频先结构化；两次 Director 决策后再执行剪辑与 QA
-  default_prompt: 使用 $long-video-remix：先完成 Broad Structure 的正式文字化观察层与 Content Map，由 Director 确认 Narrative Direction；再做 Detail Structure，以字幕 / signals 优先补足最小充分证据，不为候选区间默认全量 ASR，并保留 selection-ready 边界，随真实关键帧与自包含 handoff 交回 Director 确认 Execution Package（计划与制作 reference）；一两个样本锁定全片风格。Execute 先用 Step 0 只精校 D2 入选片段及 handles、把 boundary 升为 supported，再落实已确认包，QA 核查 Reference Compliance。保持完整基础观察、稳定 source-time 标签与两次 Direct 边界。
-  icon_small: assets/icon.svg
-  icon_large: assets/icon.svg
+  display_name: "长视频结构化与混剪执行"
+  short_description: "AI视频剪辑：长视频索引、Visual Methods、Blender合成与FFmpeg交付"
+  default_prompt: "使用 $long-video-remix：每轮续接按 references/workflow-control.md 恢复项目与待确认关口，依赖动作前运行 guard，交接保留状态；先完成 Broad Structure 的正式文字化观察层与 Content Map，由 Director 确认 Narrative Direction；再做 Detail Structure，以字幕 / signals 优先补足最小充分证据，不为候选区间默认全量 ASR，并保留 selection-ready 边界，随真实关键帧与自包含 handoff 交回 Director 确认 Execution Package（计划与制作 reference）；一两个样本锁定全片风格。Execute 先用 Step 0 只精校 D2 入选片段及 handles、把 boundary 升为 supported，再落实已确认包，QA 核查 Reference Compliance。保持完整基础观察、稳定 source-time 标签与两次 Direct 边界。 D2 依 references/visual-production.md 交付方法、Blender 工程和连续动态 demo；视觉方案不足时先按 references/visual-methods/index.md 路由并读取完整命中方法 / fallback，提出可制作候选后再进 Mockup，Visual Methods 不新增 Gate；真实审阅并确认后才回接 FFmpeg；未实现或未观看保持 pending，参数或资源变化使旧验证失效。"
+  icon_small: "assets/icon.svg"
+  icon_large: "assets/icon.svg"
 policy:
-  products:
-  - chatgpt
-  - codex
-  - api
-  - atlas
   allow_implicit_invocation: true

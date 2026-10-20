@@ -30,6 +30,8 @@
 
 ## 分层渲染与局部返工
 
+v1.3.0 新管线在既有分层流程中接入 [Blender 局部合成与动态验证](visual-production.md)：模型先交方法，限定窗口使用同一工程渲染静态 Proof 和连续 demo，经当前版本审阅/确认后才在正式 output 帧区间回接。`render_blender_composition.py` 只允许前置关口通过的 scoped build；`finish_ffmpeg.py` 复用正式 manifest/authorization，将已确认合成段插回 clean-video 并使用已确认 mix。工程 receipt 和最终 FFmpeg receipt 均不代替真实 QA。
+
 1. 视频单元层：按已验证源切点生成规范化片段，统一画布、帧率、像素格式和时间基准。再按 render-manifest 生成无新增文字的 clean_video。用 xfade 时尤其要确认输入参数一致。
 2. 音频层：从源坐标提取原声，按成片坐标混音，生成 mix_audio。单独记录对白、环境音、音乐及人声分离的来源和处理参数；每条重要音轨同时写 `narrative_role` / `treatment_reason`，先判断它承担对白信息、环境连续性、情绪音乐、节奏提示还是有意静默，再决定保留、分离、衰减、替换或删除。
 3. 文字与交付层：在 clean_video 上烧录文字，合入 mix_audio，导出成片。黑场卡尽量保留无字底片，文字也在这一层添加。

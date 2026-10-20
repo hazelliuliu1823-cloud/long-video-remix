@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.8",
+  "schema_version": "1.9",
   "project_id": null,
   "version": 1,
   "goal": null,
@@ -108,7 +108,8 @@
     "edit_boundary_required_before_ready": true,
     "evidence_binding_required_before_ready": true,
     "execution_authorization_required_before_ready": true,
-    "audio_continuity_required_before_ready": true
+    "audio_continuity_required_before_ready": true,
+    "workflow_gate_control": "required_v1"
   },
   "narrative_direction_ref": null,
   "narrative_direction_status": "not_provided",
@@ -124,5 +125,21 @@
   "visual_gate_status": "not_started",
   "visual_mockup_ref": null,
   "visual_proof_ref": null,
-  "execution_package_policy": "plan_and_reference"
+  "execution_package_policy": "plan_and_reference",
+  "workflow_control": {
+    "schema_version": "1.0",
+    "confirmations": {},
+    "audio_choice": null,
+    "visual_spec_refs": [],
+    "visual_not_applicable_reason": null,
+    "render_output_ref": "render/final.mp4",
+    "qa_ref": "qa.json"
+  },
+  "visual_pipeline": {
+    "policy": "method_blender_demo_v1",
+    "methods_ref": "visual-methods.json",
+    "composition_plan_ref": "composition-plan.json",
+    "delivery_spec_ref": "delivery-spec.json",
+    "delivery_receipt_ref": "delivery-receipt.json"
+  }
 }

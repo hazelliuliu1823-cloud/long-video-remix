@@ -112,3 +112,25 @@ tests/test_independent_audio_dialogue.py 覆盖卡片对白、同源额外音轨
 - schema 1.7 新项目必须显式包含三个 Visual Gate 字段；`visual_gate_status` 允许 not_started / mockup_confirmed / awaiting_proof / proof_confirmed / not_applicable；ready_for_render 只接受 proof_confirmed / not_applicable。
 - proof_confirmed 时 selected mockup 与 executable proof 必须是路径和内容均不同的两个真实文件；二者与 `capability-map.json` 一起进入 `execution_reference_asset_refs`，capability-map 至少一个 available capability 具备 actual_tool + entrypoint，且 output_mapping 指向当前 visual_proof_ref。任一 reference / toolchain 文件变化继续触发既有 asset 指纹失效。
 - schema 1.6 旧项目没有 Visual Gate 字段时保持兼容行为；升级到 1.7 不要求重跑 Broad / Detail。
+
+
+## v1.3.0 方法、合成与动态验收
+
+- 方法须从叙事作用与真实原画选择；证据 ID、参数、失败情形、demo 验证点完整，不能只列效果名称。
+- 缺 method 确认时实际 Blender 入口阻断；工程保存可重开，关键帧末态保持，父子图层不漂移。
+- 动态 demo 覆盖接点两侧并保留相关声音；receipt 不自动生成 pass，实际 review 和当前版本确认缺一不可。
+- 修改资源、曲线、事件窗口或声音后旧工程 / review / 确认失效；未变独立工程保留。
+- FFmpeg 仅替换声明的输出窗口；帧数、FPS、尺寸、完整解码及音轨验证通过，仍需原 QA 与新增三项后才 deliver_complete。
+- 新 schema 删除 workflow_control 或 visual_pipeline 仍阻断；旧 1.8 项目保留原检查，显式 init 才采用新管线。
+- 合成 fixture 和模拟确认只测工程与 Gate；不得当作用户同意或真实影片审美验收。
+
+## v1.3.1 Visual Methods 方案生成与轻量交互
+
+- [ ] 仍只有原 A–G / 两次 Direct；Visual Methods 没有新增阶段、状态文件或 `VisualMethodsCompliance` Gate。
+- [ ] Broad 只记录真实视觉条件，Direct 1 只给表达语气；M01–M14 的正式选择发生在 Direct 2。
+- [ ] Visual Router 默认只做导航；命中方法后继续读取 method-library 的完整条目，不能把索引摘要当完整方法。
+- [ ] 视觉方案仍只有抽象词、常见默认处理或无法适配真实关键帧时，会触发 Visual Methods 兜底并形成可制作候选 / 推荐 / 失败信号。
+- [ ] 新模板 Project Method 使用 `PMxxx`，知识库 `M01–M14` / `F01–F09` 只出现在 refs；旧项目原 method ID 仍可通过。
+- [ ] `library_refs` / `fallback_refs` / `candidate_treatments` 是 schema 1.0 的可选元数据，不改变 1.3.0 项目兼容性。
+- [ ] 默认用户交互可收敛成 Design Lock 与 Production Proof Lock 两轮，但内部各 Gate 仍独立保存 digest 并在输入变化时 stale。
+- [ ] Blender Composition、静态 Proof、Dynamic Demo、最终 FFmpeg 回接和真实 QA 没有因轻量化被删除或自动豁免。

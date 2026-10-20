@@ -2,13 +2,13 @@
 
 **中文** | [English](README.en.md)
 
-**面向长视频二创、混剪和短视频剪辑的 AI video editing / Agent Skill。** 先把长视频变成**可检索、可回查的结构化素材层**，再通过两轮人机编导确定“讲什么 / 怎么讲”，最后把选段、视觉 Proof、音画边界和授权落实成可检查的执行包。
+**AI video editing Agent Skill for long video → shorts, highlights and remix edits.** 把长视频先变成可检索、可回查的结构化素材层，再通过两轮 human-in-the-loop Direct 确定“讲什么 / 怎么讲”，最后用 Visual Methods、Blender motion composition、FFmpeg rendering 与 QA 把确认后的方案做成可复现、可审计的成片执行。
 
-`Claude Code · Codex · FFmpeg / FFprobe · MCP-ready · Human-in-the-loop · Bilingual`
+`Claude Code · Codex · AI video editing · Long video to shorts · Video highlights · Blender · FFmpeg · Human-in-the-loop · Bilingual`
 
-**你可以用它做：** long video → short-form remix、剧情 / 综艺二创、访谈高光、课程 / 活动素材复用、跨视频检索与内容效果分析。
+**它和“一键 AI 剪辑”的区别：** 不要求模型一次黑箱看完整部长视频并直接出成片。Broad 负责低成本建立 searchable video index，Detail 只深挖真正命中的区域；Direct 1 / Direct 2 保留人的创意判断，Execute 再把已确认结果落实为真实视觉制作、时间轴、渲染与最终播放 QA。
 
-**它和“一键 AI 剪辑”的区别：** 不要求模型一次黑箱看完整部长视频并直接出成片。Broad 负责低成本建立全局索引，Detail 只深挖真正命中的区域；Direct 1 / Direct 2 保留人的创意判断，Execute 再把已确认结果变成可复现、可审计的剪辑执行。
+**v1.3.1 · Visual Methods + Blender Production。** 保留 v1.3.0 的 Blender 工程、连续 Dynamic Demo、Executable Proof、FFmpeg 回接与最终 QA；新增 Style System + Visual Router + M01–M14 + F01–F09 作为 Direct 2 的视觉知识底座。已有视觉想法时用于校正深化，没有成熟方案时主动提出可制作候选并兜底。采用“瘦加载，不瘦知识”：默认只读 Router，命中后读取完整方法；不新增阶段、Gate、schema 或 QA 层。入口见 [视觉制作](references/visual-production.md)、[Style System](references/style-system.md) 与 [Visual Router](references/visual-methods/index.md)。
 
 ![流程示意：长视频素材、可回查的结构化索引、人与 AI 的编导讨论，以及确认后的剪辑执行。](assets/workflow-overview.zh.png)
 
@@ -29,6 +29,19 @@
 请仅使用你有权使用的素材。
 
 版本更新、校验结果与安装方式见 [更新说明](RELEASE_NOTES.md) · [CHANGELOG](CHANGELOG.md) · [安装与更新](INSTALL.md) · [历史 QA](docs/qa/README.md)。
+
+## AI Video Editing Use Cases / 适用场景
+
+Long Video Remix 面向需要**长素材理解 + 人工创意判断 + 可执行视觉制作**的工作流，典型入口包括：
+
+- **Long video to shorts / short-form video editing**：从长节目、活动、课程或直播中制作短视频；
+- **Video highlights / highlight extraction**：访谈高光、赛事 / 活动重点、人物反应与剧情兑现；
+- **Drama / variety-show remix editing**：剧情、综艺、CP / 关系观察、跨场景主题混剪；
+- **Livestream clipping**：直播长素材的结构化检索、候选定位与切片；
+- **AI-assisted montage editing**：由人 / Director 决定叙事，AI 负责结构化、核证、执行与 QA；
+- **Blender motion composition**：对入选片段做可编辑的 2D 动态合成、连续 Demo 与 Proof；
+- **FFmpeg video editing / rendering**：把确认后的视觉、音轨和字幕回接完整成片并审计；
+- **Searchable video analysis**：把长视频转换为可复用的结构化数据层，用于检索、研究和内容效果分析。
 
 ## 快速开始
 
@@ -53,11 +66,11 @@ python3 scripts/compile_render_manifest.py PROJECT
 python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.json
 ```
 
-原始音画处理与实际渲染由当前环境的模型、视频 MCP、FFmpeg 或其他适配器完成。随包脚本提供授权记录准备、静态检查、时间轴编译和导出审计，渲染器按 [MCP 适配](references/mcp-adapter.md) 接入。
+既有 FFmpeg / MCP 渲染器继续负责普通剪辑、clean-video 与 mix。随包新增 Blender 局部合成和 FFmpeg 回接入口，按 [视觉制作](references/visual-production.md) 交付工程、动态 demo 与实际 review；证据、授权、编译和导出审计继续沿用原入口。
 
 本地原片抽帧优先用 `scripts/extract_frames.py`；MCP / 代理等按 [MCP 适配](references/mcp-adapter.md) 保留实测时间与源绑定。脚本的 `signals` 模式标出画面变化与有声区间，`strip` 模式输出逐帧条用于定切点。E 阶段的取证、切点与问题闭环见 [Detail 证据获取](references/detail-evidence.md)。
 
-**v1.2.4：** 延续 v1.2.3 的 Selected Range Verification，并把发布前约束补严：D2 把 planned range、boundary 与当时 safe windows 写进 `d2_selection_snapshot`；Execute Step 0 只能在这份快照允许范围内校准，越界即停并返回确认。Visual Proof 还必须由 `capability-map.json` 中 `output_mapping` 实际指向当前 proof 的可执行 capability 生成。schema 1.7 继续保持旧边界严格度，schema_version 非纯数字点号格式会直接报错。迁移见 [INSTALL.md](INSTALL.md)。
+**v1.3.1：** 在 v1.3.0 的 Blender 制作链上加入 Visual Methods 方案生成 / 兜底。新项目先用 `workflow_control.py init/status` 恢复关口；Direct 2 通过 Visual Router 按需读取 M01–M14 / F01–F09，项目实际方法使用 `PM001...`，再沿用 Mockup → Blender Composition → Proof + Dynamic Demo → FFmpeg 回接 → 最终 QA。没有新增阶段或 Gate。运行环境与迁移见 [INSTALL.md](INSTALL.md)。
 
 ## 常用提问示例
 
@@ -129,7 +142,7 @@ python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.js
 
 未就绪草稿只能显式用 `--planning` 编译为不可渲染清单。声音连续性检查保护对白与尾音，J/L-cut 或创作截尾必须有具体已确认依据。运行结果继续区分技术通过与最终听看验收。
 
-工程字段与迁移见 [执行完整性契约](references/execution-integrity.md)；可运行示例见 `examples/synthetic-ready`（合成记录，无真实媒体）。同一结构层还可用于 [内容效果分析](examples/content-performance-analysis.md)。
+工程字段与迁移见 [执行完整性契约](references/execution-integrity.md)。本仓库提供两个互补示例：`examples/synthetic-ready` 是 schema 1.8 的历史/兼容性证据夹具，用于 Structure、Detail、授权与 proof 的静态路径；它**未初始化 `workflow_control`**，直接运行 `workflow_control.py status` 会报未初始化，当前校验也可能给出兼容性提示。`examples/composition-smoke` 是 v1.3.x 主示例，会生成 schema 1.9 + workflow_control 项目，并演示 `PM001`、Visual Methods 引用、Blender Composition、动态 Demo 与关口阻断。二者都使用合成数据，不代表真实素材审美验收。同一结构层还可用于 [内容效果分析](examples/content-performance-analysis.md)。
 
 <details>
 <summary><strong>完整方法、Structure 表单、Direct 职责与工程说明</strong></summary>
@@ -334,11 +347,9 @@ Detail Structure 完成后，Director 第二次接收的是完整证据包：dee
 
 ```text
 long-video-remix/
-├── README.md
-├── README.en.md
+├── README.md / README.en.md
 ├── CHANGELOG.md
-├── INSTALL.md
-├── INSTALL.en.md
+├── INSTALL.md / INSTALL.en.md
 ├── RELEASE_NOTES.md
 ├── LICENSE
 ├── SHA256SUMS
@@ -346,54 +357,29 @@ long-video-remix/
 ├── agents/
 │   └── openai.yaml
 ├── assets/
-│   ├── icon.svg
 │   ├── capability-map-template.json
-│   ├── workflow-overview.zh.png
-│   ├── workflow-overview.en.png
-│   ├── frame-observation-template.csv
-│   ├── deep-observation-template.csv
-│   ├── edit-boundary-template.csv
-│   ├── detail-interval-template.csv
-│   ├── speaker-adjudication-template.csv
-│   ├── action-node-candidate-template.csv
-│   ├── structure-question-template.csv
-│   ├── content-map-template.md
-│   ├── brief-template.md
-│   ├── narrative-direction-template.md
+│   ├── composition-plan-template.json
+│   ├── delivery-spec-template.json
+│   ├── visual-methods-template.json
 │   ├── execution-plan-template.md
 │   ├── execution-reference-template.md
 │   ├── execution-handoff-template.md
-│   ├── keyframe-reference-template.json
-│   ├── structure-exception-template.json
-│   ├── editorial-plan-template.md
-│   ├── execution-authorization-template.json
 │   ├── project-template.json
-│   ├── benchmark-template.md
-│   └── timeline-template.json
-├── docs/
-│   └── qa/
-│       ├── README.md
-│       ├── v1.0.3-QA.md
-│       ├── v1.0.3-QA.json
-│       ├── v1.0.4-QA.md
-│       ├── v1.0.4-QA.json
-│       ├── v1.0.5-QA.md
-│       ├── v1.0.5-QA.json
-│       ├── v1.0.6-QA.md
-│       ├── v1.0.6-QA.json
-│       ├── v1.1.0-QA.md
-│       ├── v1.1.0-QA.json
-│       ├── v1.2.0-QA.md
-│       ├── v1.2.0-QA.json
-│       ├── v1.2.1-QA.md
-│       ├── v1.2.1-QA.json
-│       ├── v1.2.2-QA.md
-│       └── v1.2.2-QA.json
-├── examples/
-│   ├── content-performance-analysis.md
-│   └── synthetic-ready/
+│   ├── timeline-template.json
+│   └── …其余 Structure / Detail 模板与工作流图
 ├── references/
 │   ├── workflow.md
+│   ├── workflow-control.md
+│   ├── visual-production.md
+│   ├── style-system.md
+│   ├── visual-methods/
+│   │   ├── index.md
+│   │   ├── method-library.md
+│   │   ├── fallback-recipes.md
+│   │   ├── application.md
+│   │   ├── source-index.md
+│   │   ├── resources.md
+│   │   └── research-extension.md
 │   ├── detail-evidence.md
 │   ├── data-contracts.md
 │   ├── execution-integrity.md
@@ -405,27 +391,35 @@ long-video-remix/
 │   ├── structure-regression-matrix.md
 │   ├── mcp-adapter.md
 │   └── worked-example.md
+├── scripts/
+│   ├── workflow_control.py
+│   ├── visual_pipeline.py
+│   ├── blender_composite_worker.py
+│   ├── render_blender_composition.py
+│   ├── finish_ffmpeg.py
+│   ├── versioning.py
+│   ├── extract_frames.py
+│   ├── validate_project.py
+│   ├── detail_gates.py
+│   ├── compile_render_manifest.py
+│   ├── timeline_math.py
+│   ├── execution_integrity.py
+│   ├── prepare_execution_authorization.py
+│   ├── check_render_authorization.py
+│   └── audit_render.py
 ├── tests/
-│   ├── test_dialogue_continuity.py
-│   ├── test_execution_integrity.py
-│   ├── test_execution_package.py
-│   ├── test_independent_audio_dialogue.py
-│   ├── test_extract_frames.py
-│   ├── test_detail_gates.py
-│   ├── test_selected_range_verification.py
-│   ├── test_size_budget.py
-│   ├── test_checksums.py
-│   └── fixtures/ready-project.json
-└── scripts/
-    ├── extract_frames.py
-    ├── validate_project.py
-    ├── detail_gates.py
-    ├── compile_render_manifest.py
-    ├── timeline_math.py
-    ├── execution_integrity.py
-    ├── prepare_execution_authorization.py
-    ├── check_render_authorization.py
-    └── audit_render.py
+│   ├── test_visual_pipeline.py
+│   ├── test_workflow_control.py
+│   └── …其余 Detail / Execute / audio / checksum 回归测试
+├── examples/
+│   ├── composition-smoke/
+│   ├── synthetic-ready/
+│   └── content-performance-analysis.md
+└── docs/qa/
+    ├── README.md
+    ├── v1.0.3–v1.2.3 QA 记录
+    ├── v1.3.0-QA.md / .json / -tests.txt
+    └── v1.3.1-QA.md / .json / -tests.txt
 ```
 
 ## 最小使用方式

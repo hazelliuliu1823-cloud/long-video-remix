@@ -29,7 +29,9 @@
 - proof frame 文件 / 确认来源：
 - Gate 尚未关闭时的缺口与下一步：
 
-## 少量参考锁定的规则
+## Visual Methods 与少量参考锁定的规则
+
+Visual Methods 只提供方法与兜底，不把外部案例当当前素材证据；方案仍只有抽象形容词时先按 `references/visual-methods/index.md` 路由并读取完整命中方法，再做 Mockup。
 
 | mockup ID / 实际图片 / 原片 frame_id | style / layout ID、文字层级与画面关系 | 全片应用范围与规则 | 未提供项与原因 |
 |---|---|---|---|
@@ -41,6 +43,19 @@ Visual Gate 规则见本 Skill 的 `references/execution-package.md`：一两个
 - 仅作说明的箭头 / 标签，与实际进入视频的元素及计划引用：
 
 ## 画面规则
+
+### 制作方法与动态验证（schema 1.9）
+
+- visual-methods.json：visual_problem / Project Method（PMxxx）/ library_refs（M01–M14）/ fallback_refs（F01–F09）/ 必要候选比较 / 叙事作用 / 视觉重点 / 原画条件 / 处理选择及理由 / 参数 / 失败情形 / demo 检查点：
+- method 的当前确认来源与适用范围：
+- composition-plan.json：图层 / 父子关系 / 曲线 / 帧区间 / 前后接点设计：
+- 实际 .blend、依赖资源、连续 demo（包含接点两侧及相关声音）：
+- Blender 原生 readback、技术 receipt、逐项 review：
+- proof / composition 的实际展示与当前确认来源：
+- delivery-spec.json、FFmpeg 回接窗口、成片 QA 与可调范围：
+- 未实现或未观看项及受影响 Gate：
+
+实现与检查按 [视觉制作](../references/visual-production.md)；模板空白不表示通过。
 
 - 原片保留方式 / crop / scale / 位置（精确参数）：
 - 人物、动作、硬字幕需避让的范围 / 安全边距：
@@ -85,3 +100,7 @@ Visual Gate 规则见本 Skill 的 `references/execution-package.md`：一两个
 - 实际导出 / reference 对照尚未完成的项：
 
 在原 qa.json checks 中登记 ReferenceCompliance；没有实际观看记 not_tested。具体参数变更同步计划、机器授权与受影响时间轴 / 缓存，不在 Execute 中另行定义风格。
+
+## 阶段内关口与续接
+
+按 `references/workflow-control.md` 恢复 project.json 中的关口与已有确认。交接前运行 `workflow_control.py handoff`，保留声音策略、Mockup、Proof、两次 Direct 和后续核验的当前状态、确认来源、缺口及下一步；不要因换会话而重置或默认关闭。

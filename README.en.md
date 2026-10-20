@@ -2,13 +2,13 @@
 
 [中文](README.md) | **English**
 
-**An AI video editing / Agent Skill for long-video remix, short-form editing, and reusable video understanding.** Turn long-form footage into a **searchable, traceable structured layer**, use two human-in-the-loop Director passes to decide *what to tell* and *how to tell it*, then turn the confirmed selections, visual proof, audiovisual boundaries, and authorization into an inspectable execution package.
+**AI video editing Agent Skill for long video → shorts, highlights, and remix edits.** Turn long-form footage into a searchable, traceable video structure; use two human-in-the-loop Director passes to decide *what to tell* and *how to tell it*; then use Visual Methods, Blender motion composition, FFmpeg rendering, and playback QA to turn the confirmed plan into reproducible production.
 
-`Claude Code · Codex · FFmpeg / FFprobe · MCP-ready · Human-in-the-loop · Bilingual`
+`Claude Code · Codex · AI video editing · Long video to shorts · Video highlights · Blender · FFmpeg · Human-in-the-loop · Bilingual`
 
-**Use it for:** long video → short-form remix, drama / variety recuts, interview highlights, course / event footage reuse, cross-video retrieval, and content-performance analysis.
+**Why it is different from one-click AI editors:** it does not ask one model to black-box an entire long video and jump straight to a finished cut. Broad builds a low-cost searchable video index; Detail revisits only the regions that matter; Direct 1 and Direct 2 keep creative decisions human-controlled; Execute turns confirmed decisions into real visual production, timelines, renders, and final playback QA.
 
-**Why it is different from one-click AI editors:** it does not ask one model to black-box an entire long video and jump straight to a finished cut. Broad builds a low-cost global index; Detail revisits only the regions that matter; Direct 1 and Direct 2 keep creative decisions human-controlled; Execute turns confirmed decisions into reproducible, auditable editing work.
+**v1.3.1 — Visual Methods + Blender Production.** The v1.3.0 path remains intact: editable Blender compositions, continuous Dynamic Demos, Executable Proof, FFmpeg return, and final QA. A Direct 2 knowledge layer (Style System, Visual Router, M01–M14 methods, and F01–F09 fallbacks) can refine an existing idea or propose executable alternatives when the visual plan is still generic. Runtime loading stays lean: route first, then read the full matched method. No new workflow stage, gate, schema, or QA layer is introduced. See [visual production](references/visual-production.md), [Style System](references/style-system.md), and the [Visual Router](references/visual-methods/index.md).
 
 ![Workflow schematic: long video footage, a traceable structured index, editorial discussion with AI, and execution of the confirmed edit.](assets/workflow-overview.en.png)
 
@@ -29,6 +29,19 @@ The goal is to reduce repeated interpretation of source media, not to promise ze
 Use only media you have the right to use.
 
 See [Release notes](RELEASE_NOTES.md) · [CHANGELOG](CHANGELOG.md) · [Install / update](INSTALL.en.md) · [QA history](docs/qa/README.md) (Chinese).
+
+## AI Video Editing Use Cases
+
+Long Video Remix is designed for workflows that combine **long-form media understanding, human creative direction, and executable visual production**:
+
+- **Long video to shorts / short-form video editing** — turn long shows, events, courses, or livestreams into short videos;
+- **Video highlights / highlight extraction** — interviews, events, reactions, narrative payoffs, and high-value moments;
+- **Drama / variety-show remix editing** — narrative recuts, relationship-focused edits, and cross-scene thematic montage;
+- **Livestream clipping** — searchable structure, candidate discovery, and traceable clips from long streams;
+- **AI-assisted montage editing** — humans / Directors own the narrative while AI handles structure, verification, execution, and QA;
+- **Blender motion composition** — editable 2D motion treatment, continuous demos, and executable proof for selected clips;
+- **FFmpeg video editing / rendering** — return confirmed visual, audio, and text layers to the full film and audit the export;
+- **Searchable video analysis** — reuse the same structured layer for retrieval, research, and content-performance analysis.
 
 ## Quick start
 
@@ -53,11 +66,11 @@ python3 scripts/compile_render_manifest.py PROJECT
 python3 scripts/check_render_authorization.py PROJECT PROJECT/render-manifest.json
 ```
 
-Raw audiovisual processing and actual rendering are handled by the models, video MCP, FFmpeg, or other adapters available in the current environment. The bundled scripts prepare authorization records, run static checks, compile timelines, and audit exports. Connect a renderer through the [MCP adapter contract](references/mcp-adapter.md).
+Existing FFmpeg / MCP renderers continue to handle ordinary editing, clean-video, and audio mixing. v1.3.x also bundles a Blender local-composition path plus an FFmpeg return step: follow [visual production](references/visual-production.md) to create editable compositions, continuous Dynamic Demos, Executable Proof, and actual review records. Evidence, authorization, manifest compilation, and export auditing still use the existing contracts; external renderers are mapped through the [MCP adapter contract](references/mcp-adapter.md).
 
 Prefer `scripts/extract_frames.py` for local identity-mapped sources; for MCP / proxies, follow the [MCP adapter](references/mcp-adapter.md), retaining measured times and source bindings. The script's `signals` mode marks visual-change and sound segments; `strip` returns frame-by-frame edit-point strips. See [Detail evidence](references/detail-evidence.md) for evidence and question closure.
 
-**v1.2.4:** keeps v1.2.3 Selected Range Verification but hardens the release path. Direct 2 stores planned ranges, boundary refs, and the then-current safe windows in `d2_selection_snapshot`; Execute Step 0 may calibrate only inside that snapshot and must stop for confirmation if it would exceed it. Visual Proof must also be produced by an available capability whose `output_mapping` resolves to the current proof artifact. Schema 1.7 retains its previous strict boundary behavior, and malformed project schema versions fail instead of falling back to legacy rules. See [INSTALL.en.md](INSTALL.en.md).
+**v1.3.1:** keeps the v1.3.0 Blender production path and adds Visual Methods as a Direct 2 proposal/fallback layer. New projects restore gate state with `workflow_control.py init/status`; Direct 2 routes to the full matched M01–M14 / F01–F09 knowledge as needed, stores actual project methods as `PM001...`, then continues through Mockup → Blender Composition → Proof + Dynamic Demo → FFmpeg return → final QA. No workflow stage or gate is added. See [INSTALL.en.md](INSTALL.en.md).
 
 ## Common prompt examples
 
@@ -129,7 +142,7 @@ A fixed information baseline preserves facts, derived interpretations, and unkno
 
 Drafts that are not ready may only be compiled into non-renderable manifests by explicitly using `--planning`. Audio continuity checks protect dialogue and audio tails. J/L-cuts or creative truncation require specific confirmed grounds. Results continue to distinguish technical success from final listening and viewing approval.
 
-For engineering fields and migration, see the [Execution integrity contract](references/execution-integrity.md). A runnable example is available in `examples/synthetic-ready` (synthetic records, no real media). The same structured layer can also support [Content performance analysis](examples/content-performance-analysis.md) (Chinese).
+For engineering fields and migration, see the [Execution integrity contract](references/execution-integrity.md). Two complementary examples are included. `examples/synthetic-ready` is a schema 1.8 historical/compatibility fixture for the static Structure, Detail, authorization, and proof path; it **does not initialize `workflow_control`**, so `workflow_control.py status` is expected to report that initialization is missing and current validation may emit compatibility warnings. `examples/composition-smoke` is the v1.3.x production example: it generates a schema 1.9 project with workflow control and demonstrates `PM001`, Visual Methods references, Blender Composition, motion demo, and gate blocking. Both use synthetic data and are not real-footage aesthetic approval. The same structured layer can also support [Content performance analysis](examples/content-performance-analysis.md) (Chinese).
 
 <details>
 <summary><strong>Full method, Structure forms, Direct responsibilities, and engineering notes</strong></summary>
@@ -334,11 +347,9 @@ The repository currently provides timeline compilation and export-audit scripts 
 
 ```text
 long-video-remix/
-├── README.md
-├── README.en.md
+├── README.md / README.en.md
 ├── CHANGELOG.md
-├── INSTALL.md
-├── INSTALL.en.md
+├── INSTALL.md / INSTALL.en.md
 ├── RELEASE_NOTES.md
 ├── LICENSE
 ├── SHA256SUMS
@@ -346,54 +357,29 @@ long-video-remix/
 ├── agents/
 │   └── openai.yaml
 ├── assets/
-│   ├── icon.svg
 │   ├── capability-map-template.json
-│   ├── workflow-overview.zh.png
-│   ├── workflow-overview.en.png
-│   ├── frame-observation-template.csv
-│   ├── deep-observation-template.csv
-│   ├── edit-boundary-template.csv
-│   ├── detail-interval-template.csv
-│   ├── speaker-adjudication-template.csv
-│   ├── action-node-candidate-template.csv
-│   ├── structure-question-template.csv
-│   ├── content-map-template.md
-│   ├── brief-template.md
-│   ├── narrative-direction-template.md
+│   ├── composition-plan-template.json
+│   ├── delivery-spec-template.json
+│   ├── visual-methods-template.json
 │   ├── execution-plan-template.md
 │   ├── execution-reference-template.md
 │   ├── execution-handoff-template.md
-│   ├── keyframe-reference-template.json
-│   ├── structure-exception-template.json
-│   ├── editorial-plan-template.md
-│   ├── execution-authorization-template.json
 │   ├── project-template.json
-│   ├── benchmark-template.md
-│   └── timeline-template.json
-├── docs/
-│   └── qa/
-│       ├── README.md
-│       ├── v1.0.3-QA.md
-│       ├── v1.0.3-QA.json
-│       ├── v1.0.4-QA.md
-│       ├── v1.0.4-QA.json
-│       ├── v1.0.5-QA.md
-│       ├── v1.0.5-QA.json
-│       ├── v1.0.6-QA.md
-│       ├── v1.0.6-QA.json
-│       ├── v1.1.0-QA.md
-│       ├── v1.1.0-QA.json
-│       ├── v1.2.0-QA.md
-│       ├── v1.2.0-QA.json
-│       ├── v1.2.1-QA.md
-│       ├── v1.2.1-QA.json
-│       ├── v1.2.2-QA.md
-│       └── v1.2.2-QA.json
-├── examples/
-│   ├── content-performance-analysis.md
-│   └── synthetic-ready/
+│   ├── timeline-template.json
+│   └── …other Structure / Detail templates and workflow diagrams
 ├── references/
 │   ├── workflow.md
+│   ├── workflow-control.md
+│   ├── visual-production.md
+│   ├── style-system.md
+│   ├── visual-methods/
+│   │   ├── index.md
+│   │   ├── method-library.md
+│   │   ├── fallback-recipes.md
+│   │   ├── application.md
+│   │   ├── source-index.md
+│   │   ├── resources.md
+│   │   └── research-extension.md
 │   ├── detail-evidence.md
 │   ├── data-contracts.md
 │   ├── execution-integrity.md
@@ -405,27 +391,35 @@ long-video-remix/
 │   ├── structure-regression-matrix.md
 │   ├── mcp-adapter.md
 │   └── worked-example.md
+├── scripts/
+│   ├── workflow_control.py
+│   ├── visual_pipeline.py
+│   ├── blender_composite_worker.py
+│   ├── render_blender_composition.py
+│   ├── finish_ffmpeg.py
+│   ├── versioning.py
+│   ├── extract_frames.py
+│   ├── validate_project.py
+│   ├── detail_gates.py
+│   ├── compile_render_manifest.py
+│   ├── timeline_math.py
+│   ├── execution_integrity.py
+│   ├── prepare_execution_authorization.py
+│   ├── check_render_authorization.py
+│   └── audit_render.py
 ├── tests/
-│   ├── test_dialogue_continuity.py
-│   ├── test_execution_integrity.py
-│   ├── test_execution_package.py
-│   ├── test_independent_audio_dialogue.py
-│   ├── test_extract_frames.py
-│   ├── test_detail_gates.py
-│   ├── test_selected_range_verification.py
-│   ├── test_size_budget.py
-│   ├── test_checksums.py
-│   └── fixtures/ready-project.json
-└── scripts/
-    ├── extract_frames.py
-    ├── validate_project.py
-    ├── detail_gates.py
-    ├── compile_render_manifest.py
-    ├── timeline_math.py
-    ├── execution_integrity.py
-    ├── prepare_execution_authorization.py
-    ├── check_render_authorization.py
-    └── audit_render.py
+│   ├── test_visual_pipeline.py
+│   ├── test_workflow_control.py
+│   └── …other Detail / Execute / audio / checksum regression tests
+├── examples/
+│   ├── composition-smoke/
+│   ├── synthetic-ready/
+│   └── content-performance-analysis.md
+└── docs/qa/
+    ├── README.md
+    ├── v1.0.3–v1.2.3 QA records
+    ├── v1.3.0-QA.md / .json / -tests.txt
+    └── v1.3.1-QA.md / .json / -tests.txt
 ```
 
 ## Minimal usage

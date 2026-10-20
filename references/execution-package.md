@@ -50,6 +50,8 @@ Detail 不替 Director 生成最终方案，但交付必须在没有安装本 Sk
 
 ## 4. Director 2 的 Execution Package
 
+v1.3.1 沿用 v1.3.0 新制作管线，并在本节原交付之上加入 Visual Methods 方案生成 / 兜底： [制作方法、Blender 工程与动态验证](visual-production.md)：模型先说明每个关键处理的叙事作用、视觉问题、视觉重点、原画判断、选择依据、参数及失败情形；已有方案用 Visual Methods 校正，没有成熟方案时必须通过 Router → 完整方法 / fallback 提出可制作候选；工程与真实连续 demo 在正式 Execute 前确认。静态 Proof 和动态验证分别保留，不能用工程文件存在代替播放审阅。默认交付 `visual-methods.json`、`composition-plan.json`，以及工程 / 动态视频 / readback / receipt / review；没有执行能力时明确缺口并保持 Gate pending。
+
 D2 保留 Editorial Execution Plan，交付升级为 **Execution Package**。最小组成是 `execution-plan.md` + `execution-reference.md` + 采用素材 / Detail 证据与关键帧入口。`execution-authorization.json` 仍用于正式执行；若 D2 位于外部模型 / 会话，可先交确认的创意决定与允许校准范围，待 Execute Step 0 得到最终 source in/out 后再准备 / 确认机器授权。允许引用既有文件，无需复制素材库。
 
 | 组成 | 执行前写清的内容 |

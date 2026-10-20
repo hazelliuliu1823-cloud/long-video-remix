@@ -64,8 +64,11 @@
 | Source | 每个判断、画面、台词能否回查到正确版本 | 修复引用与时间映射 |
 | Mobile | 手机上是否看清、字幕遮挡和裁切是否合适 | 以实际手机检查记录为准 |
 | ReferenceCompliance | 成片与 mockup 风格是否匹配（字体 / 字重、层级、颜色、版式位置与比例、裁切与框体），全片是否保持同一风格 | 按 reference 修正风格偏差；不要求逐帧或逐像素对应 |
+| CompositionCompliance | schema 1.9：采用的 Blender 工程、参数和素材是否与确认 demo 一致；全片使用的是否为同版输出 | 按 receipt / scene / demo 指纹定位受影响合成，保留其余部分 |
+| MotionContinuity | schema 1.9：推近/移动的起止、末尾状态、前后镜头接点是否自然；有无复位、跳切或图层漂移 | 正常速度看完整接点两侧，修改对应工程后重做动态验证 |
+| DeliveryTechnical | schema 1.9：当前 FFmpeg 输出的帧数、规格、音轨和完整解码是否通过，是否绑定当前 manifest | 对实际成片重测；技术成功不代替视觉/听感验收 |
 
-qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_questions、rough_cut_verified、final_playback_verified。checks 每项记录 name、status、method、evidence、finding、action。status 只用 pass、fail、not_tested、not_applicable。
+qa.json 包含 project_id、artifact_version、checks、blocking_issues、open_questions、rough_cut_verified、final_playback_verified。启用 workflow_control 时另存当前成片的 artifact_sha256，并在 project.workflow_control.render_output_ref 登记输出文件；最终交付检查会拒绝与当前成片不符的旧 QA。checks 每项记录 name、status、method、evidence、finding、action。status 只用 pass、fail、not_tested、not_applicable。
 
 无真实导出文件时 Audio 的计划逻辑可以检查，但实际听感必须记 not_tested；Mobile 未实看也记 not_tested；ReferenceCompliance 未实际对照查看最终导出时同样记 not_tested，静态规格检查另记。不能为了完成清单填全部 pass。
 

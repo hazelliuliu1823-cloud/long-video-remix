@@ -1,11 +1,11 @@
 ---
 name: long-video-remix
-description: 从三到五小时或多集影视、活动视频中建立可回查的画面与原声索引，先输出正式的文字化 Structured Observation Layer 与 Content Map；由人工或独立 Director 确定 Narrative Direction 后回原素材做定向高密度核验，再由 Director 基于 Detail 证据形成 Execution Package（执行计划与制作参考），最后落实为可执行剪辑时间轴、渲染清单与成片核查。用于长视频结构化、九宫格分析、逐抽样帧记录、定向精查、同集重组、跨场景主题混剪、剪辑执行稿、分层渲染、成片返工、导出核查及跨模型交接；不把两次创意决策作为默认自动职责。 Use for long video analysis, remix and highlight reel planning, traceable source indexing, timeline compilation, and execution handoff to ffmpeg or video MCP. Both directing decisions remain with a human or Director.
+description: 从三到五小时或多集影视、活动视频中建立可回查的画面与原声索引，先输出正式的文字化 Structured Observation Layer 与 Content Map；由人工或独立 Director 确定 Narrative Direction 后回原素材做定向高密度核验，再由 Director 基于 Detail 证据形成 Execution Package（执行计划与制作参考），最后落实为可执行剪辑时间轴、渲染清单与成片核查。用于长视频结构化、九宫格分析、逐抽样帧记录、定向精查、同集重组、跨场景主题混剪、剪辑执行稿、分层渲染、成片返工、导出核查及跨模型交接；不把两次创意决策作为默认自动职责。 AI video editing Agent Skill for long-video-to-shorts, highlight extraction, remix planning, traceable source indexing, Visual Methods, Blender motion composition, FFmpeg execution and QA. Both directing decisions remain with a human or Director.
 ---
 
 # 长视频结构化与混剪执行
 
-公开仓库版本 v1.2.4 · 2026年10月17日
+工作流、视觉方法与合成工程 v1.3.1 · 2026年10月20日
 
 本 Skill 的核心不是“一句话自动生成成片”，而是先把视频、图像、对白与上下文等高成本多模态信息压缩成有来源、可检索、可回查的**紧凑结构化工作层**，让后续人工、Director 或其他 Skill 尽量基于表格 / 文本继续工作；创意方案确认后，再只把命中的区域压回原素材做高密度核验，并落实成真正可执行的剪辑方案。
 
@@ -58,7 +58,7 @@ Render / QA
 - **先记录基础事实，再做派生判断。** 画面事实、动作、硬字幕、原声要点、与前帧变化、背景、情绪线索、主题判定、confidence / 证据依据、问题与未验证项必须保留；意象标签、情绪解释、叙事功能和剪辑价值只能建立在这些基础记录之上。
 - **第一次 Direct 的 Narrative Direction 是创意意图，不等于素材已经证明。** Detail Structure 必须围绕其 narrative spine、candidate regions 和 verification questions 重新回到相关原片核对。
 - 如果第二轮证据与 narrative direction 冲突，报告冲突、替代素材和缺口；默认返回 Direct 1 调整主线，不通过剪辑技巧强行证明原方案。
-- **第二次 Direct 必须发生在 Detail Structure 之后。** 它基于已核实的 Deep observations / verified units / protected ranges 与真实关键帧形成 Execution Package（计划 + 制作参考）；Execute 默认只落实该执行包，不把素材证据层直接等同于最终剪辑方案，也不擅自重写已确认的核心表达。
+- **D2 在 Detail 后完成。** 依据核实证据与真实关键帧形成计划和 Project Method。已有视觉方案时用 [Style System](references/style-system.md) / [Visual Router](references/visual-methods/index.md) 校正；仍是抽象词、默认处理或不适配真实画面时，读取命中方法完整条目，必要时用 fallback 形成可制作候选。Blender 工程、动态 demo 与实看确认仍按 [视觉制作](references/visual-production.md)；Visual Methods 不新增阶段 / Gate / QA。Execute 不重写主线。
 - 同一集优先；同一事件、对白指向和关系阶段优先级高于服装相似。跨集须有明确主题联系，并让观众辨认时空变化。
 - 删段不删句，删重复不删因果。必要问答、否定、条件、迟疑、回应和动作后果共同决定最短保留范围。
 - 默认不改写原声、不拼接词语制造新对白、不借用异场反应冒充即时回应。明确要求架空或恶搞时另行约定，不沿用剧情准确混剪的事实标签。
@@ -69,7 +69,7 @@ Render / QA
 
 1. 读取 [工作流程](references/workflow.md) 和 [数据契约](references/data-contracts.md)，建立任务目录与 `project.json`。
 2. 读取 [MCP 适配](references/mcp-adapter.md)，发现真实能力、记录映射并完成小范围探测。只使用获授权的素材访问与处理范围。
-3. 检查已有产物。按源文件版本和配置恢复进度；不因切换模型重复扫描完整视频。
+3. 每轮续接先按 [关口与续接控制](references/workflow-control.md) 恢复项目：新制作管线首次 `visual_pipeline.py init`，以后 `workflow_control.py status`；读不到状态就说明缺口。沿用有效确认，主动提示 pending/stale，不因换模型重扫或清空关口。
 4. 如果当前任务只要求 Structure，可在 Structured Observation Layer + Content Map 完成后正式交付，不必进入 Direct 或 Execute。
 5. 如果要继续混剪，先读取已有 Narrative Direction；没有时，把 Broad Structure 的正式结构化表单、scene / segment observations、Content Map、情绪 / 关系线索和 usable bounds 交给用户或独立研究 / 编导环境，结合外部资料与人工判断形成第一次 Direct 输出。Detail Structure 完成后，固定交付真实关键帧与 `execution-handoff.md`，在 handoff 内写入下游 Execution Package 的完整要求，再交给可位于其他环境的 Director 2。
 6. 从当前可验证阶段开始，按下面的顺序推进。缺少某种观察能力时降级输出，并明确标签。
@@ -126,23 +126,25 @@ Render / QA
 - 抽帧密度、批次、Content Map、第二轮定向回查和恢复：读取 [工作流程](references/workflow.md)；E 阶段取证、切点与问题闭环另读 [Detail 证据获取](references/detail-evidence.md)。
 - 时间码、记录字段、Structured Observation Layer / Content Map / 两次 Direct 与时间轴关系：读取 [数据契约](references/data-contracts.md)。
 - 换模型或 MCP、能力缺失、调用失败：读取 [MCP 适配](references/mcp-adapter.md)。
+- D2 方法、Blender 工程、动态验证与 FFmpeg 回接：读取 [视觉制作](references/visual-production.md)。新模板 schema 1.9 的方法/合成确认、成片 QA 均由入口检查；不通过降 schema 或删除 policy 规避。
 - 在已确认 Narrative Direction / execution plan 下保住完整对白、连续性与正确重组关系：读取 [重组与剪辑规则](references/montage-rules.md)。
 - 首次出片或返工：读取 [渲染与工程检查](references/render-engineering.md)，按文字校准、时间轴编译、分层渲染、解码实测、全接点检查顺序执行。
 - 交付前、移交另一模型：读取 [检查与交接](references/qa-handoff.md)。
-- Structure 字段无法取得、Detail 交接、Direct 2 完整输出或视觉风格核查：读取 [异常与执行包契约](references/execution-package.md)；固定输出字段，一两个 reference 用于锁定整体风格，不要求逐项配对。
+- Structure 异常、Detail 交接与 Direct 2 完整输出：读取 [异常与执行包契约](references/execution-package.md)；视觉方案 / 兜底按 [Style System](references/style-system.md) → [Visual Router](references/visual-methods/index.md) → 命中完整方法 / fallback。少量 reference 锁整体风格，不要求逐项配对。
 - 准备 Direct 2 执行记录、进入正式编译或接入渲染器：读取 [执行完整性契约](references/execution-integrity.md)，将采用证据与源版本绑定，明确 adopted_utterance_refs 和源音轨 review_refs；逐源音轨核对白保护及完整取段核听，包括卡片、未关联与异源仅音频。关联视频时另核同步；独立声音按成片放置核完整对白、政策原因及 track 级例外。continuity_type 不关闭保留对白政策；指纹计算不等于实际观察或人工确认。
+- 续接、跨主体/模型、阶段内确认、依赖动作与交付：读取 [关口与续接控制](references/workflow-control.md)，沿用原阶段与审批边界。
 - 每次改版或重新封装后：读取 [核心能力回归检查](references/regression-checklist.md) 与 [Structure 能力对照矩阵](references/structure-regression-matrix.md)，确认 Board/Broad / Detail / Direct / Execute 主线和基础信息层没有被弱化。
 - 需要演示两轮 Structure、外部 Direct 和 Execute 的衔接：读取 [执行示例](references/worked-example.md)。示例均为虚构，不是当前素材。
 
 复制 `assets/` 中对应模板建立配置与各表：`project-template.json`、`frame-observation`、`action-node-candidate`（4fps 局部窗口）、`structure-question`、`detail-interval`、`deep-observation`、`speaker-adjudication`（本轮没有歧义也保留带表头的文件）与 `timeline-template.json`。Direct 用 `brief`、`narrative-direction`、`execution-plan` 模板（`editorial-plan` 为兼容模板，也可接入用户已有编导文档）；Detail 交接用 `keyframe-reference` 与 `execution-handoff`；Direct 2 另用 `execution-reference`；异常按 `structure-exception` 模板逐项保存为 JSONL；效率测量用 `benchmark-template.md`。
 
-具备 Python 时运行 `scripts/validate_project.py 项目目录` 检查来源、时间和引用；不具备 Python 时按数据契约逐项核查，并写明为人工或模型静态检查。脚本不判断剧情真伪或观看流畅度。
+依赖动作前运行 `scripts/workflow_control.py guard 项目目录 --action 动作`；新模板默认启用，声音策略、Mockup、Proof 和两次 Direct 的缺项/失效会主动列出，授权草稿与正式渲染入口继续强制检查。再运行 `scripts/validate_project.py 项目目录` 核查证据。不具备 Python 时按同表静态检查并标未运行，不声称宿主已强制拦截。
 
 进入实际渲染时，用 `scripts/compile_render_manifest.py 项目目录` 编译成片坐标与缓存键，再按 [渲染与工程检查](references/render-engineering.md) 使用 `scripts/audit_render.py` 实测导出并生成接点对照表。前者需要 Python；后者需要 Python 和 FFmpeg，拼图额外需要 Pillow。缺少能力就列明未验证项，不填通过。
 
 ## 每次工作结束
 
-先交付已完成产物，再用短文字说明：本次处理范围、当前处于 Broad Structure / Direct / Detail Structure / Execute 的哪一层、发现、未验证项和下一步。更新 `handoff.md` 及 `coverage.json`。长任务同时记录已完成区间、未完成区间和可恢复入口。
+先交已完成产物，简述当前大阶段、范围、发现与下一步；有待确认/失效关口时主动展示方案或缺口，无须用户追问。运行 `workflow_control.py handoff` 将所有关口、来源与下一步写入现有 `handoff.md`（或正式 execution handoff），并更新 coverage。partial 交接不算执行许可；接收方先恢复状态。
 
 时间标签必须随交接一起保存：源版本、`time_mapping`、所有关键 `source_id + source_ms / range`、以及已经编译出的 assembly / output frame 对应关系。任何下游工件若失去源时间回查能力，视为不可交接。
 

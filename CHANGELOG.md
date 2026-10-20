@@ -1,6 +1,31 @@
 # Changelog
 
-Public release packaging targets v1.2.4. Earlier entries are retained as development history; their dates do not imply published GitHub Releases or tags.
+## v1.3.1 · 2026-10-20 — Visual Methods 方案生成 / 兜底与轻量交互
+
+- 以 v1.3.0 为主干，**完整保留 Blender 工程、静态 Proof、连续 Dynamic Demo、FFmpeg 回接和最终播放 QA**；schema 仍为 1.9，不改授权与 Composition 契约。
+- 集成 Visual Methods 1.5.1 的 Style System、Visual Router、M01–M14 完整方法库、F01–F09 fallback，以及研究 / 资源说明。采用“瘦加载，不瘦知识”：默认读 Router，命中后读取完整方法。
+- Visual Methods 正式承担 Direct 2 的方案生成 / 兜底：已有想法时校正深化；只有抽象形容词、常见默认处理、真实画面无法落地或用户要求更强视觉时，主动提出可制作候选、推荐理由、工具可执行性和失败信号。
+- 不新增阶段、Gate 或独立 QA；Visual Methods 的检查点映射到现有 Demo Review 与最终 QA。Broad 不选方法，Direct 1 只定语气，Detail 提供真实画面条件，Direct 2 才正式选择。
+- 新模板将项目实际方法 ID 改为 `PM001...`，知识库 `M01–M14` / `F01–F09` 通过可选 `library_refs` / `fallback_refs` 引用，避免 ID 冲突；旧项目 method ID 保持兼容。
+- 默认用户交互收敛成两个 confirmation bundle：D2 Design Lock 与 Production Proof Lock。内部 Gate 仍独立保存 digest / stale 状态，确认束不扩大用户授权。
+- Public packaging refresh: README 首屏与双语 Use Cases 强化 `AI video editing`、`long video to shorts`、`video highlights`、`Blender`、`FFmpeg` 等用户检索入口；Release / install / Agent metadata 同步当前 v1.3.1 能力定位，不改变工作流或 schema。
+
+## v1.3.0 · 2026-10-18 — 制作方法、Blender 工程与动态确认
+
+- 基于 v1.2.4 完整底稿，承接 v1.2.5 续接关口；A–G、两次 Direct、正式 CSV 与原授权 schema 保持不变。
+- 新项目 schema 1.9：叙事作用/视觉重点/处理依据/参数与失败情形形成可确认方法。
+- 新增固定 2D Blender 适配器（图层、父子组、曲线与末尾状态）和原生 .blend 工程路径，实际渲染后交连续 demo、readback、receipt、静态 proof 与待填 review。
+- method / composition 关口接入构建、授权草稿、正式编译与 FFmpeg 回接；参数、源范围、工程或资源变化会使旧验证失效。
+- 复杂窗口回接既有 FFmpeg clean-video / mix，保留原 QA，并要求 CompositionCompliance、MotionContinuity、DeliveryTechnical。输出成功不自动通过审美、用户确认或最终 QA。
+- 两种完整源码包使用同一核心；实际验证与限制见 `docs/qa/v1.3.0-QA.md`。
+
+## v1.2.5 · 2026-10-18 — 阶段内关口与 Chat 续接
+
+- 大阶段、两次 Direct、正式 CSV 和 project schema 1.8 保持不变。新增统一 workflow_control 状态，存入原 project.json。
+- 同一项目续接先恢复有效/待确认/失效关口；声音策略、Mockup、Proof、计划与证据绑定，变动只重开受影响记录。
+- 授权草稿与 ready_for_render 验证接入强制检查；跨大块推进要通过对应出口；partial handoff 保留全部未过关口。
+- 新模板默认启用；旧项目由 init 补控制记录，不重扫、不自动确认。QA 绑定实际成片指纹。
+- Chat 外层提供项目说明与完整文字参考作为持续上下文；不宣称插件文件能够强制宿主每轮加载。
 
 
 

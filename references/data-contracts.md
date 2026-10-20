@@ -26,6 +26,10 @@
 | structure-exceptions.jsonl | 无法满足的 Structure 字段 / 产物声明；status、reason、impact、downstream_handling 与原字段分开保存 |
 | keyframe-references.json | Detail 的真实关键帧清单与可读图片入口；source time、素材节点、用途和异常 |
 | execution-handoff.md | E 阶段独立交接；主题、Scope Lock、证据、保护范围、关键帧、capability-map 中相关工具链及下游完整 Execution Package 要求 |
+| visual-methods.json | schema 1.0；D2 的 Project Method：叙事作用、visual_problem、视觉重点、原画条件、处理依据、参数、失败情形及动态验证点；v1.3.1 可选 `library_refs` / `fallback_refs` / `candidate_treatments` 记录 Visual Methods 的方案生成与兜底来源，不新增 Gate |
+| composition-plan.json | schema 1.0；局部 Blender 工程、图层/关联/曲线、事件范围、接点、七类交付路径 |
+| compositions/… | 实际 .blend、visual / demo MP4、proof PNG、render receipt、原生 readback 和逐项 review；新版本使用新路径 |
+| delivery-spec.json / delivery-receipt.json | schema 1.0；FFmpeg clean-video / mix / 字幕 / 输出规格，以及真实最终输出字节和技术检查 |
 | execution-reference.md | D2 的制作参考；Visual Gate、Toolchain Continuity、具体样式、声音 / 转场规则、少量 reference 的应用规则、资源与 QA |
 | coverage.json | 数组；按素材、区间、模态记录覆盖状态 |
 | overview.md | 带 scene_id 的 source-order 全片导航，不替代证据 |
@@ -47,7 +51,7 @@
 
 ## 共同约定
 
-- 各类文件的 schema 分开管理：`project.json` 当前使用 `schema_version=1.8`；`timeline.json` 使用 `schema_version=1.4`；`render-manifest.json` 使用 `schema_version=1.4`；`execution-authorization.json` 使用 `schema_version=1.0`。证据 JSONL / CSV 按本文件字段契约管理，不把 project / timeline / manifest 的版本号混用。原有 1.0 / 1.1 证据记录保留，不为升级重写内容。UTF-8；JSONL 每行独立合法 JSON；未知值用 null，不用猜测值占位。
+- 各类文件的 schema 分开管理：`project.json` 新项目使用 `schema_version=1.9`（旧 1.8 保持兼容）；`timeline.json` 使用 `schema_version=1.4`；`render-manifest.json` 使用 `schema_version=1.4`；`execution-authorization.json` 使用 `schema_version=1.0`。证据 JSONL / CSV 按本文件字段契约管理，不把 project / timeline / manifest 的版本号混用。原有 1.0 / 1.1 证据记录保留，不为升级重写内容。UTF-8；JSONL 每行独立合法 JSON；未知值用 null，不用猜测值占位。
 - source_id、frame_id、utterance_id、scene_id、unit_id、candidate_id、event_id、review_id 各自全项目唯一；一旦被引用不重新编号。
 - 所有源区间使用整数 start_ms、end_ms，左闭右开，即包含开始、不包含结束。必须满足 0 ≤ start_ms < end_ms ≤ source.duration_ms。单帧用 timestamp_ms，必须小于 duration_ms。
 - **`source_id + source ms/range` 是全流程证据层的 canonical time tag。** `display_timecode`、九宫格位置、抽样序号、字幕 / ASR 文件时间和代理时间只是派生信息；若使用代理、分轨或外部字幕，必须通过 `source.time_mapping` 映射回 canonical source time。进入 Execute 后新增 assembly / output frame，但不得覆盖源时间。任何引用如果只有“第几秒”却没有 source_id 或坐标空间，不视为稳定定位。

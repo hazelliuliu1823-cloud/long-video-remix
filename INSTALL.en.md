@@ -1,4 +1,9 @@
-# Install and upgrade · v1.2.4
+# Install and upgrade · v1.3.1
+
+Long Video Remix is an **AI video editing Agent Skill for Claude Code and Codex**, covering long video to shorts, video highlights, Visual Methods, Blender motion composition, FFmpeg rendering, and QA.
+
+Schema 1.9 and the v1.3.0 Blender motion-proof checkpoints remain unchanged. v1.3.1 adds a Direct 2 Style System / Visual Router / method-and-fallback knowledge layer without adding a stage, gate, schema, or QA layer. Read [visual production](references/visual-production.md); install Blender separately for native renders, and FFmpeg/ffprobe for video validation and final return. No bundled Blender/MCP service is implicitly installed. Adopt on an existing project with `python scripts/visual_pipeline.py init PROJECT`; existing evidence and decisions are preserved, never auto-approved. Actual platform validation is listed in [release QA](docs/qa/v1.3.1-QA.md).
+
 
 Keep the complete `long-video-remix/` directory together: `SKILL.md`, `references/`, `assets/`, `scripts/`, `tests/`, and `agents/`. Copying `SKILL.md` alone drops the contracts and validation tools.
 
@@ -16,10 +21,10 @@ git clone https://github.com/hazelliuliu1823-cloud/long-video-remix.git ~/.agent
 
 You may also place the extracted `long-video-remix` folder under `~/.claude/skills/` or `~/.agents/skills/`. Keep source media and project data outside the skill directory.
 
-After the `v1.2.4` tag is published, a pinned install can use:
+After the `v1.3.1` tag is published, a pinned install can use:
 
 ```sh
-git clone --branch v1.2.4 --depth 1 https://github.com/hazelliuliu1823-cloud/long-video-remix.git TARGET
+git clone --branch v1.3.1 --depth 1 https://github.com/hazelliuliu1823-cloud/long-video-remix.git TARGET
 ```
 
 ## Runtime
@@ -27,7 +32,7 @@ git clone --branch v1.2.4 --depth 1 https://github.com/hazelliuliu1823-cloud/lon
 - Validation, authorization, manifest compilation, and regression tests: Python 3.9+ standard library.
 - `extract_frames.py` and export auditing: FFmpeg / ffprobe; contact-sheet generation additionally uses Pillow.
 - Models, video MCPs, and renderers are discovered from the current environment and recorded in `capability-map.json`; the package does not download large models or media.
-- v1.2.4 release regression was verified with Python 3.13.5 + FFmpeg 7.1.5 + Pillow 12.3.0; all 216 discovered tests passed. Extraction tests still skip when FFmpeg / Pillow are unavailable.
+- The current v1.3.1 regression environment is Python 3.13.5 + FFmpeg 7.1.5 + Pillow 12.3.0. It discovers 265 tests: 263 pass, 2 are conditionally skipped because `BLENDER_EXECUTABLE` is not configured in this run, and 0 fail. v1.3.0 QA retains the earlier actual Blender/FFmpeg synthetic-render evidence; v1.3.1 does not present that historical evidence as rerun. Integration tests skip when their FFmpeg / Pillow / Blender dependency is unavailable.
 
 ## Verify the installation
 
